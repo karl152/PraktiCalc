@@ -1295,7 +1295,7 @@ def paste() :
     try:
         DezimalZahl = int(cp)
     except:
-        messagebox.showerror("Dude.", "Please enter a real number!")
+        messagebox.showerror("Error", "Please enter a real number!")
     DezimalAnzeige.config(text=str(DezimalZahl))
     BinaerZahl = bin(DezimalZahl)[2:]
     HexadezimalZahl = hex(DezimalZahl)
@@ -1431,3 +1431,4 @@ Fenster.bind("<Key>", Tastendruck)
 Mehr.place(x=0, y=225, height=30, width=40)
 # Checkb.place(x=200, y=200)
 Fenster.mainloop()
+
