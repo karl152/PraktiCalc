@@ -922,10 +922,6 @@ def CustomInfo() :
     CustomInfoExit.place(x=400, y=200)
     ExtendedInfoFrame.place(x=100, y=55, height=125, width=357)
     ExtInfoText1.place(x=5, y=0)
-    # ExtInfoText2.place(x=5, y=25)
-    # ExtInfoText3.place(x=5, y=45)
-    # ExtInfoText4.place(x=5, y=65)
-    # ExtInfoText5.place(x=5, y=85)
 def CustomMsgBoxOn() :
     global CustomMsgBox, CustomMsgBoxToggle
     CustomMsgBox = 1
