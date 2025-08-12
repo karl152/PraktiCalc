@@ -824,17 +824,17 @@ def Tastendruck(event):
 def Settings() :
     global Status, SettingsWindow, StatusBar, StatusBarToggle, CustomMsgBox, CustomMsgBoxToggle, DarkMode, DarkModeToggle
     SettingsWindow = Tk()
-    SettingsWindow.title("Einstellungen")
+    SettingsWindow.title("Settings")
     if DarkMode == 1 :
         SettingsWindow.config(width=250, height=152, bg="black")
-        SettingsTitle = Label(SettingsWindow, text="Einstellungen", font=("Liberation Sans", 12), bg="black", fg="white")
+        SettingsTitle = Label(SettingsWindow, text="Settings", font=("Liberation Sans", 12), bg="black", fg="white")
         SettingsTitleDecoration = Label(SettingsWindow, text="▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀", font=("Courier New", 12), bg="black", fg="white")
-        StatusBarSettingDesc = Label(SettingsWindow, text="Statusleiste", bg="black", fg="white")
+        StatusBarSettingDesc = Label(SettingsWindow, text="Status Bar", bg="black", fg="white")
         if StatusBar == 0 :
             StatusBarToggle = Button(SettingsWindow, text="☐", command=StatusBarOn, bg="black", fg="white")
         if StatusBar == 1 :
             StatusBarToggle = Button(SettingsWindow, text="🗹", command=StatusBarOff, bg="black", fg="white")
-        CustomStatusBarDesc = Label(SettingsWindow, text="Alternative Messageboxen", bg="black", fg="white")
+        CustomStatusBarDesc = Label(SettingsWindow, text="Alternative Messageboxes", bg="black", fg="white")
         if CustomMsgBox == 0 :
             CustomMsgBoxToggle = Button(SettingsWindow, text="☐", command=CustomMsgBoxOn, bg="black", fg="white")
         if CustomMsgBox == 1 :
@@ -843,14 +843,14 @@ def Settings() :
         DarkModeDesc = Label(SettingsWindow, text="Dark Mode", bg="black", fg="white")
     if DarkMode == 0 :
         SettingsWindow.config(width=250, height=152)
-        SettingsTitle = Label(SettingsWindow, text="Einstellungen", font=("Liberation Sans", 12))
+        SettingsTitle = Label(SettingsWindow, text="Settings", font=("Liberation Sans", 12))
         SettingsTitleDecoration = Label(SettingsWindow, text="▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀", font=("Courier New", 12))
-        StatusBarSettingDesc = Label(SettingsWindow, text="Statusleiste")
+        StatusBarSettingDesc = Label(SettingsWindow, text="Status Bar")
         if StatusBar == 0 :
             StatusBarToggle = Button(SettingsWindow, text="☐", command=StatusBarOn)
         if StatusBar == 1 :
             StatusBarToggle = Button(SettingsWindow, text="🗹", command=StatusBarOff)
-        CustomStatusBarDesc = Label(SettingsWindow, text="Alternative Messageboxen")
+        CustomStatusBarDesc = Label(SettingsWindow, text="Alternative Messageboxes")
         if CustomMsgBox == 0 :
             CustomMsgBoxToggle = Button(SettingsWindow, text="☐", command=CustomMsgBoxOn)
         if CustomMsgBox == 1 :
@@ -868,7 +868,7 @@ def Settings() :
 def StatusBarOn() :
     global Status, StatusBar, StatusBarToggle, StatusDecoration, Fenster
     Fenster.config(width=256, height=330)
-    Status.config(text="Bereit")
+    Status.config(text="Ready")
     StatusBar = 1
     StatusBarToggle.config(text="🗹", command=StatusBarOff)
     StatusDecoration.config(text="__________________________________________________")
@@ -884,15 +884,15 @@ def StatusBarOff() :
 def CustomDiv0() :
     global Div0Error
     Div0Error = Tk()
-    Div0Error.title("Fehler")
+    Div0Error.title("Error")
     if DarkMode == 1 :
         Div0Error.config(width=500, height=250, bg="black")
-        Div0Desc = Label(Div0Error, text="Division durch 0", font=("Liberation Sans", 15), bg="black", fg="white")
+        Div0Desc = Label(Div0Error, text="Division by 0", font=("Liberation Sans", 15), bg="black", fg="white")
         Div0Symbol = Label(Div0Error, text="🚫", font=("Segoe UI Symbol", 52), bg="black", fg="white")
         Div0Exit = Button(Div0Error, text="     OK     ", command=closeCustomDiv0, bg="black", fg="white")
     if DarkMode == 0 :
         Div0Error.config(width=500, height=250)
-        Div0Desc = Label(Div0Error, text="Division durch 0", font=("Liberation Sans", 15))
+        Div0Desc = Label(Div0Error, text="Division by 0", font=("Liberation Sans", 15))
         Div0Symbol = Label(Div0Error, text="🚫", font=("Segoe UI Symbol", 52))
         Div0Exit = Button(Div0Error, text="     OK     ", command=closeCustomDiv0)
     Div0Desc.place(x=150, y=100)
@@ -1140,10 +1140,10 @@ def updateDisplay() :
 def History() :
     global HistoryX, History1, History2, History3, History4, History5, History6, History7, History8, History9, History10, History11, History12, History13, History14, History15
     HistoryX = Tk()
-    HistoryX.title("Verlauf")
+    HistoryX.title("History")
     if DarkMode == 1 :
         HistoryX.config(height=400, width=256, bg="black")
-        HistoryLabel = Label(HistoryX, text="Verlauf", font=("Liberation Sans", 12), bg="black", fg="white")
+        HistoryLabel = Label(HistoryX, text="History", font=("Liberation Sans", 12), bg="black", fg="white")
         Hostory1 = Label(HistoryX, text=History1, bg="black", fg="white")
         Hostory2 = Label(HistoryX, text=History2, bg="black", fg="white")
         Hostory3 = Label(HistoryX, text=History3, bg="black", fg="white")
@@ -1162,7 +1162,7 @@ def History() :
         ClearButton = Button(HistoryX, text="🗑", font=("Liberation Sans", 12), command=clearHistory, bg="black", fg="white")
     if DarkMode == 0 :
         HistoryX.config(height=400, width=256)
-        HistoryLabel = Label(HistoryX, text="Verlauf", font=("Liberation Sans", 12))
+        HistoryLabel = Label(HistoryX, text="History", font=("Liberation Sans", 12))
         Hostory1 = Label(HistoryX, text=History1)
         Hostory2 = Label(HistoryX, text=History2)
         Hostory3 = Label(HistoryX, text=History3)
@@ -1237,7 +1237,7 @@ def wurzelig() :
 def Meehr() :
     global DarkMode, MehrX, DezimalFrame, DezimalAnzeige, DezimalZahl, BinaerLabel, HexLabel
     MehrX = Tk()
-    MehrX.title("Mehr")
+    MehrX.title("Decimal Converter")
     if DarkMode == 1 :
         MehrX.config(height=200, width=500, bg="black")
         DezimalFrame = Frame(MehrX, height=50, width=435, bg="black", relief="sunken", borderwidth=2)
@@ -1245,12 +1245,12 @@ def Meehr() :
         InsertButton = Button(MehrX, text="OK", command=paste, bg="black", fg="white")
         binFrame = Frame(MehrX, bg="black", relief="sunken", borderwidth=2)
         hexFrame = Frame(MehrX, bg="black", relief="sunken", borderwidth=2)
-        binDesc = Label(binFrame, text="Binär", font=("Courier", 15), bg="black", fg="white")
-        hexDesc = Label(hexFrame, text="Hexadezimal", font=("Courier", 15), bg="black", fg="white")
+        binDesc = Label(binFrame, text="Binary", font=("Courier", 15), bg="black", fg="white")
+        hexDesc = Label(hexFrame, text="Hexadecimal", font=("Courier", 15), bg="black", fg="white")
         BinaerLabel = Label(binFrame, text="", font=("Courier", 15), bg="black", fg="white")
         HexLabel = Label(hexFrame, text="", font=("Courier", 15), bg="black", fg="white")
-        BinCopy = Button(binFrame, text="Kopieren", command=copybin, bg="black", fg="white")
-        HexCopy = Button(hexFrame, text="Kopieren", command=copyhex, bg="black", fg="white")
+        BinCopy = Button(binFrame, text="Copy", command=copybin, bg="black", fg="white")
+        HexCopy = Button(hexFrame, text="Copy", command=copyhex, bg="black", fg="white")
     if DarkMode == 0 :
         MehrX.config(height=200, width=500)
         DezimalFrame = Frame(MehrX, height=50, width=435, relief="sunken", borderwidth=2)
@@ -1258,12 +1258,12 @@ def Meehr() :
         InsertButton = Button(MehrX, text="OK", command=paste)
         binFrame = Frame(MehrX, relief="sunken", borderwidth=2)
         hexFrame = Frame(MehrX, relief="sunken", borderwidth=2)
-        binDesc = Label(binFrame, text="Binär", font=("Courier", 15))
-        hexDesc = Label(hexFrame, text="Hexadezimal", font=("Courier", 15))
+        binDesc = Label(binFrame, text="Binary", font=("Courier", 15))
+        hexDesc = Label(hexFrame, text="Hexadecimal", font=("Courier", 15))
         BinaerLabel = Label(binFrame, text="", font=("Courier", 15))
         HexLabel = Label(hexFrame, text="", font=("Courier", 15))
-        BinCopy = Button(binFrame, text="Kopieren", command=copybin)
-        HexCopy = Button(hexFrame, text="Kopieren", command=copyhex)
+        BinCopy = Button(binFrame, text="Copy", command=copybin)
+        HexCopy = Button(hexFrame, text="Copy", command=copyhex)
     DezimalFrame.place(x=5, y=5)
     DezimalAnzeige.place(x=0, y=0)
     InsertButton.place(x=444, y=5, height=50, width=52)
