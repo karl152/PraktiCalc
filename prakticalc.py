@@ -56,7 +56,7 @@ HexadezimalZahl = 0
 # Funktionen definieren
 def info() :
     if CustomMsgBox == 0 :
-        messagebox.showinfo("PraktiCalc 1.2.1 vom 10.08.2025, lizensiert unter GPLv3", "This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.")
+        messagebox.showinfo("PraktiCalc 1.3 (in development), licensed under GPLv3", "This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.")
     if CustomMsgBox == 1 :
         CustomInfo()
 def eins() :
@@ -689,11 +689,11 @@ def calc() :
             if Eingabe2 == "0" :
                 if StatusBar == 0 :
                     if CustomMsgBox == 0 :
-                        messagebox.showerror("Fehler", "Division durch 0")
+                        messagebox.showerror("Error", "Division by 0")
                     if CustomMsgBox == 1 :
                         CustomDiv0()
                 if StatusBar == 1 :
-                    Status.config(text="Fehler: Division durch 0")
+                    Status.config(text="Error: Division by 0")
                 clear()
             else :
                 EndErgebnis = (float(Eingabe1) / float(Eingabe2))
@@ -965,7 +965,7 @@ def DarkModeOn() :
     WurzelB.config(bg="black", fg="white")
     Mehr.config(bg="black", fg="white")
     Settings()
-    # messagebox.showwarning("Problem", "Bitte DarkMode im Code auf 1 stellen")
+    # messagebox.showwarning("Problem", "Please set the DarkMode variable to 1")
 def DarkModeOff() :
     global DarkMode, DarkModeToggle, SettingsWindow
     DarkMode = 0
@@ -1001,7 +1001,7 @@ def DarkModeOff() :
     WurzelB.config(bg="white", fg="black")
     Mehr.config(bg="white", fg="black")
     Settings()
-    # messagebox.showwarning("Problem", "Bitte DarkMode im Code auf 0 stellen")
+    # messagebox.showwarning("Problem", "Please set the DarkMode variable to 0")
 def closeCustomInfo() :
     global CustomInfox
     CustomInfox.destroy()
@@ -1102,7 +1102,7 @@ def SizeReload() :
 def ZeichenStatus() :
     global Status, StatusBar
     if StatusBar == 1 :
-        Status.config(text="Der Rechner unterstützt maximal 15 Zeichen!")
+        Status.config(text="PraktiCalc only supports up to 15 characters!")
 def Backspace() :
     global Eingabe1, Eingabe2
     if Stage == 1 :
