@@ -21,7 +21,7 @@
 # Module importieren
 from tkinter import *
 from tkinter import messagebox
-import win32clipboard
+# import win32clipboard
 # Variablen definieren
 Eingabe1 = "0"
 Eingabe2 = "0"
@@ -1252,8 +1252,8 @@ def Meehr() :
     if DarkMode == 1 :
         MehrX.config(height=200, width=500, bg="black")
         DezimalFrame = Frame(MehrX, height=50, width=435, bg="black", relief="sunken", borderwidth=2)
-        DezimalAnzeige = Label(DezimalFrame, text="0", font=("Courier New", 24), bg="black", fg="white")
-        InsertButton = Button(MehrX, text="Einfügen", command=paste, bg="black", fg="white")
+        DezimalAnzeige = Entry(DezimalFrame, text="0", font=("Courier New", 24), bg="black", fg="white")
+        InsertButton = Button(MehrX, text="OK", command=paste, bg="black", fg="white")
         binFrame = Frame(MehrX, bg="black", relief="sunken", borderwidth=2)
         hexFrame = Frame(MehrX, bg="black", relief="sunken", borderwidth=2)
         binDesc = Label(binFrame, text="Binär", font=("Courier", 15), bg="black", fg="white")
@@ -1265,8 +1265,8 @@ def Meehr() :
     if DarkMode == 0 :
         MehrX.config(height=200, width=500)
         DezimalFrame = Frame(MehrX, height=50, width=435, relief="sunken", borderwidth=2)
-        DezimalAnzeige = Label(DezimalFrame, text="0", font=("Courier New", 24))
-        InsertButton = Button(MehrX, text="Einfügen", command=paste)
+        DezimalAnzeige = Entry(DezimalFrame, text="0", font=("Courier New", 24))
+        InsertButton = Button(MehrX, text="OK", command=paste)
         binFrame = Frame(MehrX, relief="sunken", borderwidth=2)
         hexFrame = Frame(MehrX, relief="sunken", borderwidth=2)
         binDesc = Label(binFrame, text="Binär", font=("Courier", 15))
@@ -1284,14 +1284,18 @@ def Meehr() :
     hexDesc.place(x=5, y=5)
     BinaerLabel.place(x=5, y=50)
     HexLabel.place(x=5, y=50)
-    BinCopy.place(x=5, y=100, width=225)
-    HexCopy.place(x=5, y=100, width=230)
+    # BinCopy.place(x=5, y=100, width=225)
+    # HexCopy.place(x=5, y=100, width=230)
 def paste() :
     global DezimalZahl, DezimalAnzeige, BinaerZahl, HexadezimalZahl, BinaerLabel, HexLabel
-    win32clipboard.OpenClipboard()
-    cp = win32clipboard.GetClipboardData()
-    win32clipboard.CloseClipboard()
-    DezimalZahl = int(cp)
+    # win32clipboard.OpenClipboard()
+    # cp = win32clipboard.GetClipboardData()
+    # win32clipboard.CloseClipboard()
+    cp = str(DezimalAnzeige.get())
+    try:
+        DezimalZahl = int(cp)
+    except:
+        messagebox.showerror("Dude.", "Please enter a real number!")
     DezimalAnzeige.config(text=str(DezimalZahl))
     BinaerZahl = bin(DezimalZahl)[2:]
     HexadezimalZahl = hex(DezimalZahl)
