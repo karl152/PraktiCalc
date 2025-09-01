@@ -19,8 +19,11 @@
 # getestet für Python 3.13.6 (Windows)
 
 # Module importieren
-from tkinter import *
+import tkinter as tk
+from tkinter import ttk
 from tkinter import messagebox
+from ttkthemes import ThemedStyle
+usedttktheme = "default"
 # import win32clipboard
 # Variablen definieren
 Eingabe1 = "0"
@@ -29,7 +32,7 @@ Stage = 0
 Operator = "op"
 StatusBar = 0
 CustomMsgBox = 1
-DarkMode = 1
+DarkMode = 0
 History1 = History2 = History3 = History4 = History5 = History6 = History7 = History8 = History9 = History10 = History11 = History12 = History13 = History14 = History15 = ""
 # History1 = ""
 # History2 = ""
@@ -823,48 +826,50 @@ def Tastendruck(event):
         Backspace()
 def Settings() :
     global Status, SettingsWindow, StatusBar, StatusBarToggle, CustomMsgBox, CustomMsgBoxToggle, DarkMode, DarkModeToggle
-    SettingsWindow = Tk()
+    SettingsWindow = tk.Tk()
     SettingsWindow.title("Settings")
     if DarkMode == 1 :
         SettingsWindow.config(width=250, height=152, bg="black")
-        SettingsTitle = Label(SettingsWindow, text="Settings", font=("Liberation Sans", 12), bg="black", fg="white")
-        SettingsTitleDecoration = Label(SettingsWindow, text="▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀", font=("Courier New", 12), bg="black", fg="white")
-        StatusBarSettingDesc = Label(SettingsWindow, text="Status Bar", bg="black", fg="white")
+        SettingsTitle = ttk.Label(SettingsWindow, text="Settings", bg="black", fg="white")
+        SettingsTitleDecoration = ttk.Label(SettingsWindow, text="▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀", bg="black", fg="white")
+        StatusBarSettingDesc = ttk.Label(SettingsWindow, text="Status Bar", bg="black", fg="white")
         if StatusBar == 0 :
-            StatusBarToggle = Button(SettingsWindow, text="☐", command=StatusBarOn, bg="black", fg="white")
+            StatusBarToggle = ttk.Button(SettingsWindow, text="☐", command=StatusBarOn, bg="black", fg="white")
         if StatusBar == 1 :
-            StatusBarToggle = Button(SettingsWindow, text="🗹", command=StatusBarOff, bg="black", fg="white")
-        CustomStatusBarDesc = Label(SettingsWindow, text="Alternative Messageboxes", bg="black", fg="white")
+            StatusBarToggle = ttk.Button(SettingsWindow, text="🗹", command=StatusBarOff, bg="black", fg="white")
+        CustomStatusBarDesc = ttk.Label(SettingsWindow, text="Alternative Messageboxes", bg="black", fg="white")
         if CustomMsgBox == 0 :
-            CustomMsgBoxToggle = Button(SettingsWindow, text="☐", command=CustomMsgBoxOn, bg="black", fg="white")
+            CustomMsgBoxToggle = ttk.Button(SettingsWindow, text="☐", command=CustomMsgBoxOn, bg="black", fg="white")
         if CustomMsgBox == 1 :
-            CustomMsgBoxToggle = Button(SettingsWindow, text="🗹", command=CustomMsgBoxOff, bg="black", fg="white")
-        DarkModeToggle = Button(SettingsWindow, text="🗹", command=DarkModeOff, bg="black", fg="white")
-        DarkModeDesc = Label(SettingsWindow, text="Dark Mode", bg="black", fg="white")
+            CustomMsgBoxToggle = ttk.Button(SettingsWindow, text="🗹", command=CustomMsgBoxOff, bg="black", fg="white")
+        DarkModeToggle = ttk.Button(SettingsWindow, text="🗹", command=DarkModeOff, bg="black", fg="white")
+        DarkModeDesc = ttk.Label(SettingsWindow, text="Dark Mode", bg="black", fg="white")
     if DarkMode == 0 :
         SettingsWindow.config(width=250, height=152)
-        SettingsTitle = Label(SettingsWindow, text="Settings", font=("Liberation Sans", 12))
-        SettingsTitleDecoration = Label(SettingsWindow, text="▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀", font=("Courier New", 12))
-        StatusBarSettingDesc = Label(SettingsWindow, text="Status Bar")
+        style = ThemedStyle(SettingsWindow)
+        style.theme_use(usedttktheme)
+        SettingsTitle = ttk.Label(SettingsWindow, text="Settings", )
+        SettingsTitleDecoration = ttk.Label(SettingsWindow, text="▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀", )
+        StatusBarSettingDesc = ttk.Label(SettingsWindow, text="Status Bar")
         if StatusBar == 0 :
-            StatusBarToggle = Button(SettingsWindow, text="☐", command=StatusBarOn)
+            StatusBarToggle = ttk.Button(SettingsWindow, text="☐", command=StatusBarOn)
         if StatusBar == 1 :
-            StatusBarToggle = Button(SettingsWindow, text="🗹", command=StatusBarOff)
-        CustomStatusBarDesc = Label(SettingsWindow, text="Alternative Messageboxes")
+            StatusBarToggle = ttk.Button(SettingsWindow, text="🗹", command=StatusBarOff)
+        CustomStatusBarDesc = ttk.Label(SettingsWindow, text="Alternative Messageboxes")
         if CustomMsgBox == 0 :
-            CustomMsgBoxToggle = Button(SettingsWindow, text="☐", command=CustomMsgBoxOn)
+            CustomMsgBoxToggle = ttk.Button(SettingsWindow, text="☐", command=CustomMsgBoxOn)
         if CustomMsgBox == 1 :
-            CustomMsgBoxToggle = Button(SettingsWindow, text="🗹", command=CustomMsgBoxOff)
-        DarkModeToggle = Button(SettingsWindow, text="☐", command=DarkModeOn)
-        DarkModeDesc = Label(SettingsWindow, text="Dark Mode")
+            CustomMsgBoxToggle = ttk.Button(SettingsWindow, text="🗹", command=CustomMsgBoxOff)
+        DarkModeToggle = ttk.Button(SettingsWindow, text="☐", command=DarkModeOn)
+        DarkModeDesc = ttk.Label(SettingsWindow, text="Dark Mode")
     SettingsTitle.place(x=0, y=0)
     SettingsTitleDecoration.place(x=0, y=24)
     StatusBarSettingDesc.place(x=30, y=45)
     StatusBarToggle.place(x=5, y=45)
     CustomStatusBarDesc.place(x=30, y=72)
     CustomMsgBoxToggle.place(x=5, y=72)
-    DarkModeToggle.place(x=5, y=99)
-    DarkModeDesc.place(x=30, y=99)
+    # DarkModeToggle.place(x=5, y=99)
+    # DarkModeDesc.place(x=30, y=99)
 def StatusBarOn() :
     global Status, StatusBar, StatusBarToggle, StatusDecoration, Fenster
     Fenster.config(width=256, height=330)
@@ -883,40 +888,44 @@ def StatusBarOff() :
     SizeReload()
 def CustomDiv0() :
     global Div0Error
-    Div0Error = Tk()
+    Div0Error = tk.Tk()
     Div0Error.title("Error")
     if DarkMode == 1 :
         Div0Error.config(width=500, height=250, bg="black")
-        Div0Desc = Label(Div0Error, text="Division by 0", font=("Liberation Sans", 15), bg="black", fg="white")
-        Div0Symbol = Label(Div0Error, text="🚫", font=("Segoe UI Symbol", 52), bg="black", fg="white")
-        Div0Exit = Button(Div0Error, text="     OK     ", command=closeCustomDiv0, bg="black", fg="white")
+        Div0Desc = ttk.Label(Div0Error, text="Division by 0", bg="black", fg="white")
+        Div0Symbol = ttk.Label(Div0Error, text="🚫", bg="black", fg="white")
+        Div0Exit = ttk.Button(Div0Error, text="     OK     ", command=closeCustomDiv0, bg="black", fg="white")
     if DarkMode == 0 :
         Div0Error.config(width=500, height=250)
-        Div0Desc = Label(Div0Error, text="Division by 0", font=("Liberation Sans", 15))
-        Div0Symbol = Label(Div0Error, text="🚫", font=("Segoe UI Symbol", 52))
-        Div0Exit = Button(Div0Error, text="     OK     ", command=closeCustomDiv0)
+        style = ThemedStyle(Div0Error)
+        style.theme_use(usedttktheme)
+        Div0Desc = ttk.Label(Div0Error, text="Division by 0")
+        Div0Symbol = ttk.Label(Div0Error, text="🚫")
+        Div0Exit = ttk.Button(Div0Error, text="     OK     ", command=closeCustomDiv0)
     Div0Desc.place(x=150, y=100)
     Div0Symbol.place(x=10, y=10)
     Div0Exit.place(x=400, y=200)
 def CustomInfo() :
     global CustomInfox
-    CustomInfox = Tk()
+    CustomInfox = tk.Tk()
     CustomInfox.title("Info")
     infotext = "PraktiCalc\nVersion 1.3 (in development)\ntested in Python 3.11+\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/"
     if DarkMode == 1 :
         CustomInfox.config(width=500, height=250, bg="black")
-        CustomInfoDesc = Label(CustomInfox, text="PraktiCalc", font=("Liberation Sans", 15), bg="black", fg="white")
-        CustomInfoSymbol = Label(CustomInfox, text="ℹ", font=("Segoe UI Symbol", 52), bg="black", fg="white")
-        CustomInfoExit = Button(CustomInfox, text="     OK     ", command=closeCustomInfo, bg="black", fg="white")
-        ExtendedInfoFrame = Frame(CustomInfox, relief="sunken", borderwidth=2, bg="black")
-        ExtInfoText1 = Label(ExtendedInfoFrame, text=infotext, bg="black", fg="white", justify="left")
+        CustomInfoDesc = ttk.Label(CustomInfox, text="PraktiCalc", bg="black", fg="white")
+        CustomInfoSymbol = ttk.Label(CustomInfox, text="ℹ", bg="black", fg="white")
+        CustomInfoExit = ttk.Button(CustomInfox, text="     OK     ", command=closeCustomInfo, bg="black", fg="white")
+        ExtendedInfoFrame = ttk.Frame(CustomInfox, relief="sunken", borderwidth=2, bg="black")
+        ExtInfoText1 = ttk.Label(ExtendedInfoFrame, text=infotext, bg="black", fg="white", justify="left")
     if DarkMode == 0 :
         CustomInfox.config(width=500, height=250)
-        CustomInfoDesc = Label(CustomInfox, text="PraktiCalc", font=("Liberation Sans", 15))
-        CustomInfoSymbol = Label(CustomInfox, text="ℹ", font=("Segoe UI Symbol", 52))
-        CustomInfoExit = Button(CustomInfox, text="     OK     ", command=closeCustomInfo)
-        ExtendedInfoFrame = Frame(CustomInfox, relief="sunken", borderwidth=2)
-        ExtInfoText1 = Label(ExtendedInfoFrame, text=infotext, justify="left")
+        style = ThemedStyle(CustomInfox)
+        style.theme_use(usedttktheme)
+        CustomInfoDesc = ttk.Label(CustomInfox, text="PraktiCalc")
+        CustomInfoSymbol = ttk.Label(CustomInfox, text="ℹ")
+        CustomInfoExit = ttk.Button(CustomInfox, text="     OK     ", command=closeCustomInfo)
+        ExtendedInfoFrame = ttk.Frame(CustomInfox, relief="sunken", borderwidth=2)
+        ExtInfoText1 = ttk.Label(ExtendedInfoFrame, text=infotext, justify="left")
     CustomInfoDesc.place(x=150, y=25)
     CustomInfoSymbol.place(x=10, y=10)
     CustomInfoExit.place(x=400, y=200)
@@ -1009,96 +1018,7 @@ def closeCustomDiv0() :
     global Div0Error
     Div0Error.destroy()
 def SizeReload() :
-    if Stage == 0 :
-        Ausgabe.config(font=("Courier New", 25))
-    if Stage == 1 :
-        if len(str(Eingabe1)) == 9 :
-            Ausgabe.config(font=("Courier New", 22))
-        if len(str(Eingabe1)) == 10 :
-            Ausgabe.config(font=("Courier New", 20))
-        if len(str(Eingabe1)) == 11 :
-            Ausgabe.config(font=("Courier New", 18))
-        if len(str(Eingabe1)) == 12 :
-            Ausgabe.config(font=("Courier New", 17))
-        if len(str(Eingabe1)) == 13 :
-            Ausgabe.config(font=("Courier New", 15))
-        if len(str(Eingabe1)) == 14 :
-            Ausgabe.config(font=("Courier New", 14))
-        if len(str(Eingabe1)) == 15 :
-            Ausgabe.config(font=("Courier New", 13))
-        if len(str(Eingabe1)) >= 16 :
-            Ausgabe.config(font=("Courier New", 13))
-            ZeichenStatus()
-    if Stage == 2 :
-        if len(str(Eingabe1)) == 9 :
-            Ausgabe.config(font=("Courier New", 22))
-        if len(str(Eingabe1)) == 10 :
-            Ausgabe.config(font=("Courier New", 20))
-        if len(str(Eingabe1)) == 11 :
-            Ausgabe.config(font=("Courier New", 18))
-        if len(str(Eingabe1)) == 12 :
-            Ausgabe.config(font=("Courier New", 17))
-        if len(str(Eingabe1)) == 13 :
-            Ausgabe.config(font=("Courier New", 15))
-        if len(str(Eingabe1)) == 14 :
-            Ausgabe.config(font=("Courier New", 14))
-        if len(str(Eingabe1)) == 15 :
-            Ausgabe.config(font=("Courier New", 13))
-        if len(str(Eingabe1)) >= 16 :
-            ZeichenStatus()
-    if Stage == 3 :
-        Ausgabe.config(font=("Courier New", 25))
-    if Stage == 4 :
-        if len(str(Eingabe2)) == 9 :
-            Ausgabe.config(font=("Courier New", 22))
-        if len(str(Eingabe2)) == 10 :
-            Ausgabe.config(font=("Courier New", 20))
-        if len(str(Eingabe2)) == 11 :
-            Ausgabe.config(font=("Courier New", 18))
-        if len(str(Eingabe2)) == 12 :
-            Ausgabe.config(font=("Courier New", 17))
-        if len(str(Eingabe2)) == 13 :
-            Ausgabe.config(font=("Courier New", 15))
-        if len(str(Eingabe2)) == 14 :
-            Ausgabe.config(font=("Courier New", 14))
-        if len(str(Eingabe2)) == 15 :
-            Ausgabe.config(font=("Courier New", 13))
-        if len(str(Eingabe2)) >= 16 :
-            ZeichenStatus()
-    if Stage == 5 :
-        if len(str(Eingabe2)) == 9 :
-            Ausgabe.config(font=("Courier New", 22))
-        if len(str(Eingabe2)) == 10 :
-            Ausgabe.config(font=("Courier New", 20))
-        if len(str(Eingabe2)) == 11 :
-            Ausgabe.config(font=("Courier New", 18))
-        if len(str(Eingabe2)) == 12 :
-            Ausgabe.config(font=("Courier New", 17))
-        if len(str(Eingabe2)) == 13 :
-            Ausgabe.config(font=("Courier New", 15))
-        if len(str(Eingabe2)) == 14 :
-            Ausgabe.config(font=("Courier New", 14))
-        if len(str(Eingabe2)) == 15 :
-            Ausgabe.config(font=("Courier New", 13))
-        if len(str(Eingabe2)) >= 16 :
-            ZeichenStatus()
-    if Stage == 6 :
-        if len(str(EndErgebnis)) == 9 :
-            Ausgabe.config(font=("Courier New", 22))
-        if len(str(EndErgebnis)) == 10 :
-            Ausgabe.config(font=("Courier New", 20))
-        if len(str(EndErgebnis)) == 11 :
-            Ausgabe.config(font=("Courier New", 18))
-        if len(str(EndErgebnis)) == 12 :
-            Ausgabe.config(font=("Courier New", 17))
-        if len(str(EndErgebnis)) == 13 :
-            Ausgabe.config(font=("Courier New", 15))
-        if len(str(EndErgebnis)) == 14 :
-            Ausgabe.config(font=("Courier New", 14))
-        if len(str(EndErgebnis)) == 15 :
-            Ausgabe.config(font=("Courier New", 13))
-        if len(str(EndErgebnis)) >= 16 :
-            ZeichenStatus()
+    pass
 def ZeichenStatus() :
     global Status, StatusBar
     if StatusBar == 1 :
@@ -1139,46 +1059,48 @@ def updateDisplay() :
     SizeReload()
 def History() :
     global HistoryX, History1, History2, History3, History4, History5, History6, History7, History8, History9, History10, History11, History12, History13, History14, History15
-    HistoryX = Tk()
+    HistoryX = tk.Tk()
     HistoryX.title("History")
     if DarkMode == 1 :
         HistoryX.config(height=400, width=256, bg="black")
-        HistoryLabel = Label(HistoryX, text="History", font=("Liberation Sans", 12), bg="black", fg="white")
-        Hostory1 = Label(HistoryX, text=History1, bg="black", fg="white")
-        Hostory2 = Label(HistoryX, text=History2, bg="black", fg="white")
-        Hostory3 = Label(HistoryX, text=History3, bg="black", fg="white")
-        Hostory4 = Label(HistoryX, text=History4, bg="black", fg="white")
-        Hostory5 = Label(HistoryX, text=History5, bg="black", fg="white")
-        Hostory6 = Label(HistoryX, text=History6, bg="black", fg="white")
-        Hostory7 = Label(HistoryX, text=History7, bg="black", fg="white")
-        Hostory8 = Label(HistoryX, text=History8, bg="black", fg="white")
-        Hostory9 = Label(HistoryX, text=History9, bg="black", fg="white")
-        Hostory10 = Label(HistoryX, text=History10, bg="black", fg="white")
-        Hostory11 = Label(HistoryX, text=History11, bg="black", fg="white")
-        Hostory12 = Label(HistoryX, text=History12, bg="black", fg="white")
-        Hostory13 = Label(HistoryX, text=History13, bg="black", fg="white")
-        Hostory14 = Label(HistoryX, text=History14, bg="black", fg="white")
-        Hostory15 = Label(HistoryX, text=History15, bg="black", fg="white")
-        ClearButton = Button(HistoryX, text="🗑", font=("Liberation Sans", 12), command=clearHistory, bg="black", fg="white")
+        HistoryLabel = ttk.Label(HistoryX, text="History", bg="black", fg="white")
+        Hostory1 = ttk.Label(HistoryX, text=History1, bg="black", fg="white")
+        Hostory2 = ttk.Label(HistoryX, text=History2, bg="black", fg="white")
+        Hostory3 = ttk.Label(HistoryX, text=History3, bg="black", fg="white")
+        Hostory4 = ttk.Label(HistoryX, text=History4, bg="black", fg="white")
+        Hostory5 = ttk.Label(HistoryX, text=History5, bg="black", fg="white")
+        Hostory6 = ttk.Label(HistoryX, text=History6, bg="black", fg="white")
+        Hostory7 = ttk.Label(HistoryX, text=History7, bg="black", fg="white")
+        Hostory8 = ttk.Label(HistoryX, text=History8, bg="black", fg="white")
+        Hostory9 = ttk.Label(HistoryX, text=History9, bg="black", fg="white")
+        Hostory10 = ttk.Label(HistoryX, text=History10, bg="black", fg="white")
+        Hostory11 = ttk.Label(HistoryX, text=History11, bg="black", fg="white")
+        Hostory12 = ttk.Label(HistoryX, text=History12, bg="black", fg="white")
+        Hostory13 = ttk.Label(HistoryX, text=History13, bg="black", fg="white")
+        Hostory14 = ttk.Label(HistoryX, text=History14, bg="black", fg="white")
+        Hostory15 = ttk.Label(HistoryX, text=History15, bg="black", fg="white")
+        ClearButton = ttk.Button(HistoryX, text="🗑", command=clearHistory, bg="black", fg="white")
     if DarkMode == 0 :
         HistoryX.config(height=400, width=256)
-        HistoryLabel = Label(HistoryX, text="History", font=("Liberation Sans", 12))
-        Hostory1 = Label(HistoryX, text=History1)
-        Hostory2 = Label(HistoryX, text=History2)
-        Hostory3 = Label(HistoryX, text=History3)
-        Hostory4 = Label(HistoryX, text=History4)
-        Hostory5 = Label(HistoryX, text=History5)
-        Hostory6 = Label(HistoryX, text=History6)
-        Hostory7 = Label(HistoryX, text=History7)
-        Hostory8 = Label(HistoryX, text=History8)
-        Hostory9 = Label(HistoryX, text=History9)
-        Hostory10 = Label(HistoryX, text=History10)
-        Hostory11 = Label(HistoryX, text=History11)
-        Hostory12 = Label(HistoryX, text=History12)
-        Hostory13 = Label(HistoryX, text=History13)
-        Hostory14 = Label(HistoryX, text=History14)
-        Hostory15 = Label(HistoryX, text=History15)
-        ClearButton = Button(HistoryX, text="🗑", font=("Liberation Sans", 12), command=clearHistory)
+        style = ThemedStyle(HistoryX)
+        style.theme_use(usedttktheme)
+        HistoryLabel = ttk.Label(HistoryX, text="History")
+        Hostory1 = ttk.Label(HistoryX, text=History1)
+        Hostory2 = ttk.Label(HistoryX, text=History2)
+        Hostory3 = ttk.Label(HistoryX, text=History3)
+        Hostory4 = ttk.Label(HistoryX, text=History4)
+        Hostory5 = ttk.Label(HistoryX, text=History5)
+        Hostory6 = ttk.Label(HistoryX, text=History6)
+        Hostory7 = ttk.Label(HistoryX, text=History7)
+        Hostory8 = ttk.Label(HistoryX, text=History8)
+        Hostory9 = ttk.Label(HistoryX, text=History9)
+        Hostory10 = ttk.Label(HistoryX, text=History10)
+        Hostory11 = ttk.Label(HistoryX, text=History11)
+        Hostory12 = ttk.Label(HistoryX, text=History12)
+        Hostory13 = ttk.Label(HistoryX, text=History13)
+        Hostory14 = ttk.Label(HistoryX, text=History14)
+        Hostory15 = ttk.Label(HistoryX, text=History15)
+        ClearButton = ttk.Button(HistoryX, text="🗑", command=clearHistory)
     HistoryLabel.place(x=0, y=0)
     Hostory1.place(x=0, y=25)
     Hostory2.place(x=0, y=50)
@@ -1236,34 +1158,36 @@ def wurzelig() :
     calc()
 def Meehr() :
     global DarkMode, MehrX, DezimalFrame, DezimalAnzeige, DezimalZahl, BinaerLabel, HexLabel
-    MehrX = Tk()
+    MehrX = tk.Tk()
     MehrX.title("Decimal Converter")
     if DarkMode == 1 :
         MehrX.config(height=200, width=500, bg="black")
-        DezimalFrame = Frame(MehrX, height=50, width=435, bg="black", relief="sunken", borderwidth=2)
-        DezimalAnzeige = Entry(DezimalFrame, text="0", font=("Courier New", 24), bg="black", fg="white")
-        InsertButton = Button(MehrX, text="OK", command=paste, bg="black", fg="white")
-        binFrame = Frame(MehrX, bg="black", relief="sunken", borderwidth=2)
-        hexFrame = Frame(MehrX, bg="black", relief="sunken", borderwidth=2)
-        binDesc = Label(binFrame, text="Binary", font=("Courier", 15), bg="black", fg="white")
-        hexDesc = Label(hexFrame, text="Hexadecimal", font=("Courier", 15), bg="black", fg="white")
-        BinaerLabel = Label(binFrame, text="", font=("Courier", 15), bg="black", fg="white")
-        HexLabel = Label(hexFrame, text="", font=("Courier", 15), bg="black", fg="white")
-        BinCopy = Button(binFrame, text="Copy", command=copybin, bg="black", fg="white")
-        HexCopy = Button(hexFrame, text="Copy", command=copyhex, bg="black", fg="white")
+        DezimalFrame = ttk.Frame(MehrX, height=50, width=435, bg="black", relief="sunken", borderwidth=2)
+        DezimalAnzeige = ttk.Entry(DezimalFrame, text="0", bg="black", fg="white")
+        InsertButton = ttk.Button(MehrX, text="OK", command=paste, bg="black", fg="white")
+        binFrame = ttk.Frame(MehrX, bg="black", relief="sunken", borderwidth=2)
+        hexFrame = ttk.Frame(MehrX, bg="black", relief="sunken", borderwidth=2)
+        binDesc = ttk.Label(binFrame, text="Binary", bg="black", fg="white")
+        hexDesc = ttk.Label(hexFrame, text="Hexadecimal", bg="black", fg="white")
+        BinaerLabel = ttk.Label(binFrame, text="", bg="black", fg="white")
+        HexLabel = ttk.Label(hexFrame, text="", bg="black", fg="white")
+        BinCopy = ttk.Button(binFrame, text="Copy", command=copybin, bg="black", fg="white")
+        HexCopy = ttk.Button(hexFrame, text="Copy", command=copyhex, bg="black", fg="white")
     if DarkMode == 0 :
         MehrX.config(height=200, width=500)
-        DezimalFrame = Frame(MehrX, height=50, width=435, relief="sunken", borderwidth=2)
-        DezimalAnzeige = Entry(DezimalFrame, text="0", font=("Courier New", 24))
-        InsertButton = Button(MehrX, text="OK", command=paste)
-        binFrame = Frame(MehrX, relief="sunken", borderwidth=2)
-        hexFrame = Frame(MehrX, relief="sunken", borderwidth=2)
-        binDesc = Label(binFrame, text="Binary", font=("Courier", 15))
-        hexDesc = Label(hexFrame, text="Hexadecimal", font=("Courier", 15))
-        BinaerLabel = Label(binFrame, text="", font=("Courier", 15))
-        HexLabel = Label(hexFrame, text="", font=("Courier", 15))
-        BinCopy = Button(binFrame, text="Copy", command=copybin)
-        HexCopy = Button(hexFrame, text="Copy", command=copyhex)
+        style = ThemedStyle(MehrX)
+        style.theme_use(usedttktheme)
+        DezimalFrame = ttk.Frame(MehrX, height=50, width=435, relief="sunken", borderwidth=2)
+        DezimalAnzeige = ttk.Entry(DezimalFrame, text="0")
+        InsertButton = ttk.Button(MehrX, text="OK", command=paste)
+        binFrame = ttk.Frame(MehrX, relief="sunken", borderwidth=2)
+        hexFrame = ttk.Frame(MehrX, relief="sunken", borderwidth=2)
+        binDesc = ttk.Label(binFrame, text="Binary")
+        hexDesc = ttk.Label(hexFrame, text="Hexadecimal")
+        BinaerLabel = ttk.Label(binFrame, text="")
+        HexLabel = ttk.Label(hexFrame, text="")
+        BinCopy = ttk.Button(binFrame, text="Copy", command=copybin)
+        HexCopy = ttk.Button(hexFrame, text="Copy", command=copyhex)
     DezimalFrame.place(x=5, y=5)
     DezimalAnzeige.place(x=0, y=0)
     InsertButton.place(x=444, y=5, height=50, width=52)
@@ -1320,74 +1244,76 @@ def xcheck() :
 def xquit() :
     Fenster.destroy()
 # Hauptfenster
-Fenster = Tk()
+Fenster = tk.Tk()
 Fenster.title("PraktiCalc")
 if DarkMode == 1 :
     Fenster.config(width=256, height=315, bg="black")
-    Ausgaberahmen = Frame(Fenster, borderwidth=2, relief="sunken", bg="black")
-    Ausgabe = Label(Ausgaberahmen, text="0", font=("Courier New", 25), bg="black", fg="white")
+    Ausgaberahmen = ttk.Frame(Fenster, borderwidth=2, relief="sunken", bg="black")
+    Ausgabe = ttk.Label(Ausgaberahmen, text="0", bg="black", fg="white")
     # Buttons
-    PlusButton = Button(Fenster, text="➕", font=("Courier New", 12), command=plus, bg="black", fg="white")
-    MinusButton = Button(Fenster, text="➖", font=("Courier New", 12), command=minus, bg="black", fg="white")
-    MalButton = Button(Fenster, text="✖", font=("Courier New", 12), command=mal, bg="black", fg="white")
-    GeteiltButton = Button(Fenster, text="➗", font=("Courier New", 12), command=geteilt, bg="black", fg="white")
-    SiebenButton = Button(Fenster, text="7", font=("Courier New", 12), command=sieben, bg="black", fg="white")
-    AchtButton = Button(Fenster, text="8", font=("Courier New", 12), command=acht, bg="black", fg="white")
-    NeunButton = Button(Fenster, text="9", font=("Courier New", 12), command=neun, bg="black", fg="white")
-    CEButton = Button(Fenster, text="CE", font=("Courier New", 12), command=clear, bg="black", fg="white")
-    VierButton = Button(Fenster, text="4", font=("Courier New", 12), command=vier, bg="black", fg="white")
-    FünfButton = Button(Fenster, text="5", font=("Courier New", 12), command=fünf, bg="black", fg="white")
-    SechsButton = Button(Fenster, text="6", font=("Courier New", 12), command=sechs, bg="black", fg="white")
-    KommaButton = Button(Fenster, text=",", font=("Courier New", 12), command=komma, bg="black", fg="white")
-    EinsButton = Button(Fenster, text="1", font=("Courier New", 12), command=eins, bg="black", fg="white")
-    ZweiButton = Button(Fenster, text="2", font=("Courier New", 12), command=zwei, bg="black", fg="white")
-    DreiButton = Button(Fenster, text="3", font=("Courier New", 12), command=drei, bg="black", fg="white")
-    GleichButton = Button(Fenster, text="=", font=("Courier New", 12), command=calc, bg="black", fg="white")
-    InfoButton = Button(Fenster, text="i", font=("Courier New", 12), command=info, bg="black", fg="white")
-    NullButton = Button(Fenster, text="0", font=("Courier New", 12), command=null, bg="black", fg="white")
-    ExitButton = Button(Fenster, text="X",font=("Courier New", 12), bg="red", fg="white", command=xquit)
-    Status = Label(Fenster, text="", bg="black", fg="white")
-    StatusDecoration = Label(Fenster, text="", bg="black", fg="white")
-    SettingsButton = Button(Fenster, text="🔧", font=("Courier New", 10), command=Settings, bg="black", fg="white")
-    BackspaceButton = Button(Fenster, text="<", font=("Courier New", 7), command=Backspace, bg="black", fg="white")
-    HistoryButton = Button(Fenster, text="📜", font=("Courier New", 12), command=History, bg="black", fg="white")
-    Checkb = Button(Fenster, text="Check", command=xcheck)
-    MButton = Button(Fenster, text="±", font=("Courier New", 12), command=mnus, bg="black", fg="white")
-    WurzelB = Button(Fenster, text="√", font=("Courier New", 12), command=wurzelig, bg="black", fg="white")
-    Mehr = Button(Fenster, text="...", font=("Courier New", 12), command=Meehr, bg="black", fg="white")
+    PlusButton = ttk.Button(Fenster, text="➕", command=plus, bg="black", fg="white")
+    MinusButton = ttk.Button(Fenster, text="➖", command=minus, bg="black", fg="white")
+    MalButton = ttk.Button(Fenster, text="✖", command=mal, bg="black", fg="white")
+    GeteiltButton = ttk.Button(Fenster, text="➗", command=geteilt, bg="black", fg="white")
+    SiebenButton = ttk.Button(Fenster, text="7", command=sieben, bg="black", fg="white")
+    AchtButton = ttk.Button(Fenster, text="8", command=acht, bg="black", fg="white")
+    NeunButton = ttk.Button(Fenster, text="9", command=neun, bg="black", fg="white")
+    CEButton = ttk.Button(Fenster, text="CE", command=clear, bg="black", fg="white")
+    VierButton = ttk.Button(Fenster, text="4", command=vier, bg="black", fg="white")
+    FünfButton = ttk.Button(Fenster, text="5", command=fünf, bg="black", fg="white")
+    SechsButton = ttk.Button(Fenster, text="6", command=sechs, bg="black", fg="white")
+    KommaButton = ttk.Button(Fenster, text=",", command=komma, bg="black", fg="white")
+    EinsButton = ttk.Button(Fenster, text="1", command=eins, bg="black", fg="white")
+    ZweiButton = ttk.Button(Fenster, text="2", command=zwei, bg="black", fg="white")
+    DreiButton = ttk.Button(Fenster, text="3", command=drei, bg="black", fg="white")
+    GleichButton = ttk.Button(Fenster, text="=", command=calc, bg="black", fg="white")
+    InfoButton = ttk.Button(Fenster, text="i", command=info, bg="black", fg="white")
+    NullButton = ttk.Button(Fenster, text="0", command=null, bg="black", fg="white")
+    ExitButton = ttk.Button(Fenster, text="X", command=xquit)
+    Status = ttk.Label(Fenster, text="", bg="black", fg="white")
+    StatusDecoration = ttk.Label(Fenster, text="", bg="black", fg="white")
+    SettingsButton = ttk.Button(Fenster, text="🔧", command=Settings, bg="black", fg="white")
+    BackspaceButton = ttk.Button(Fenster, text="<", command=Backspace, bg="black", fg="white")
+    HistoryButton = ttk.Button(Fenster, text="📜", command=History, bg="black", fg="white")
+    Checkb = ttk.Button(Fenster, text="Check", command=xcheck)
+    MButton = ttk.Button(Fenster, text="±", command=mnus, bg="black", fg="white")
+    WurzelB = ttk.Button(Fenster, text="√", command=wurzelig, bg="black", fg="white")
+    Mehr = ttk.Button(Fenster, text="...", command=Meehr, bg="black", fg="white")
 if DarkMode == 0 :
     Fenster.config(width=256, height=315)
-    Ausgaberahmen = Frame(Fenster, borderwidth=2, relief="sunken")
-    Ausgabe = Label(Ausgaberahmen, text="0", font=("Courier New", 25))
+    style = ThemedStyle(Fenster)
+    style.theme_use(usedttktheme)
+    Ausgaberahmen = ttk.Frame(Fenster, borderwidth=2, relief="sunken")
+    Ausgabe = ttk.Label(Ausgaberahmen, text="0")
     # Buttons
-    PlusButton = Button(Fenster, text="➕", font=("Courier New", 12), command=plus)
-    MinusButton = Button(Fenster, text="➖", font=("Courier New", 12), command=minus)
-    MalButton = Button(Fenster, text="✖", font=("Courier New", 12), command=mal)
-    GeteiltButton = Button(Fenster, text="➗", font=("Courier New", 12), command=geteilt)
-    SiebenButton = Button(Fenster, text="7", font=("Courier New", 12), command=sieben)
-    AchtButton = Button(Fenster, text="8", font=("Courier New", 12), command=acht)
-    NeunButton = Button(Fenster, text="9", font=("Courier New", 12), command=neun)
-    CEButton = Button(Fenster, text="CE", font=("Courier New", 12), command=clear)
-    VierButton = Button(Fenster, text="4", font=("Courier New", 12), command=vier)
-    FünfButton = Button(Fenster, text="5", font=("Courier New", 12), command=fünf)
-    SechsButton = Button(Fenster, text="6", font=("Courier New", 12), command=sechs)
-    KommaButton = Button(Fenster, text=",", font=("Courier New", 12), command=komma)
-    EinsButton = Button(Fenster, text="1", font=("Courier New", 12), command=eins)
-    ZweiButton = Button(Fenster, text="2", font=("Courier New", 12), command=zwei)
-    DreiButton = Button(Fenster, text="3", font=("Courier New", 12), command=drei)
-    GleichButton = Button(Fenster, text="=", font=("Courier New", 12), command=calc)
-    InfoButton = Button(Fenster, text="i", font=("Courier New", 12), command=info)
-    NullButton = Button(Fenster, text="0", font=("Courier New", 12), command=null)
-    ExitButton = Button(Fenster, text="X",font=("Courier New", 12), bg="red", fg="white", command=xquit)
-    Status = Label(Fenster, text="")
-    StatusDecoration = Label(Fenster, text="")
-    SettingsButton = Button(Fenster, text="🔧", font=("Courier New", 10), command=Settings)
-    BackspaceButton = Button(Fenster, text="<", font=("Courier New", 7), command=Backspace)
-    HistoryButton = Button(Fenster, text="📜", font=("Courier New", 12), command=History)
-    MButton = Button(Fenster, text="±", font=("Courier New", 12), command=mnus)
-    Checkb = Button(Fenster, text="Check", command=xcheck) # some debug thing
-    WurzelB = Button(Fenster, text="√", font=("Courier New", 12), command=wurzelig)
-    Mehr = Button(Fenster, text="...", font=("Courier New", 12), command=Meehr)
+    PlusButton = ttk.Button(Fenster, text="➕", command=plus)
+    MinusButton = ttk.Button(Fenster, text="➖", command=minus)
+    MalButton = ttk.Button(Fenster, text="✖", command=mal)
+    GeteiltButton = ttk.Button(Fenster, text="➗", command=geteilt)
+    SiebenButton = ttk.Button(Fenster, text="7", command=sieben)
+    AchtButton = ttk.Button(Fenster, text="8", command=acht)
+    NeunButton = ttk.Button(Fenster, text="9", command=neun)
+    CEButton = ttk.Button(Fenster, text="CE", command=clear)
+    VierButton = ttk.Button(Fenster, text="4", command=vier)
+    FünfButton = ttk.Button(Fenster, text="5", command=fünf)
+    SechsButton = ttk.Button(Fenster, text="6", command=sechs)
+    KommaButton = ttk.Button(Fenster, text=",", command=komma)
+    EinsButton = ttk.Button(Fenster, text="1", command=eins)
+    ZweiButton = ttk.Button(Fenster, text="2", command=zwei)
+    DreiButton = ttk.Button(Fenster, text="3", command=drei)
+    GleichButton = ttk.Button(Fenster, text="=", command=calc)
+    InfoButton = ttk.Button(Fenster, text="i", command=info)
+    NullButton = ttk.Button(Fenster, text="0", command=null)
+    ExitButton = ttk.Button(Fenster, text="X", command=xquit)
+    Status = ttk.Label(Fenster, text="")
+    StatusDecoration = ttk.Label(Fenster, text="")
+    SettingsButton = ttk.Button(Fenster, text="🔧", command=Settings)
+    BackspaceButton = ttk.Button(Fenster, text="<", command=Backspace)
+    HistoryButton = ttk.Button(Fenster, text="📜", command=History)
+    MButton = ttk.Button(Fenster, text="±", command=mnus)
+    Checkb = ttk.Button(Fenster, text="Check", command=xcheck) # some debug thing
+    WurzelB = ttk.Button(Fenster, text="√", command=wurzelig)
+    Mehr = ttk.Button(Fenster, text="...", command=Meehr)
 Ausgaberahmen.place(x=45, y=8, height=40, width=185)
 Ausgabe.pack()
 PlusButton.place(x=50, y=59, height=30, width=40)
