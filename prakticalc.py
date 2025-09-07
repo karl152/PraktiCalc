@@ -843,7 +843,7 @@ def Settings() :
         CustomMsgBoxToggle = ttk.Button(SettingsWindow, text="☐", command=CustomMsgBoxOn)
     if CustomMsgBox == 1 :
         CustomMsgBoxToggle = ttk.Button(SettingsWindow, text="🗹", command=CustomMsgBoxOff)
-    DarkModeToggle = ttk.Button(SettingsWindow, text="☐", command=DarkModeOn)
+    DarkModeToggle = ttk.Checkbutton(SettingsWindow, text="Dark Mode", command=ChangeDarkMode)
     DarkModeDesc = ttk.Label(SettingsWindow, text="Dark Mode")
     SettingsTitle.place(x=0, y=0)
     SettingsTitleDecoration.place(x=0, y=24)
@@ -852,7 +852,40 @@ def Settings() :
     CustomStatusBarDesc.place(x=30, y=72)
     CustomMsgBoxToggle.place(x=5, y=72)
     DarkModeToggle.place(x=5, y=99)
-    DarkModeDesc.place(x=30, y=99)
+    # DarkModeDesc.place(x=30, y=99)
+def ChangeDarkMode() :
+    global DarkMode, usedttktheme, SettingsWindow, style, HistoryX, MehrX
+    if DarkMode == 0 :
+        DarkMode = 1
+        usedttktheme = "black"
+        style = ThemedStyle(Fenster)
+        style.theme_use(usedttktheme)
+        style = ThemedStyle(SettingsWindow)
+        style.theme_use(usedttktheme)
+        style = ThemedStyle(HistoryX)
+        style.theme_use(usedttktheme)
+        style = ThemedStyle(MehrX)
+        style.theme_use(usedttktheme)
+        style = ThemedStyle(Div0Error)
+        style.theme_use(usedttktheme)
+        style = ThemedStyle(CustomInfox)
+        style.theme_use(usedttktheme)
+    elif DarkMode == 1 :
+        DarkMode = 0
+        usedttktheme = "default"
+        style = ThemedStyle(Fenster)
+        style.theme_use(usedttktheme)
+        style = ThemedStyle(SettingsWindow)
+        style.theme_use(usedttktheme)
+        style = ThemedStyle(HistoryX)
+        style.theme_use(usedttktheme)
+        style = ThemedStyle(MehrX)
+        style.theme_use(usedttktheme)
+        style = ThemedStyle(Div0Error)
+        style.theme_use(usedttktheme)
+        style = ThemedStyle(CustomInfox)
+        style.theme_use(usedttktheme)
+    print(DarkMode)
 def StatusBarOn() :
     global Status, StatusBar, StatusBarToggle, StatusDecoration, Fenster
     Fenster.config(width=256, height=330)
@@ -908,18 +941,6 @@ def CustomMsgBoxOff() :
     global CustomMsgBox, CustomMsgBoxToggle
     CustomMsgBox = 0
     CustomMsgBoxToggle.config(text="☐", command=CustomMsgBoxOn)
-def DarkModeOn() :
-    global DarkMode, DarkModeToggle, SettingsWindow
-    DarkMode = 1
-    DarkModeToggle.config(text="🗹", command=DarkModeOff)
-    usedttktheme = "black"
-    # messagebox.showwarning("Problem", "Please set the DarkMode variable to 1")
-def DarkModeOff() :
-    global DarkMode, DarkModeToggle, SettingsWindow
-    DarkMode = 0
-    DarkModeToggle.config(text="☐", command=DarkModeOn)
-    usedttktheme = "default"
-    # messagebox.showwarning("Problem", "Please set the DarkMode variable to 0")
 def closeCustomInfo() :
     global CustomInfox
     CustomInfox.destroy()
@@ -1046,11 +1067,9 @@ def wurzelig() :
         Stage = 3
     calc()
 def Meehr() :
-    global DarkMode, MehrX, DezimalFrame, DezimalAnzeige, DezimalZahl, BinaerLabel, HexLabel
+    global DarkMode, MehrX, DezimalFrame, DezimalAnzeige, DezimalZahl, BinaerLabel, HexLabel, usedttktheme
     MehrX = tk.Tk()
     MehrX.title("Decimal Converter")
-    if DarkMode == 1 :
-        usedttktheme = "black"
     MehrX.config(height=200, width=500)
     style = ThemedStyle(MehrX)
     style.theme_use(usedttktheme)
@@ -1120,8 +1139,8 @@ def xcheck() :
     print("____________________________")
 def xquit() :
     Fenster.destroy()
-if DarkMode == 1 :
-    usedttktheme = "black"
+# if DarkMode == 1 :
+#     usedttktheme = "black"
 # Hauptfenster
 Fenster = tk.Tk()
 Fenster.title("PraktiCalc")
