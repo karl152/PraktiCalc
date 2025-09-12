@@ -833,17 +833,17 @@ def Settings() :
     style.theme_use(usedttktheme)
     SettingsTitle = ttk.Label(SettingsWindow, text="Settings", )
     SettingsTitleDecoration = ttk.Label(SettingsWindow, text="▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀", )
-    StatusBarSettingDesc = ttk.Label(SettingsWindow, text="Status Bar")
-    if StatusBar == 0 :
-        StatusBarToggle = ttk.Button(SettingsWindow, text="☐", command=StatusBarOn)
-    if StatusBar == 1 :
-        StatusBarToggle = ttk.Button(SettingsWindow, text="🗹", command=StatusBarOff)
-    CustomStatusBarDesc = ttk.Label(SettingsWindow, text="Alternative Messageboxes")
+    StatusBarToggle = ttk.Checkbutton(SettingsWindow, text="Status Bar", command=ToggleStatusBar)
+    CustomMsgBoxToggle = ttk.Checkbutton(SettingsWindow, text="Alternative Messageboxes", command=ToggleCustomMsgBoxes)
     if CustomMsgBox == 0 :
-        CustomMsgBoxToggle = ttk.Button(SettingsWindow, text="☐", command=CustomMsgBoxOn)
+        CustomMsgBoxToggle.state(["!selected"])
     if CustomMsgBox == 1 :
-        CustomMsgBoxToggle = ttk.Button(SettingsWindow, text="🗹", command=CustomMsgBoxOff)
+        CustomMsgBoxToggle.state(["selected"])
     DarkModeToggle = ttk.Checkbutton(SettingsWindow, text="Dark Mode", command=ChangeDarkMode)
+    if StatusBar == 1:
+        StatusBarToggle.state(["selected"])
+    elif StatusBar == 0:
+        StatusBarToggle.state(["!selected"])
     if DarkMode == 1:
         DarkModeToggle.state(["selected"])
     elif DarkMode == 0:
@@ -851,12 +851,27 @@ def Settings() :
     DarkModeDesc = ttk.Label(SettingsWindow, text="Dark Mode")
     SettingsTitle.place(x=0, y=0)
     SettingsTitleDecoration.place(x=0, y=24)
-    StatusBarSettingDesc.place(x=30, y=45)
     StatusBarToggle.place(x=5, y=45)
-    CustomStatusBarDesc.place(x=30, y=72)
     CustomMsgBoxToggle.place(x=5, y=72)
     DarkModeToggle.place(x=5, y=99)
-    # DarkModeDesc.place(x=30, y=99)
+def ToggleCustomMsgBoxes():
+    global CustomMsgBox, CustomMsgBoxToggle
+    if CustomMsgBox == 0:
+        CustomMsgBox = 1
+    elif CustomMsgBox == 1:
+        CustomMsgBox = 0
+def ToggleStatusBar():
+    global Status, StatusBar, StatusBarToggle, StatusDecoration, Fenster
+    if StatusBar == 1:
+        Status.config(text="")
+        StatusBar = 0
+        StatusDecoration.config(text="")
+        Fenster.config(width=256, height=315)
+    elif StatusBar == 0:
+        Fenster.config(width=256, height=330)
+        Status.config(text="Ready")
+        StatusBar = 1
+        StatusDecoration.config(text="__________________________________________________")
 def ChangeDarkMode() :
     global DarkMode, usedttktheme, SettingsWindow, style, HistoryX, MehrX
     if DarkMode == 0 :
@@ -889,23 +904,6 @@ def ChangeDarkMode() :
         style.theme_use(usedttktheme)
         style = ThemedStyle(CustomInfox)
         style.theme_use(usedttktheme)
-    print(DarkMode)
-def StatusBarOn() :
-    global Status, StatusBar, StatusBarToggle, StatusDecoration, Fenster
-    Fenster.config(width=256, height=330)
-    Status.config(text="Ready")
-    StatusBar = 1
-    StatusBarToggle.config(text="🗹", command=StatusBarOff)
-    StatusDecoration.config(text="__________________________________________________")
-    SizeReload()
-def StatusBarOff() :
-    global Status, StatusBar, StatusBarToggle, StatusDecoration, Fenster
-    Status.config(text="")
-    StatusBar = 0
-    StatusBarToggle.config(text="☐", command=StatusBarOn)
-    StatusDecoration.config(text="")
-    Fenster.config(width=256, height=315)
-    SizeReload()
 def CustomDiv0() :
     global Div0Error
     Div0Error = tk.Tk()
@@ -937,14 +935,6 @@ def CustomInfo() :
     CustomInfoExit.place(x=400, y=200)
     ExtendedInfoFrame.place(x=100, y=55, height=125, width=357)
     ExtInfoText1.place(x=5, y=0)
-def CustomMsgBoxOn() :
-    global CustomMsgBox, CustomMsgBoxToggle
-    CustomMsgBox = 1
-    CustomMsgBoxToggle.config(text="🗹", command=CustomMsgBoxOff)
-def CustomMsgBoxOff() :
-    global CustomMsgBox, CustomMsgBoxToggle
-    CustomMsgBox = 0
-    CustomMsgBoxToggle.config(text="☐", command=CustomMsgBoxOn)
 def closeCustomInfo() :
     global CustomInfox
     CustomInfox.destroy()
