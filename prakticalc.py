@@ -844,6 +844,10 @@ def Settings() :
     if CustomMsgBox == 1 :
         CustomMsgBoxToggle = ttk.Button(SettingsWindow, text="🗹", command=CustomMsgBoxOff)
     DarkModeToggle = ttk.Checkbutton(SettingsWindow, text="Dark Mode", command=ChangeDarkMode)
+    if DarkMode == 1:
+        DarkModeToggle.state(["selected"])
+    elif DarkMode == 0:
+        DarkModeToggle.state(["!selected"])
     DarkModeDesc = ttk.Label(SettingsWindow, text="Dark Mode")
     SettingsTitle.place(x=0, y=0)
     SettingsTitleDecoration.place(x=0, y=24)
