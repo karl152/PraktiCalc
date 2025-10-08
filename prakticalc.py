@@ -23,7 +23,14 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from ttkthemes import ThemedStyle
+import platform
+import subprocess
 usedttktheme = "default"
+if platform.system() == "Windows":
+    MsgBoxStyles = ["Tkinter", "Alternative"] #, "VBS"]
+else:
+    MsgBoxStyles = ["Tkinter", "Alternative", "XMessage", "YAD", "KDialog", "Zenity"]
+CurrentMsgBoxStyle = 1
 # import win32clipboard
 # Variablen definieren
 Eingabe1 = "0"
@@ -58,10 +65,7 @@ HexadezimalZahl = 0
 
 # Funktionen definieren
 def info() :
-    if CustomMsgBox == 0 :
-        messagebox.showinfo("PraktiCalc 1.3 (in development), licensed under GPLv3", "This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.")
-    if CustomMsgBox == 1 :
-        CustomInfo()
+    CustomInfo()
 def eins() :
     global Eingabe1, Eingabe2, Ausgabe, Stage
     if Stage == 5 :
@@ -394,7 +398,7 @@ def komma() :
         Stage = 2
     SizeReload()
 def calc() :
-    global historylist, Eingabe1, Stage, Eingabe2, Ausgabe, Operator, EndErgebnis, aEndErgebnis, CustomMsgBox, HistoryWrite, History1, History2, History3, History4, History5, History6, History7, History8, History9, History10, History11, History12, History13, History14, History15
+    global historylist, Eingabe1, Stage, Eingabe2, Ausgabe, Operator, EndErgebnis, aEndErgebnis, HistoryWrite, History1, History2, History3, History4, History5, History6, History7, History8, History9, History10, History11, History12, History13, History14, History15
     if HistoryWrite >=16 :
         History1 = History2
         History2 = History3
@@ -691,10 +695,7 @@ def calc() :
         if Operator == "/" :
             if Eingabe2 == "0" :
                 if StatusBar == 0 :
-                    if CustomMsgBox == 0 :
-                        messagebox.showerror("Error", "Division by 0")
-                    if CustomMsgBox == 1 :
-                        CustomDiv0()
+                    CustomDiv0()
                 if StatusBar == 1 :
                     Status.config(text="Error: Division by 0")
                 clear()
@@ -825,21 +826,23 @@ def Tastendruck(event):
     if Taste == "BackSpace" :
         Backspace()
 def Settings() :
-    global Status, SettingsWindow, StatusBar, StatusBarToggle, CustomMsgBox, CustomMsgBoxToggle, DarkMode, DarkModeToggle
+    global Status, SettingsWindow, StatusBar, StatusBarToggle, CustomMsgBox, CustomMsgBoxToggle, DarkMode, DarkModeToggle, MsgBoxStyles, CurrentMsgBoxStyle, MsgBoxStyleSelect
     SettingsWindow = tk.Tk()
     SettingsWindow.title("Settings")
     SettingsWindow.config(width=250, height=152)
+    SettingsWindow.rowconfigure(0, weight=1)
+    SettingsWindow.columnconfigure(0, weight=1)
     style = ThemedStyle(SettingsWindow)
     style.theme_use(usedttktheme)
-    SettingsTitle = ttk.Label(SettingsWindow, text="Settings", )
-    SettingsTitleDecoration = ttk.Label(SettingsWindow, text="▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀", )
-    StatusBarToggle = ttk.Checkbutton(SettingsWindow, text="Status Bar", command=ToggleStatusBar)
-    CustomMsgBoxToggle = ttk.Checkbutton(SettingsWindow, text="Alternative Messageboxes", command=ToggleCustomMsgBoxes)
+    SettingsWindowFrame = ttk.Frame(SettingsWindow)
+    SettingsWindowFrame.columnconfigure(0, weight=1)
+    StatusBarToggle = ttk.Checkbutton(SettingsWindowFrame, text="Status Bar", command=ToggleStatusBar)
+    CustomMsgBoxToggle = ttk.Checkbutton(SettingsWindowFrame, text="Alternative Messageboxes", command=ToggleCustomMsgBoxes)
     if CustomMsgBox == 0 :
         CustomMsgBoxToggle.state(["!selected"])
     if CustomMsgBox == 1 :
         CustomMsgBoxToggle.state(["selected"])
-    DarkModeToggle = ttk.Checkbutton(SettingsWindow, text="Dark Mode", command=ChangeDarkMode)
+    DarkModeToggle = ttk.Checkbutton(SettingsWindowFrame, text="Dark Mode", command=ChangeDarkMode)
     if StatusBar == 1:
         StatusBarToggle.state(["selected"])
     elif StatusBar == 0:
@@ -848,12 +851,23 @@ def Settings() :
         DarkModeToggle.state(["selected"])
     elif DarkMode == 0:
         DarkModeToggle.state(["!selected"])
-    DarkModeDesc = ttk.Label(SettingsWindow, text="Dark Mode")
-    SettingsTitle.place(x=0, y=0)
-    SettingsTitleDecoration.place(x=0, y=24)
-    StatusBarToggle.place(x=5, y=45)
-    CustomMsgBoxToggle.place(x=5, y=72)
-    DarkModeToggle.place(x=5, y=99)
+    MsgBoxStyleFrame = ttk.LabelFrame(SettingsWindowFrame, text="Messagebox Style")
+    MsgBoxStyleFrame.columnconfigure(0, weight=1)
+    MsgBoxStyleSelect = ttk.Combobox(MsgBoxStyleFrame, values=MsgBoxStyles)
+    MsgBoxStyleSelect.current(CurrentMsgBoxStyle)
+    SettingsOKButton = ttk.Button(SettingsWindowFrame, text="OK", command=loadTheme)
+    SettingsWindowFrame.grid(row=0, column=0, sticky="nesw")
+    StatusBarToggle.grid(row=0, column=0, sticky="w", padx=10)
+    # CustomMsgBoxToggle.grid(row=1, column=0, sticky="w", padx=10)
+    DarkModeToggle.grid(row=2, column=0, sticky="w", padx=10)
+    MsgBoxStyleFrame.grid(row=3, column=0, sticky="ew", padx=10)
+    MsgBoxStyleSelect.grid(row=0, column=0, sticky="ew")
+    SettingsOKButton.grid(row=4, column=0, sticky="ew", padx=10, pady=10)
+def loadTheme():
+    global SettingsWindow, CurrentMsgBoxStyle, MsgBoxStyleSelect
+    CurrentMsgBoxStyle = MsgBoxStyleSelect.current()
+    print(CurrentMsgBoxStyle)
+    SettingsWindow.destroy()
 def ToggleCustomMsgBoxes():
     global CustomMsgBox, CustomMsgBoxToggle
     if CustomMsgBox == 0:
@@ -906,35 +920,72 @@ def ChangeDarkMode() :
         style.theme_use(usedttktheme)
 def CustomDiv0() :
     global Div0Error
-    Div0Error = tk.Tk()
-    Div0Error.title("Error")
-    Div0Error.config(width=500, height=250)
-    style = ThemedStyle(Div0Error)
-    style.theme_use(usedttktheme)
-    Div0Desc = ttk.Label(Div0Error, text="Division by 0")
-    Div0Symbol = ttk.Label(Div0Error, text="🚫")
-    Div0Exit = ttk.Button(Div0Error, text="     OK     ", command=closeCustomDiv0)
-    Div0Desc.place(x=150, y=100)
-    Div0Symbol.place(x=10, y=10)
-    Div0Exit.place(x=400, y=200)
+    if CurrentMsgBoxStyle == 0:
+        messagebox.showerror("Error", "Division by 0")
+    elif CurrentMsgBoxStyle == 1:
+        Div0Error = tk.Tk()
+        Div0Error.title("Error")
+        Div0Error.config(width=500, height=250)
+        style = ThemedStyle(Div0Error)
+        style.theme_use(usedttktheme)
+        Div0Desc = ttk.Label(Div0Error, text="Division by 0")
+        Div0Symbol = ttk.Label(Div0Error, text="🚫")
+        Div0Exit = ttk.Button(Div0Error, text="     OK     ", command=closeCustomDiv0)
+        Div0Desc.place(x=150, y=100)
+        Div0Symbol.place(x=10, y=10)
+        Div0Exit.place(x=400, y=200)
+    else:
+        if platform.system() == "Windows":
+            print("ERROR: Unknown Message Box Style")
+        else:
+            if CurrentMsgBoxStyle == 2:
+                subprocess.Popen(["xmessage", "-title", "Error", "Division by 0"])
+            elif CurrentMsgBoxStyle == 3:
+                subprocess.Popen(["yad", "--title=Error", "--error", "--button=OK", "--text=Division by 0"])
+            elif CurrentMsgBoxStyle == 4:
+                subprocess.Popen(["kdialog", "--title=Error", "--error", "Division by 0"])
+            elif CurrentMsgBoxStyle == 5:
+                subprocess.Popen(["zenity", "--title=Error", "--error", "--text=Division by 0"])
+            else:
+                print("ERROR: Unknown Message Box Style")
 def CustomInfo() :
     global CustomInfox
-    CustomInfox = tk.Tk()
-    CustomInfox.title("Info")
-    infotext = "PraktiCalc\nVersion 1.3 (in development)\ntested in Python 3.11+\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/"
-    CustomInfox.config(width=500, height=250)
-    style = ThemedStyle(CustomInfox)
-    style.theme_use(usedttktheme)
-    CustomInfoDesc = ttk.Label(CustomInfox, text="PraktiCalc")
-    CustomInfoSymbol = ttk.Label(CustomInfox, text="ℹ")
-    CustomInfoExit = ttk.Button(CustomInfox, text="     OK     ", command=closeCustomInfo)
-    ExtendedInfoFrame = ttk.Frame(CustomInfox, relief="sunken", borderwidth=2)
-    ExtInfoText1 = ttk.Label(ExtendedInfoFrame, text=infotext, justify="left")
-    CustomInfoDesc.place(x=150, y=25)
-    CustomInfoSymbol.place(x=10, y=10)
-    CustomInfoExit.place(x=400, y=200)
-    ExtendedInfoFrame.place(x=100, y=55, height=125, width=357)
-    ExtInfoText1.place(x=5, y=0)
+    infotext = "PraktiCalc\nVersion 1.3 (in development)\nrunning on Python "+ platform.python_version() + "\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/"
+    if CurrentMsgBoxStyle == 0:
+        messagebox.showinfo("About PraktiCalc", infotext)
+    elif CurrentMsgBoxStyle == 1:
+        CustomInfox = tk.Tk()
+        CustomInfox.title("About PraktiCalc")
+        CustomInfox.config(width=500, height=250)
+        style = ThemedStyle(CustomInfox)
+        style.theme_use(usedttktheme)
+        CustomInfoDesc = ttk.Label(CustomInfox, text="PraktiCalc")
+        CustomInfoSymbol = ttk.Label(CustomInfox, text="ℹ")
+        CustomInfoExit = ttk.Button(CustomInfox, text="     OK     ", command=closeCustomInfo)
+        ExtendedInfoFrame = ttk.Frame(CustomInfox, relief="sunken", borderwidth=2)
+        ExtInfoText1 = ttk.Label(ExtendedInfoFrame, text=infotext, justify="left")
+        CustomInfoDesc.place(x=150, y=25)
+        CustomInfoSymbol.place(x=10, y=10)
+        CustomInfoExit.place(x=400, y=200)
+        ExtendedInfoFrame.place(x=100, y=55, height=125, width=357)
+        ExtInfoText1.place(x=5, y=0)
+    else:
+        if platform.system() == "Windows":
+            #if CurrentMsgBoxStyle == 2:
+                #pass #subprocess.Popen(["cmd", "/C", 'echo MsgBox "Hallo Welt" > test.vbs && cscript test.vbs && del test.vbs']) this is difficult and not important at all. VBS integration not coming soon
+            #else:
+            print("ERROR: Unknown Message Box Style")
+        else:
+            if CurrentMsgBoxStyle == 2:
+                subprocess.Popen(["xmessage", "-title", "About PraktiCalc", infotext])
+            elif CurrentMsgBoxStyle == 3:
+                subprocess.Popen(["yad", "--title=About PraktiCalc", "--info", "--button=OK", "--text=" + infotext])
+            elif CurrentMsgBoxStyle == 4:
+                subprocess.Popen(["kdialog", "--title=About PraktiCalc", "--msgbox", infotext])
+            elif CurrentMsgBoxStyle == 5:
+                subprocess.Popen(["zenity", "--title=About PraktiCalc", "--info", "--text=" + infotext])
+            else:
+                print("ERROR: Unknown Message Box Style")
 def closeCustomInfo() :
     global CustomInfox
     CustomInfox.destroy()
@@ -1102,7 +1153,24 @@ def paste() :
     try:
         DezimalZahl = int(cp)
     except:
-        messagebox.showerror("Error", "Please enter a real number!", parent=MehrX)
+        if CurrentMsgBoxStyle == 0:
+            messagebox.showerror("Error", "Please enter a real number!", parent=MehrX)
+        elif CurrentMsgBoxStyle == 1:
+            messagebox.showerror("Error", "Please enter a real number!", parent=MehrX)
+        else:
+            if platform.system() == "Windows":
+                print("ERROR: Unknown Message Box Style")
+            else:
+                if CurrentMsgBoxStyle == 2:
+                    subprocess.Popen(["xmessage", "-title", "Error", "Please enter a real number!"])
+                elif CurrentMsgBoxStyle == 3:
+                    subprocess.Popen(["yad", "--title=Error", "--error", "--button=OK", "--text=Please enter a real number!"])
+                elif CurrentMsgBoxStyle == 4:
+                    subprocess.Popen(["kdialog", "--title=Error", "--error", "Please enter a real number!"])
+                elif CurrentMsgBoxStyle == 5:
+                    subprocess.Popen(["zenity", "--title=Error", "--error", "--text=Please enter a real number!"])
+                else:
+                    print("ERROR: Unknown Message Box Style")
     DezimalAnzeige.config(text=str(DezimalZahl))
     BinaerZahl = bin(DezimalZahl)[2:]
     HexadezimalZahl = hex(DezimalZahl)
