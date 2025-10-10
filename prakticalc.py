@@ -27,7 +27,7 @@ import platform
 import subprocess
 usedttktheme = "default"
 if platform.system() == "Windows":
-    MsgBoxStyles = ["Tkinter", "Alternative"] #, "VBS"]
+    MsgBoxStyles = ["Tkinter", "Alternative", "VBS"]
 else:
     MsgBoxStyles = ["Tkinter", "Alternative", "XMessage", "YAD", "KDialog", "Zenity"]
 CurrentMsgBoxStyle = 1
@@ -936,7 +936,10 @@ def CustomDiv0() :
         Div0Exit.place(x=400, y=200)
     else:
         if platform.system() == "Windows":
-            print("ERROR: Unknown Message Box Style")
+            if CurrentMsgBoxStyle == 2:
+                subprocess.getoutput('cmd /C echo(MsgBox "Division by 0", 16, "Error"> test.vbs && cscript test.vbs && del test.vbs')
+            else:
+                print("ERROR: Unknown Message Box Style")
         else:
             if CurrentMsgBoxStyle == 2:
                 subprocess.Popen(["xmessage", "-title", "Error", "Division by 0"])
@@ -971,10 +974,10 @@ def CustomInfo() :
         ExtInfoText1.place(x=5, y=0)
     else:
         if platform.system() == "Windows":
-            #if CurrentMsgBoxStyle == 2:
-                #pass #subprocess.Popen(["cmd", "/C", 'echo MsgBox "Hallo Welt" > test.vbs && cscript test.vbs && del test.vbs']) this is difficult and not important at all. VBS integration not coming soon
-            #else:
-            print("ERROR: Unknown Message Box Style")
+            if CurrentMsgBoxStyle == 2:
+                subprocess.getoutput('cmd /C echo(MsgBox "PraktiCalc                                                                              Version 1.3                                                                                      a Python Project                                                                 Licensed under GPLv3                                                               read more at https://www.gnu.org/licenses/", 64, "About PraktiCalc"> test.vbs && cscript test.vbs && del test.vbs')
+            else:
+                print("ERROR: Unknown Message Box Style")
         else:
             if CurrentMsgBoxStyle == 2:
                 subprocess.Popen(["xmessage", "-title", "About PraktiCalc", infotext])
@@ -1159,7 +1162,10 @@ def paste() :
             messagebox.showerror("Error", "Please enter a real number!", parent=MehrX)
         else:
             if platform.system() == "Windows":
-                print("ERROR: Unknown Message Box Style")
+                if CurrentMsgBoxStyle == 2:
+                    subprocess.getoutput('cmd /C echo(MsgBox "Please enter a real number!", 16, "Error"> test.vbs && cscript test.vbs && del test.vbs')
+                else:
+                    print("ERROR: Unknown Message Box Style")
             else:
                 if CurrentMsgBoxStyle == 2:
                     subprocess.Popen(["xmessage", "-title", "Error", "Please enter a real number!"])
