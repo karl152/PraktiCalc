@@ -919,38 +919,7 @@ def ChangeDarkMode() :
         style = ThemedStyle(CustomInfox)
         style.theme_use(usedttktheme)
 def CustomDiv0() :
-    global Div0Error
-    if CurrentMsgBoxStyle == 0:
-        messagebox.showerror("Error", "Division by 0")
-    elif CurrentMsgBoxStyle == 1:
-        Div0Error = tk.Tk()
-        Div0Error.title("Error")
-        Div0Error.config(width=500, height=250)
-        style = ThemedStyle(Div0Error)
-        style.theme_use(usedttktheme)
-        Div0Desc = ttk.Label(Div0Error, text="Division by 0")
-        Div0Symbol = ttk.Label(Div0Error, text="🚫")
-        Div0Exit = ttk.Button(Div0Error, text="     OK     ", command=closeCustomDiv0)
-        Div0Desc.place(x=150, y=100)
-        Div0Symbol.place(x=10, y=10)
-        Div0Exit.place(x=400, y=200)
-    else:
-        if platform.system() == "Windows":
-            if CurrentMsgBoxStyle == 2:
-                subprocess.getoutput('cmd /C echo(MsgBox "Division by 0", 16, "Error"> test.vbs && cscript test.vbs && del test.vbs')
-            else:
-                print("ERROR: Unknown Message Box Style")
-        else:
-            if CurrentMsgBoxStyle == 2:
-                subprocess.Popen(["xmessage", "-title", "Error", "[X] Division by 0"])
-            elif CurrentMsgBoxStyle == 3:
-                subprocess.Popen(["yad", "--title=Error", "--error", "--image=dialog-error", "--button=OK", "--text=Division by 0"])
-            elif CurrentMsgBoxStyle == 4:
-                subprocess.Popen(["kdialog", "--title=Error", "--error", "Division by 0"])
-            elif CurrentMsgBoxStyle == 5:
-                subprocess.Popen(["zenity", "--title=Error", "--error", "--text=Division by 0"])
-            else:
-                print("ERROR: Unknown Message Box Style")
+    showError("Division by 0")
 def CustomInfo() :
     global CustomInfox
     infotext = "PraktiCalc\nVersion 1.3 (in development)\nrunning on Python "+ platform.python_version() + "\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/"
@@ -995,6 +964,42 @@ def closeCustomInfo() :
 def closeCustomDiv0() :
     global Div0Error
     Div0Error.destroy()
+def showError(message):
+    global ErrorWindow
+    if CurrentMsgBoxStyle == 0:
+        messagebox.showerror("Error", message)
+    elif CurrentMsgBoxStyle == 1:
+        ErrorWindow = tk.Tk()
+        ErrorWindow.title("Error")
+        ErrorWindow.config(width=500, height=250)
+        style = ThemedStyle(ErrorWindow)
+        style.theme_use(usedttktheme)
+        ErrorDesc = ttk.Label(ErrorWindow, text=message)
+        ErrorSymbol = ttk.Label(ErrorWindow, text="🚫")
+        ErrorExitButton = ttk.Button(ErrorWindow, text="     OK     ", command=closeError)
+        ErrorDesc.place(x=150, y=100)
+        ErrorSymbol.place(x=10, y=10)
+        ErrorExitButton.place(x=400, y=200)
+    else:
+        if platform.system() == "Windows":
+            if CurrentMsgBoxStyle == 2:
+                subprocess.getoutput('cmd /C echo(MsgBox "' + message + '", 16, "Error"> test.vbs && cscript test.vbs && del test.vbs')
+            else:
+                print("ERROR: Unknown Message Box Style")
+        else:
+            if CurrentMsgBoxStyle == 2:
+                subprocess.Popen(["xmessage", "-title", "Error", "[X] " + message])
+            elif CurrentMsgBoxStyle == 3:
+                subprocess.Popen(["yad", "--title=Error", "--error", "--image=dialog-error", "--button=OK", "--text=" + message])
+            elif CurrentMsgBoxStyle == 4:
+                subprocess.Popen(["kdialog", "--title=Error", "--error", message])
+            elif CurrentMsgBoxStyle == 5:
+                subprocess.Popen(["zenity", "--title=Error", "--error", "--text=" + message])
+            else:
+                print("ERROR: Unknown Message Box Style")
+def closeError():
+    global ErrorWindow
+    ErrorWindow.destroy()
 def SizeReload() :
     pass
 def ZeichenStatus() :
@@ -1156,27 +1161,7 @@ def paste() :
     try:
         DezimalZahl = int(cp)
     except:
-        if CurrentMsgBoxStyle == 0:
-            messagebox.showerror("Error", "Please enter a real number!", parent=MehrX)
-        elif CurrentMsgBoxStyle == 1:
-            messagebox.showerror("Error", "Please enter a real number!", parent=MehrX)
-        else:
-            if platform.system() == "Windows":
-                if CurrentMsgBoxStyle == 2:
-                    subprocess.getoutput('cmd /C echo(MsgBox "Please enter a real number!", 16, "Error"> test.vbs && cscript test.vbs && del test.vbs')
-                else:
-                    print("ERROR: Unknown Message Box Style")
-            else:
-                if CurrentMsgBoxStyle == 2:
-                    subprocess.Popen(["xmessage", "-title", "Error", "[X] Please enter a real number!"])
-                elif CurrentMsgBoxStyle == 3:
-                    subprocess.Popen(["yad", "--title=Error", "--error", "--image=dialog-error", "--button=OK", "--text=Please enter a real number!"])
-                elif CurrentMsgBoxStyle == 4:
-                    subprocess.Popen(["kdialog", "--title=Error", "--error", "Please enter a real number!"])
-                elif CurrentMsgBoxStyle == 5:
-                    subprocess.Popen(["zenity", "--title=Error", "--error", "--text=Please enter a real number!"])
-                else:
-                    print("ERROR: Unknown Message Box Style")
+        showError("Please enter a real number!")
     DezimalAnzeige.config(text=str(DezimalZahl))
     BinaerZahl = bin(DezimalZahl)[2:]
     HexadezimalZahl = hex(DezimalZahl)
