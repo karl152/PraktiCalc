@@ -20,7 +20,7 @@ from tkinter import messagebox
 from ttkthemes import ThemedStyle
 import platform
 import subprocess
-usedttktheme = "default"
+usedttktheme = "plastik"
 if platform.system() == "Windows":
     MsgBoxStyles = ["Tkinter", "Alternative", "VBS"]
 else:
@@ -900,7 +900,7 @@ def ChangeDarkMode() :
         style.theme_use(usedttktheme)
     elif DarkMode == 1 :
         DarkMode = 0
-        usedttktheme = "default"
+        usedttktheme = "plastik"
         style = ThemedStyle(MainWindow)
         style.theme_use(usedttktheme)
         style = ThemedStyle(SettingsWindow)
