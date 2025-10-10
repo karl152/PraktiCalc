@@ -827,8 +827,16 @@ def Settings() :
     SettingsWindow.config(width=250, height=152)
     SettingsWindow.rowconfigure(0, weight=1)
     SettingsWindow.columnconfigure(0, weight=1)
-    style = ThemedStyle(SettingsWindow)
-    style.theme_use(usedttktheme)
+    if platform.system() == "Windows":
+        if DarkMode == 1:
+            style = ThemedStyle(SettingsWindow)
+            style.theme_use(usedttktheme)
+        else:
+            style = ttk.Style(SettingsWindow)
+            style.theme_use("vista")
+    else:
+        style = ThemedStyle(SettingsWindow)
+        style.theme_use(usedttktheme)
     SettingsWindowFrame = ttk.Frame(SettingsWindow)
     SettingsWindowFrame.columnconfigure(0, weight=1)
     StatusBarToggle = ttk.Checkbutton(SettingsWindowFrame, text="Status Bar", command=ToggleStatusBar)
@@ -894,25 +902,39 @@ def ChangeDarkMode() :
         style.theme_use(usedttktheme)
         style = ThemedStyle(MoreWindow)
         style.theme_use(usedttktheme)
-        style = ThemedStyle(Div0Error)
+        style = ThemedStyle(ErrorWindow)
         style.theme_use(usedttktheme)
         style = ThemedStyle(CustomInfox)
         style.theme_use(usedttktheme)
     elif DarkMode == 1 :
         DarkMode = 0
         usedttktheme = "plastik"
-        style = ThemedStyle(MainWindow)
-        style.theme_use(usedttktheme)
-        style = ThemedStyle(SettingsWindow)
-        style.theme_use(usedttktheme)
-        style = ThemedStyle(HistoryX)
-        style.theme_use(usedttktheme)
-        style = ThemedStyle(MoreWindow)
-        style.theme_use(usedttktheme)
-        style = ThemedStyle(Div0Error)
-        style.theme_use(usedttktheme)
-        style = ThemedStyle(CustomInfox)
-        style.theme_use(usedttktheme)
+        if platform.system() == "Windows":
+            style = ttk.Style(MainWindow)
+            style.theme_use("vista")
+            style = ttk.Style(SettingsWindow)
+            style.theme_use("vista")
+            style = ttk.Style(HistoryX)
+            style.theme_use("vista")
+            style = ttk.Style(MoreWindow)
+            style.theme_use("vista")
+            style = ttk.Style(ErrorWindow)
+            style.theme_use("vista")
+            style = ttk.Style(CustomInfox)
+            style.theme_use("vista")
+        else:
+            style = ThemedStyle(MainWindow)
+            style.theme_use(usedttktheme)
+            style = ThemedStyle(SettingsWindow)
+            style.theme_use(usedttktheme)
+            style = ThemedStyle(HistoryX)
+            style.theme_use(usedttktheme)
+            style = ThemedStyle(MoreWindow)
+            style.theme_use(usedttktheme)
+            style = ThemedStyle(ErrorWindow)
+            style.theme_use(usedttktheme)
+            style = ThemedStyle(CustomInfox)
+            style.theme_use(usedttktheme)
 def CustomDiv0() :
     showError("Division by 0")
 def CustomInfo() :
@@ -925,8 +947,16 @@ def CustomInfo() :
         CustomInfox.title("About PraktiCalc")
         CustomInfox.rowconfigure(0, weight=1)
         CustomInfox.columnconfigure(0, weight=1)
-        style = ThemedStyle(CustomInfox)
-        style.theme_use(usedttktheme)
+        if platform.system() == "Windows":
+            if DarkMode == 1:
+                style = ThemedStyle(CustomInfox)
+                style.theme_use(usedttktheme)
+            else:
+                style = ttk.Style(CustomInfox)
+                style.theme_use("vista")
+        else:
+            style = ThemedStyle(CustomInfox)
+            style.theme_use(usedttktheme)
         CustomInfoFrame = ttk.Frame(CustomInfox)
         CustomInfoFrame.rowconfigure(0, weight=1)
         CustomInfoFrame.columnconfigure(0, weight=1)
@@ -971,8 +1001,16 @@ def showError(message):
         ErrorWindow.title("Error")
         ErrorWindow.rowconfigure(0, weight=1)
         ErrorWindow.columnconfigure(0, weight=1)
-        style = ThemedStyle(ErrorWindow)
-        style.theme_use(usedttktheme)
+        if platform.system() == "Windows":
+            if DarkMode == 1:
+                style = ThemedStyle(ErrorWindow)
+                style.theme_use(usedttktheme)
+            else:
+                style = ttk.Style(ErrorWindow)
+                style.theme_use("vista")
+        else:
+            style = ThemedStyle(ErrorWindow)
+            style.theme_use(usedttktheme)
         ErrorWindowFrame = ttk.Frame(ErrorWindow)
         ErrorWindowFrame.rowconfigure(0, weight=1)
         ErrorWindowFrame.columnconfigure(0, weight=1)
@@ -1052,8 +1090,16 @@ def History() :
     HistoryX.columnconfigure(0, weight=1)
     HistoryX.title("History")
     # HistoryX.config(height=400, width=256)
-    style = ThemedStyle(HistoryX)
-    style.theme_use(usedttktheme)
+    if platform.system() == "Windows":
+        if DarkMode == 1:
+            style = ThemedStyle(HistoryX)
+            style.theme_use(usedttktheme)
+        else:
+            style = ttk.Style(HistoryX)
+            style.theme_use("vista")
+    else:
+        style = ThemedStyle(HistoryX)
+        style.theme_use(usedttktheme)
     HistoryWindowFrame = ttk.Frame(HistoryX)
     HistoryWindowFrame.columnconfigure(0, weight=1)
     for i in range(31):
@@ -1166,8 +1212,16 @@ def More() :
     MoreWindow.config(height=200, width=500)
     MoreWindow.rowconfigure(0, weight=1)
     MoreWindow.columnconfigure(0, weight=1)
-    style = ThemedStyle(MoreWindow)
-    style.theme_use(usedttktheme)
+    if platform.system() == "Windows":
+        if DarkMode == 1:
+            style = ThemedStyle(MoreWindow)
+            style.theme_use(usedttktheme)
+        else:
+            style = ttk.Style(MoreWindow)
+            style.theme_use("vista")
+    else:
+        style = ThemedStyle(MoreWindow)
+        style.theme_use(usedttktheme)
     ConverterWindowFrame = ttk.Frame(MoreWindow)
     DecimalFrame = ttk.LabelFrame(ConverterWindowFrame, text="Decimal")
     DecimalInput = ttk.Entry(DecimalFrame, width=70)
@@ -1245,8 +1299,16 @@ MainWindow.title("PraktiCalc")
 MainWindow.config(width=256, height=315)
 MainWindow.rowconfigure(0, weight=1)
 MainWindow.columnconfigure(0, weight=1)
-style = ThemedStyle(MainWindow)
-style.theme_use(usedttktheme)
+if platform.system() == "Windows":
+    if DarkMode == 1:
+        style = ThemedStyle(MainWindow)
+        style.theme_use(usedttktheme)
+    else:
+        style = ttk.Style(MainWindow)
+        style.theme_use("vista")
+else:
+    style = ThemedStyle(MainWindow)
+    style.theme_use(usedttktheme)
 WindowFrame = ttk.Frame(MainWindow)
 for colrow in range(5):
     WindowFrame.rowconfigure(colrow, weight=1)
@@ -1286,7 +1348,7 @@ sqrtButton = ttk.Button(WindowFrame, text="√", command=rooty)
 More = ttk.Button(WindowFrame, text="...", command=More)
 WindowFrame.grid(row=0, column=0, sticky="nesw")
 Outputframe.grid(row=0, column=0, columnspan=4, sticky="nesw")
-Output.pack()
+Output.pack(pady=1)
 PlusButton.grid(row=1, column=1, sticky="nesw")
 MinusButton.grid(row=1, column=2, sticky="nesw")
 MultiplyButton.grid(row=1, column=3, sticky="nesw")
