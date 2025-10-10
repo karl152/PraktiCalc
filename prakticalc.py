@@ -866,7 +866,7 @@ def Settings() :
 def loadTheme():
     global SettingsWindow, CurrentMsgBoxStyle, MsgBoxStyleSelect
     CurrentMsgBoxStyle = MsgBoxStyleSelect.current()
-    print(CurrentMsgBoxStyle)
+    # print(CurrentMsgBoxStyle)
     SettingsWindow.destroy()
 def ToggleCustomMsgBoxes():
     global CustomMsgBox, CustomMsgBoxToggle
