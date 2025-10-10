@@ -1262,17 +1262,19 @@ def paste() :
     BinaryLabel.config(text=str(BinaryNumber))
     HexLabel.config(text=str(HexadecimalNumber))
 def copybin() :
-    global BinaryNumber
-    win32clipboard.OpenClipboard()
-    win32clipboard.EmptyClipboard()
-    win32clipboard.SetClipboardText(BinaryNumber)
-    win32clipboard.CloseClipboard()
+    # global BinaryNumber
+    # win32clipboard.OpenClipboard()
+    # win32clipboard.EmptyClipboard()
+    # win32clipboard.SetClipboardText(BinaryNumber)
+    # win32clipboard.CloseClipboard()
+    pass
 def copyhex() :
-    global HexadecimalNumber
-    win32clipboard.OpenClipboard()
-    win32clipboard.EmptyClipboard()
-    win32clipboard.SetClipboardText(HexadecimalNumber)
-    win32clipboard.CloseClipboard()
+    # global HexadecimalNumber
+    # win32clipboard.OpenClipboard()
+    # win32clipboard.EmptyClipboard()
+    # win32clipboard.SetClipboardText(HexadecimalNumber)
+    # win32clipboard.CloseClipboard()
+    pass
 def clearHistory() :
     global HistoryX, HistoryWrite, History1, History2, History3, History4, History5, History6, History7, History8, History9, History10, History11, History12, History13, History14, History15
     History1 = History2 = History3 = History4 = History5 = History6 = History7 = History8 = History9 = History10 = History11 = History12 = History13 = History14 = History15 = ""
