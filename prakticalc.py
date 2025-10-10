@@ -942,9 +942,9 @@ def CustomDiv0() :
                 print("ERROR: Unknown Message Box Style")
         else:
             if CurrentMsgBoxStyle == 2:
-                subprocess.Popen(["xmessage", "-title", "Error", "Division by 0"])
+                subprocess.Popen(["xmessage", "-title", "Error", "[X] Division by 0"])
             elif CurrentMsgBoxStyle == 3:
-                subprocess.Popen(["yad", "--title=Error", "--error", "--button=OK", "--text=Division by 0"])
+                subprocess.Popen(["yad", "--title=Error", "--error", "--image=dialog-error", "--button=OK", "--text=Division by 0"])
             elif CurrentMsgBoxStyle == 4:
                 subprocess.Popen(["kdialog", "--title=Error", "--error", "Division by 0"])
             elif CurrentMsgBoxStyle == 5:
@@ -982,7 +982,7 @@ def CustomInfo() :
             if CurrentMsgBoxStyle == 2:
                 subprocess.Popen(["xmessage", "-title", "About PraktiCalc", infotext])
             elif CurrentMsgBoxStyle == 3:
-                subprocess.Popen(["yad", "--title=About PraktiCalc", "--info", "--button=OK", "--text=" + infotext])
+                subprocess.Popen(["yad", "--title=About PraktiCalc", "--info", "--image=dialog-information", "--button=OK", "--text=" + infotext])
             elif CurrentMsgBoxStyle == 4:
                 subprocess.Popen(["kdialog", "--title=About PraktiCalc", "--msgbox", infotext])
             elif CurrentMsgBoxStyle == 5:
@@ -1168,9 +1168,9 @@ def paste() :
                     print("ERROR: Unknown Message Box Style")
             else:
                 if CurrentMsgBoxStyle == 2:
-                    subprocess.Popen(["xmessage", "-title", "Error", "Please enter a real number!"])
+                    subprocess.Popen(["xmessage", "-title", "Error", "[X] Please enter a real number!"])
                 elif CurrentMsgBoxStyle == 3:
-                    subprocess.Popen(["yad", "--title=Error", "--error", "--button=OK", "--text=Please enter a real number!"])
+                    subprocess.Popen(["yad", "--title=Error", "--error", "--image=dialog-error", "--button=OK", "--text=Please enter a real number!"])
                 elif CurrentMsgBoxStyle == 4:
                     subprocess.Popen(["kdialog", "--title=Error", "--error", "Please enter a real number!"])
                 elif CurrentMsgBoxStyle == 5:
