@@ -972,7 +972,8 @@ def CustomInfo() :
     else:
         if platform.system() == "Windows":
             if CurrentMsgBoxStyle == 2:
-                subprocess.getoutput('cmd /C echo(MsgBox "PraktiCalc                                                                              Version 1.3                                                                                      a Python Project                                                                 Licensed under GPLv3                                                               read more at https://www.gnu.org/licenses/", 64, "About PraktiCalc"> test.vbs && cscript test.vbs && del test.vbs')
+                pyver = platform.python_version()
+                subprocess.getoutput('cmd /C echo(MsgBox "PraktiCalc                                                                              Version 1.3                                                                                      running on Python ' + pyver + '                                                      Licensed under GPLv3                                                               read more at https://www.gnu.org/licenses/", 64, "About PraktiCalc"> test.vbs && cscript test.vbs && del test.vbs')
             else:
                 print("ERROR: Unknown Message Box Style")
         else:
