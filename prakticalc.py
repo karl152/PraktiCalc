@@ -1257,6 +1257,8 @@ def More() :
     hexFrame.grid(row=1, column=1, sticky="nesw", padx=5)
     BinaryLabel.grid(row=0, column=0)
     HexLabel.grid(row=0, column=0)
+    if platform.system() != "Windows":
+        DecimalInput.focus_set()
 def paste() :
     global DecimalNumber, DecimalInput, BinaryNumber, HexadecimalNumber, BinaryLabel, HexLabel
     # win32clipboard.OpenClipboard()
