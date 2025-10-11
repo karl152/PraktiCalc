@@ -21,14 +21,27 @@ from ttkthemes import ThemedStyle
 import platform
 import subprocess
 import sys
-usedttktheme = "plastik"
+# import win32clipboard
+# variables
+breeze = "--breeze" in sys.argv
+yaru = "--yaru" in sys.argv
+equilux = "--equilux" in sys.argv
+if breeze == True:
+    thettktheme = "breeze"
+elif yaru == True:
+    thettktheme = "yaru"
+else:
+    thettktheme = "plastik"
+if equilux == True:
+    darkttktheme = "equilux"
+else:
+    darkttktheme = "black"
+usedttktheme = thettktheme
 if platform.system() == "Windows":
     MsgBoxStyles = ["Tkinter", "Alternative", "VBS"]
 else:
     MsgBoxStyles = ["Tkinter", "Alternative", "XMessage", "YAD", "KDialog", "Zenity"]
 CurrentMsgBoxStyle = 1
-# import win32clipboard
-# variables
 Input1 = "0"
 Input2 = "0"
 Stage = 0
@@ -897,7 +910,7 @@ def ChangeDarkMode() :
     global DarkMode, usedttktheme, SettingsWindow, style, HistoryX, MoreWindow
     if DarkMode == False :
         DarkMode = True
-        usedttktheme = "black"
+        usedttktheme = darkttktheme
         style = ThemedStyle(MainWindow)
         style.theme_use(usedttktheme)
         style = ThemedStyle(SettingsWindow)
@@ -912,7 +925,7 @@ def ChangeDarkMode() :
         style.theme_use(usedttktheme)
     elif DarkMode == True :
         DarkMode = False
-        usedttktheme = "plastik"
+        usedttktheme = thettktheme
         if platform.system() == "Windows":
             style = ttk.Style(MainWindow)
             style.theme_use("vista")
@@ -1308,7 +1321,7 @@ def xcheck() :
 def xquit() :
     MainWindow.destroy()
 if DarkMode == True :
-    usedttktheme = "black"
+    usedttktheme = darkttktheme
 
 # main window
 MainWindow = tk.Tk()
