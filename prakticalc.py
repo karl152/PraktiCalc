@@ -828,6 +828,8 @@ def Settings() :
     SettingsWindow.rowconfigure(0, weight=1)
     SettingsWindow.columnconfigure(0, weight=1)
     if platform.system() == "Windows":
+        SettingsWindow.attributes("-toolwindow", True)
+        SettingsWindow.focus_force()
         if DarkMode == 1:
             style = ThemedStyle(SettingsWindow)
             style.theme_use(usedttktheme)
@@ -948,6 +950,8 @@ def CustomInfo() :
         CustomInfox.rowconfigure(0, weight=1)
         CustomInfox.columnconfigure(0, weight=1)
         if platform.system() == "Windows":
+            CustomInfox.attributes("-toolwindow", True)
+            CustomInfox.focus_force()
             if DarkMode == 1:
                 style = ThemedStyle(CustomInfox)
                 style.theme_use(usedttktheme)
@@ -1003,6 +1007,8 @@ def showError(message):
         ErrorWindow.rowconfigure(0, weight=1)
         ErrorWindow.columnconfigure(0, weight=1)
         if platform.system() == "Windows":
+            ErrorWindow.attributes("-toolwindow", True)
+            ErrorWindow.focus_force()
             if DarkMode == 1:
                 style = ThemedStyle(ErrorWindow)
                 style.theme_use(usedttktheme)
@@ -1092,6 +1098,8 @@ def History() :
     HistoryX.title("History")
     # HistoryX.config(height=400, width=256)
     if platform.system() == "Windows":
+        HistoryX.attributes("-toolwindow", True)
+        HistoryX.focus_force()
         if DarkMode == 1:
             style = ThemedStyle(HistoryX)
             style.theme_use(usedttktheme)
@@ -1214,6 +1222,8 @@ def More() :
     MoreWindow.rowconfigure(0, weight=1)
     MoreWindow.columnconfigure(0, weight=1)
     if platform.system() == "Windows":
+        MoreWindow.attributes("-toolwindow", True)
+        MoreWindow.focus_force()
         if DarkMode == 1:
             style = ThemedStyle(MoreWindow)
             style.theme_use(usedttktheme)
