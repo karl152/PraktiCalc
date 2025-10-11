@@ -32,9 +32,9 @@ Input1 = "0"
 Input2 = "0"
 Stage = 0
 Operator = "op"
-StatusBar = 0
-CustomMsgBox = 1
-DarkMode = 0
+StatusBar = False
+CustomMsgBox = True
+DarkMode = False
 History1 = History2 = History3 = History4 = History5 = History6 = History7 = History8 = History9 = History10 = History11 = History12 = History13 = History14 = History15 = ""
 # History1 = ""
 # History2 = ""
@@ -365,7 +365,7 @@ def clear() :
     Input2 = "0"
     Stage = 0
     Output.config(text="0")
-    if StatusBar == 1 :
+    if StatusBar == True :
         Status.config(text="Bereit")
     SizeReload()
 def comma() :
@@ -689,9 +689,9 @@ def calc() :
             HistoryWrite += 1
         if Operator == "/" :
             if Input2 == "0" :
-                if StatusBar == 0 :
+                if StatusBar == False :
                     CustomDiv0()
-                if StatusBar == 1 :
+                if StatusBar == True :
                     Status.config(text="Error: Division by 0")
                 clear()
             else :
@@ -830,7 +830,7 @@ def Settings() :
     if platform.system() == "Windows":
         SettingsWindow.attributes("-toolwindow", True)
         SettingsWindow.focus_force()
-        if DarkMode == 1:
+        if DarkMode == True:
             style = ThemedStyle(SettingsWindow)
             style.theme_use(usedttktheme)
         else:
@@ -843,18 +843,18 @@ def Settings() :
     SettingsWindowFrame.columnconfigure(0, weight=1)
     StatusBarToggle = ttk.Checkbutton(SettingsWindowFrame, text="Status Bar", command=ToggleStatusBar)
     CustomMsgBoxToggle = ttk.Checkbutton(SettingsWindowFrame, text="Alternative Messageboxes", command=ToggleCustomMsgBoxes)
-    if CustomMsgBox == 0 :
+    if CustomMsgBox == False :
         CustomMsgBoxToggle.state(["!selected"])
-    if CustomMsgBox == 1 :
+    if CustomMsgBox == True :
         CustomMsgBoxToggle.state(["selected"])
     DarkModeToggle = ttk.Checkbutton(SettingsWindowFrame, text="Dark Mode", command=ChangeDarkMode)
-    if StatusBar == 1:
+    if StatusBar == True:
         StatusBarToggle.state(["selected"])
-    elif StatusBar == 0:
+    elif StatusBar == False:
         StatusBarToggle.state(["!selected"])
-    if DarkMode == 1:
+    if DarkMode == True:
         DarkModeToggle.state(["selected"])
-    elif DarkMode == 0:
+    elif DarkMode == False:
         DarkModeToggle.state(["!selected"])
     MsgBoxStyleFrame = ttk.LabelFrame(SettingsWindowFrame, text="Messagebox Style")
     MsgBoxStyleFrame.columnconfigure(0, weight=1)
@@ -875,26 +875,26 @@ def loadTheme():
     SettingsWindow.destroy()
 def ToggleCustomMsgBoxes():
     global CustomMsgBox, CustomMsgBoxToggle
-    if CustomMsgBox == 0:
-        CustomMsgBox = 1
-    elif CustomMsgBox == 1:
-        CustomMsgBox = 0
+    if CustomMsgBox == False:
+        CustomMsgBox = True
+    elif CustomMsgBox == True:
+        CustomMsgBox = False
 def ToggleStatusBar():
     global Status, StatusBar, StatusBarToggle, StatusDecoration, MainWindow
-    if StatusBar == 1:
+    if StatusBar == True:
         Status.config(text="")
-        StatusBar = 0
+        StatusBar = False
         StatusDecoration.config(text="")
         MainWindow.config(width=256, height=315)
-    elif StatusBar == 0:
+    elif StatusBar == False:
         MainWindow.config(width=256, height=330)
         Status.config(text="Ready")
-        StatusBar = 1
+        StatusBar = True
         StatusDecoration.config(text="__________________________________________________")
 def ChangeDarkMode() :
     global DarkMode, usedttktheme, SettingsWindow, style, HistoryX, MoreWindow
-    if DarkMode == 0 :
-        DarkMode = 1
+    if DarkMode == False :
+        DarkMode = True
         usedttktheme = "black"
         style = ThemedStyle(MainWindow)
         style.theme_use(usedttktheme)
@@ -908,8 +908,8 @@ def ChangeDarkMode() :
         style.theme_use(usedttktheme)
         style = ThemedStyle(CustomInfox)
         style.theme_use(usedttktheme)
-    elif DarkMode == 1 :
-        DarkMode = 0
+    elif DarkMode == True :
+        DarkMode = False
         usedttktheme = "plastik"
         if platform.system() == "Windows":
             style = ttk.Style(MainWindow)
@@ -952,7 +952,7 @@ def CustomInfo() :
         if platform.system() == "Windows":
             CustomInfox.attributes("-toolwindow", True)
             CustomInfox.focus_force()
-            if DarkMode == 1:
+            if DarkMode == True:
                 style = ThemedStyle(CustomInfox)
                 style.theme_use(usedttktheme)
             else:
@@ -1009,7 +1009,7 @@ def showError(message):
         if platform.system() == "Windows":
             ErrorWindow.attributes("-toolwindow", True)
             ErrorWindow.focus_force()
-            if DarkMode == 1:
+            if DarkMode == True:
                 style = ThemedStyle(ErrorWindow)
                 style.theme_use(usedttktheme)
             else:
@@ -1054,7 +1054,7 @@ def SizeReload() :
     pass
 def CharacterStatus() :
     global Status, StatusBar
-    if StatusBar == 1 :
+    if StatusBar == True :
         Status.config(text="PraktiCalc only supports up to 15 characters!")
 def Backspace() :
     global Input1, Input2
@@ -1100,7 +1100,7 @@ def History() :
     if platform.system() == "Windows":
         HistoryX.attributes("-toolwindow", True)
         HistoryX.focus_force()
-        if DarkMode == 1:
+        if DarkMode == True:
             style = ThemedStyle(HistoryX)
             style.theme_use(usedttktheme)
         else:
@@ -1224,7 +1224,7 @@ def More() :
     if platform.system() == "Windows":
         MoreWindow.attributes("-toolwindow", True)
         MoreWindow.focus_force()
-        if DarkMode == 1:
+        if DarkMode == True:
             style = ThemedStyle(MoreWindow)
             style.theme_use(usedttktheme)
         else:
@@ -1305,7 +1305,7 @@ def xcheck() :
     print("____________________________")
 def xquit() :
     MainWindow.destroy()
-# if DarkMode == 1 :
+# if DarkMode == True :
 #     usedttktheme = "black"
 
 # main window
@@ -1315,7 +1315,7 @@ MainWindow.config(width=256, height=315)
 MainWindow.rowconfigure(0, weight=1)
 MainWindow.columnconfigure(0, weight=1)
 if platform.system() == "Windows":
-    if DarkMode == 1:
+    if DarkMode == True:
         style = ThemedStyle(MainWindow)
         style.theme_use(usedttktheme)
     else:
