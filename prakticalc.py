@@ -1,4 +1,4 @@
-# PraktiCalc - a calculator with GUI i started at my student internship in 2024
+# PraktiCalc - a calculator with GUI I started at my student internship in 2024
 # Copyright (C) 2024-2025 karl152
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,6 +23,23 @@ import subprocess
 import sys
 # import win32clipboard
 # variables
+CLIHelp = "--help" in sys.argv
+CLIVersion = "--version" in sys.argv
+PraktiCalcVersion = "1.3"
+if CLIHelp == True:
+    print("PraktiCalc " + PraktiCalcVersion + " CLI Options")
+    print("--debug   | add a test button for debugging")
+    print("--dark    | enable dark mode by default")
+    if platform.system() != "Windows":
+        print("--breeze  | set the light theme to breeze")
+        print("--yaru    | set the light theme to yaru")
+    print("--equilux | set the dark theme to equilux")
+    print("--help    | display this help text and exit")
+    print("--version | display version and exit")
+    exit()
+if CLIVersion == True:
+    print("PraktiCalc " + PraktiCalcVersion)
+    exit()
 breeze = "--breeze" in sys.argv
 yaru = "--yaru" in sys.argv
 equilux = "--equilux" in sys.argv
@@ -956,7 +973,7 @@ def CustomDiv0() :
     showError("Division by 0")
 def CustomInfo() :
     global CustomInfox
-    infotext = "PraktiCalc\nVersion 1.3 (in development)\nrunning on Python "+ platform.python_version() + "\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/"
+    infotext = "PraktiCalc\nVersion " + PraktiCalcVersion + " (in development)\nrunning on Python "+ platform.python_version() + "\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/"
     if CurrentMsgBoxStyle == 0:
         messagebox.showinfo("About PraktiCalc", infotext)
     elif CurrentMsgBoxStyle == 1:
@@ -992,7 +1009,7 @@ def CustomInfo() :
         if platform.system() == "Windows":
             if CurrentMsgBoxStyle == 2:
                 pyver = platform.python_version()
-                subprocess.getoutput('cmd /C echo(MsgBox "PraktiCalc                                                                              Version 1.3                                                                                      running on Python ' + pyver + '                                                      Licensed under GPLv3                                                               read more at https://www.gnu.org/licenses/", 64, "About PraktiCalc"> test.vbs && cscript test.vbs && del test.vbs')
+                subprocess.getoutput('cmd /C echo(MsgBox "PraktiCalc                                                                              Version ' + PraktiCalcVersion + '                                                                                      running on Python ' + pyver + '                                                      Licensed under GPLv3                                                               read more at https://www.gnu.org/licenses/", 64, "About PraktiCalc"> test.vbs && cscript test.vbs && del test.vbs')
             else:
                 print("ERROR: Unknown Message Box Style")
         else:
