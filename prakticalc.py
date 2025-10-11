@@ -20,6 +20,7 @@ from tkinter import messagebox
 from ttkthemes import ThemedStyle
 import platform
 import subprocess
+import sys
 usedttktheme = "plastik"
 if platform.system() == "Windows":
     MsgBoxStyles = ["Tkinter", "Alternative", "VBS"]
@@ -34,7 +35,8 @@ Stage = 0
 Operator = "op"
 StatusBar = False
 CustomMsgBox = True
-DarkMode = False
+DarkMode = "--dark" in sys.argv
+debug = "--debug" in sys.argv
 History1 = History2 = History3 = History4 = History5 = History6 = History7 = History8 = History9 = History10 = History11 = History12 = History13 = History14 = History15 = ""
 # History1 = ""
 # History2 = ""
@@ -1305,8 +1307,8 @@ def xcheck() :
     print("____________________________")
 def xquit() :
     MainWindow.destroy()
-# if DarkMode == True :
-#     usedttktheme = "black"
+if DarkMode == True :
+    usedttktheme = "black"
 
 # main window
 MainWindow = tk.Tk()
@@ -1393,5 +1395,6 @@ BackspaceButton.grid(row=0, column=4, sticky="nesw")
 HistoryButton.grid(row=4, column=0, sticky="nesw")
 MainWindow.bind("<Key>", KeyPress)
 More.grid(row=3, column=0, sticky="nesw")
-# Checkb.grid(row=1, column=0, sticky="nesw")
+if debug == True:
+    Checkb.grid(row=1, column=0, sticky="nesw")
 MainWindow.mainloop()
