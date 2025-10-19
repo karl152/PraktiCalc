@@ -28,7 +28,7 @@ CLIVersion = "--version" in sys.argv
 PraktiCalcVersion = "1.3"
 if CLIHelp == True:
     if platform.system() == "Windows":
-        messagebox.showinfo("PraktiCalc CLI Options", "PraktiCalc " + PraktiCalcVersion + " CLI Options:\n--debug: add a test button for debugging\n--dark: enable dark mode by default\n--equilux: set the dark theme to equilux\n--help: display this help text and exit\n--version: display version and exit")
+        messagebox.showinfo("PraktiCalc CLI Options", "PraktiCalc " + PraktiCalcVersion + " CLI Options:\n--debug: add a test button for debugging\n--nodpiawareness: disable Windows DPI Awareness\n--dark: enable dark mode by default\n--equilux: set the dark theme to equilux\n--help: display this help text and exit\n--version: display version and exit")
         exit()
     else:
         print("PraktiCalc " + PraktiCalcVersion + " CLI Options")
@@ -59,8 +59,15 @@ if equilux == True:
 else:
     darkttktheme = "black"
 usedttktheme = thettktheme
+BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 if platform.system() == "Windows":
     MsgBoxStyles = ["Tkinter", "Alternative", "VBS"]
+    if BypassWindowsDPIFix == False:
+        import ctypes
+        try:
+            ctypes.windll.shcore.SetProcessDpiAwareness(1)
+        except:
+            pass
 else:
     MsgBoxStyles = ["Tkinter", "Alternative", "XMessage", "YAD", "KDialog", "Zenity"]
 CurrentMsgBoxStyle = 1
