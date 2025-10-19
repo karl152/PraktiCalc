@@ -41,7 +41,6 @@ CurrentMsgBoxStyle = 1
 if CLIHelp == True:
     if platform.system() == "Windows":
         messagebox.showinfo("PraktiCalc CLI Options", "PraktiCalc " + PraktiCalcVersion + " CLI Options:\n--debug: add a test button for debugging\n--nodpiawareness: disable Windows DPI Awareness\n--dark: enable dark mode by default\n--equilux: set the dark theme to equilux\n--help: display this help text and exit\n--version: display version and exit")
-        exit()
     else:
         print("PraktiCalc " + PraktiCalcVersion + " CLI Options")
         print("--debug   | add a test button for debugging")
@@ -51,6 +50,7 @@ if CLIHelp == True:
         print("--equilux | set the dark theme to equilux")
         print("--help    | display this help text and exit")
         print("--version | display version and exit")
+    exit()
 if CLIVersion == True:
     if platform.system() == "Windows":
         messagebox.showinfo("PraktiCalc " + PraktiCalcVersion, "PraktiCalc " + PraktiCalcVersion)
