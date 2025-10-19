@@ -27,18 +27,23 @@ CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
 PraktiCalcVersion = "1.3"
 if CLIHelp == True:
-    print("PraktiCalc " + PraktiCalcVersion + " CLI Options")
-    print("--debug   | add a test button for debugging")
-    print("--dark    | enable dark mode by default")
-    if platform.system() != "Windows":
+    if platform.system() == "Windows":
+        messagebox.showinfo("PraktiCalc CLI Options", "PraktiCalc " + PraktiCalcVersion + " CLI Options:\n--debug: add a test button for debugging\n--dark: enable dark mode by default\n--equilux: set the dark theme to equilux\n--help: display this help text and exit\n--version: display version and exit")
+        exit()
+    else:
+        print("PraktiCalc " + PraktiCalcVersion + " CLI Options")
+        print("--debug   | add a test button for debugging")
+        print("--dark    | enable dark mode by default")
         print("--breeze  | set the light theme to breeze")
         print("--yaru    | set the light theme to yaru")
-    print("--equilux | set the dark theme to equilux")
-    print("--help    | display this help text and exit")
-    print("--version | display version and exit")
-    exit()
+        print("--equilux | set the dark theme to equilux")
+        print("--help    | display this help text and exit")
+        print("--version | display version and exit")
 if CLIVersion == True:
-    print("PraktiCalc " + PraktiCalcVersion)
+    if platform.system() == "Windows":
+        messagebox.showinfo("PraktiCalc " + PraktiCalcVersion, "PraktiCalc " + PraktiCalcVersion)
+    else:
+        print("PraktiCalc " + PraktiCalcVersion)
     exit()
 breeze = "--breeze" in sys.argv
 yaru = "--yaru" in sys.argv
