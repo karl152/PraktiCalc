@@ -582,7 +582,7 @@ def KeyPress(event):
         Backspace()
 def Settings() :
     global Status, SettingsWindow, StatusBar, StatusBarToggle, CustomMsgBox, CustomMsgBoxToggle, DarkMode, DarkModeToggle, MsgBoxStyles, CurrentMsgBoxStyle, MsgBoxStyleSelect
-    SettingsWindow = tk.Tk()
+    SettingsWindow = tk.Toplevel(MainWindow)
     SettingsWindow.title("Settings")
     SettingsWindow.config(width=250, height=152)
     SettingsWindow.rowconfigure(0, weight=1)
@@ -762,7 +762,7 @@ def showError(message):
     if CurrentMsgBoxStyle == 0:
         messagebox.showerror("Error", message)
     elif CurrentMsgBoxStyle == 1:
-        ErrorWindow = tk.Tk()
+        ErrorWindow = tk.Toplevel(MainWindow)
         ErrorWindow.title("Error")
         ErrorWindow.rowconfigure(0, weight=1)
         ErrorWindow.columnconfigure(0, weight=1)
@@ -852,7 +852,7 @@ def updateDisplay() :
     SizeReload()
 def History() :
     global HistoryX, History1, History2, History3, History4, History5, History6, History7, History8, History9, History10, History11, History12, History13, History14, History15
-    HistoryX = tk.Tk()
+    HistoryX = tk.Toplevel(MainWindow)
     HistoryX.rowconfigure(0, weight=1)
     HistoryX.columnconfigure(0, weight=1)
     HistoryX.title("History")
@@ -966,7 +966,7 @@ def rooty() :
     calc()
 def More() :
     global DarkMode, MoreWindow, DecimalFrame, DecimalInput, DecimalNumber, BinaryLabel, HexLabel, usedttktheme
-    MoreWindow = tk.Tk()
+    MoreWindow = tk.Toplevel(MainWindow)
     MoreWindow.title("Decimal Converter")
     MoreWindow.config(height=200, width=500)
     MoreWindow.rowconfigure(0, weight=1)
@@ -1055,6 +1055,13 @@ def xcheck() :
     print("____________________________")
 def xquit() :
     MainWindow.destroy()
+if DarkMode == True :
+    usedttktheme = darkttktheme
+
+# main window
+MainWindow = tk.Tk()
+MainWindow.title("PraktiCalc")
+MainWindow.config(width=256, height=315)
 if console == True:
     def executeTheCommand(cominput):
         ConsoleInput.delete(0, tk.END)
@@ -1109,7 +1116,7 @@ Useful Tips:
         ConsoleKey = event.keysym
         if ConsoleKey == "Return":
             executeTheCommand(ConsoleInput.get())
-    ConsoleWindow = tk.Tk()
+    ConsoleWindow = tk.Toplevel(MainWindow)
     ConsoleWindow.title("PraktiCalc Console")
     ConsoleWindow.config(bg="black")
     ConsoleWindow.rowconfigure(0, weight=1)
@@ -1126,13 +1133,6 @@ Useful Tips:
     ConsoleInput.grid(row=1, column=1, sticky="ew")
     ConsoleExecuteButton.grid(row=1, column=2, sticky="ew", pady=2, padx=2)
     ConsoleInput.focus_set()
-if DarkMode == True :
-    usedttktheme = darkttktheme
-
-# main window
-MainWindow = tk.Tk()
-MainWindow.title("PraktiCalc")
-MainWindow.config(width=256, height=315)
 MainWindow.rowconfigure(0, weight=1)
 MainWindow.columnconfigure(0, weight=1)
 if platform.system() == "Windows":
