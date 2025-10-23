@@ -81,21 +81,6 @@ CustomMsgBox = True
 DarkMode = "--dark" in sys.argv
 debug = "--debug" in sys.argv
 History1 = History2 = History3 = History4 = History5 = History6 = History7 = History8 = History9 = History10 = History11 = History12 = History13 = History14 = History15 = ""
-# History1 = ""
-# History2 = ""
-# History3 = ""
-# History4 = ""
-# History5 = ""
-# History6 = ""
-# History7 = ""
-# History8 = ""
-# History9 = ""
-# History10 = ""
-# History11 = ""
-# History12 = ""
-# History13 = ""
-# History14 = ""
-# History15 = ""
 HistoryWrite = 1
 FinalResult = 0
 aFinalResult = 0
@@ -106,213 +91,39 @@ HexadecimalNumber = 0
 # functions
 def info() :
     CustomInfo()
-def one() :
+def processNumber(number):
     global Input1, Input2, Output, Stage
-    if Stage == 5 :
-        Input2 = str(Input2) + "1"
-        Output.config(text=Input2)
-    if Stage == 4 :
-        Input2 = str(Input2) + "1"
+    if Stage == 4 or Stage == 5:
+        Input2 = str(Input2) + number
         Output.config(text=Input2)
     if Stage == 3 :
-        Input2 = "1"
+        Input2 = number
         Output.config(text=Input2)
         Stage = 4
-    if Stage == 2 :
-            Input1 = str(Input1) + "1"
-            Output.config(text=Input1)
-    if Stage == 1 :
-        Input1 = str(Input1) + "1"
+    if Stage == 1 or Stage == 2:
+        Input1 = str(Input1) + number
         Output.config(text=Input1)
     if Stage == 0 :
-        Input1 = "1"
+        Input1 = number
         Output.config(text=Input1)
         Stage = 1
-    SizeReload()
-def two() :
-    global Input1, Input2, Output, Stage
-    if Stage == 5 :
-        Input2 = str(Input2) + "2"
-        Output.config(text=Input2)
-    if Stage == 4 :
-        Input2 = str(Input2) + "2"
-        Output.config(text=Input2)
-    if Stage == 3 :
-        Input2 = "2"
-        Output.config(text=Input2)
-        Stage = 4
-    if Stage == 2 :
-        Input1 = str(Input1) + "2"
-        Output.config(text=Input1)
-    if Stage == 1 :
-        Input1 = str(Input1) + "2"
-        Output.config(text=Input1)
-    if Stage == 0 :
-        Input1 = "2"
-        Output.config(text=Input1)
-        Stage = 1
-    SizeReload()
-def three() :
-    global Input1, Input2, Output, Stage
-    if Stage == 5 :
-        Input2 = str(Input2) + "3"
-        Output.config(text=Input2)
-    if Stage == 4 :
-        Input2 = str(Input2) + "3"
-        Output.config(text=Input2)
-    if Stage == 3 :
-        Input2 = "3"
-        Output.config(text=Input2)
-        Stage = 4
-    if Stage == 2 :
-        Input1 = str(Input1) + "3"
-        Output.config(text=Input1)
-    if Stage == 1 :
-        Input1 = str(Input1) + "3"
-        Output.config(text=Input1)
-    if Stage == 0 :
-        Input1 = "3"
-        Output.config(text=Input1)
-        Stage = 1
-    SizeReload()
-def four() :
-    global Input1, Input2, Output, Stage
-    if Stage == 5 :
-        Input2 = str(Input2) + "4"
-        Output.config(text=Input2)
-    if Stage == 4 :
-        Input2 = str(Input2) + "4"
-        Output.config(text=Input2)
-    if Stage == 3 :
-        Input2 = "4"
-        Output.config(text=Input2)
-        Stage = 4
-    if Stage == 2 :
-        Input1 = str(Input1) + "4"
-        Output.config(text=Input1)
-    if Stage == 1 :
-        Input1 = str(Input1) + "4"
-        Output.config(text=Input1)
-    if Stage == 0 :
-        Input1 = "4"
-        Output.config(text=Input1)
-        Stage = 1
-    SizeReload()
-def five() :
-    global Input1, Input2, Output, Stage
-    if Stage == 5 :
-        Input2 = str(Input2) + "5"
-        Output.config(text=Input2)
-    if Stage == 4 :
-        Input2 = str(Input2) + "5"
-        Output.config(text=Input2)
-    if Stage == 3 :
-        Input2 = "5"
-        Output.config(text=Input2)
-        Stage = 4
-    if Stage == 2 :
-        Input1 = str(Input1) + "5"
-        Output.config(text=Input1)
-    if Stage == 1 :
-        Input1 = str(Input1) + "5"
-        Output.config(text=Input1)
-    if Stage == 0 :
-        Input1 = "5"
-        Output.config(text=Input1)
-        Stage = 1
-    SizeReload()
-def six() :
-    global Input1, Input2, Output, Stage
-    if Stage == 5 :
-        Input2 = str(Input2) + "6"
-        Output.config(text=Input2)
-    if Stage == 4 :
-        Input2 = str(Input2) + "6"
-        Output.config(text=Input2)
-    if Stage == 3 :
-        Input2 = "6"
-        Output.config(text=Input2)
-        Stage = 4
-    if Stage == 2 :
-        Input1 = str(Input1) + "6"
-        Output.config(text=Input1)
-    if Stage == 1 :
-        Input1 = str(Input1) + "6"
-        Output.config(text=Input1)
-    if Stage == 0 :
-        Input1 = "6"
-        Output.config(text=Input1)
-        Stage = 1
-    SizeReload()
-def seven() :
-    global Input1, Input2, Output, Stage
-    if Stage == 5 :
-        Input2 = str(Input2) + "7"
-        Output.config(text=Input2)
-    if Stage == 4 :
-        Input2 = str(Input2) + "7"
-        Output.config(text=Input2)
-    if Stage == 3 :
-        Input2 = "7"
-        Output.config(text=Input2)
-        Stage = 4
-    if Stage == 2 :
-        Input1 = str(Input1) + "7"
-        Output.config(text=Input1)
-    if Stage == 1 :
-        Input1 = str(Input1) + "7"
-        Output.config(text=Input1)
-    if Stage == 0 :
-        Input1 = "7"
-        Output.config(text=Input1)
-        Stage = 1
-    SizeReload()
-def eight() :
-    global Input1, Input2, Output, Stage
-    if Stage == 5 :
-        Input2 = str(Input2) + "8"
-        Output.config(text=Input2)
-    if Stage == 4 :
-        Input2 = str(Input2) + "8"
-        Output.config(text=Input2)
-    if Stage == 3 :
-        Input2 = "8"
-        Output.config(text=Input2)
-        Stage = 4
-    if Stage == 2 :
-        Input1 = str(Input1) + "8"
-        Output.config(text=Input1)
-    if Stage == 1 :
-        Input1 = str(Input1) + "8"
-        Output.config(text=Input1)
-    if Stage == 0 :
-        Input1 = "8"
-        Output.config(text=Input1)
-        Stage = 1
-    SizeReload()
-def nine() :
-    global Input1, Input2, Output, Stage
-    if Stage == 5 :
-        Input2 = str(Input2) + "9"
-        Output.config(text=Input2)
-    if Stage == 4 :
-        Input2 = str(Input2) + "9"
-        Output.config(text=Input2)
-    if Stage == 3 :
-        Input2 = "9"
-        Output.config(text=Input2)
-        Stage = 4
-    if Stage == 2 :
-        Input1 = str(Input1) + "9"
-        Output.config(text=Input1)
-    if Stage == 1 :
-        Input1 = str(Input1) + "9"
-        Output.config(text=Input1)
-    if Stage == 0 :
-        Input1 = "9"
-        Output.config(text=Input1)
-        Stage = 1
-    SizeReload()
+def processOperator(TheOneAndOnlyOperatorThatShouldBeProcessed):
+    global Stage, Output, Operator, FinalResult, aFinalResult, Input1, Input2
+    if Stage != 0 and Stage != 3 and Stage != 4 and Stage != 5 and Stage != 6 :
+        Stage = 3
+        Operator = TheOneAndOnlyOperatorThatShouldBeProcessed
+        Output.config(text="0")
+    if Stage == 4 or Stage == 5 :
+        calc()
+        Input1 = FinalResult
+        Operator = TheOneAndOnlyOperatorThatShouldBeProcessed
+        Output.config(text="0")
+        Stage = 3
+    if Stage == 6 :
+        Operator = TheOneAndOnlyOperatorThatShouldBeProcessed
+        Stage = 3
+        Output.config(text="0")
+        Input1 = FinalResult
 def zero() :
     global Input1, Input2, Output, Stage
     if Stage == 5 :
@@ -331,78 +142,6 @@ def zero() :
         Output.config(text=Input1)
     if Stage == 0 :
         pass
-    SizeReload()
-def add() :
-    global Stage, Output, Operator, FinalResult, aFinalResult, Input1, Input2
-    if Stage != 0 and Stage != 3 and Stage != 4 and Stage != 5 and Stage != 6 :
-        Stage = 3
-        Operator = "+"
-        Output.config(text="0")
-    if Stage == 4 or Stage == 5 :
-        calc()
-        Input1 = FinalResult
-        Operator = "+"
-        Output.config(text="0")
-        Stage = 3
-    if Stage == 6 :
-        Operator = "+"
-        Stage = 3
-        Output.config(text="0")
-        Input1 = FinalResult
-    SizeReload()
-def subtract() :
-    global Stage, Output, Operator, FinalResult, aFinalResult, Input1, Input2
-    if Stage != 0 and Stage != 3 and Stage != 4 and Stage != 5 and Stage != 6 :
-        Stage = 3
-        Operator = "-"
-        Output.config(text="0")
-    if Stage == 4 or Stage == 5 :
-        calc()
-        Input1 = FinalResult
-        Operator = "-"
-        Output.config(text="0")
-        Stage = 3
-    if Stage == 6 :
-        Operator = "-"
-        Stage = 3
-        Output.config(text="0")
-        Input1 = FinalResult
-    SizeReload()
-def multiply() :
-    global Stage, Output, Operator, FinalResult, aFinalResult, Input1, Input2
-    if Stage != 0 and Stage != 3 and Stage != 4 and Stage != 5 and Stage != 6 :
-        Stage = 3
-        Operator = "*"
-        Output.config(text="0")
-    if Stage == 4 or Stage == 5 :
-        calc()
-        Input1 = FinalResult
-        Operator = "*"
-        Output.config(text="0")
-        Stage = 3
-    if Stage == 6 :
-        Operator = "*"
-        Stage = 3
-        Output.config(text="0")
-        Input1 = FinalResult
-    SizeReload()
-def divide() :
-    global Stage, Output, Operator, FinalResult, aFinalResult, Input1, Input2
-    if Stage != 0 and Stage != 3 and Stage != 4 and Stage != 5 and Stage != 6 :
-        Stage = 3
-        Operator = "/"
-        Output.config(text="0")
-    if Stage == 4 or Stage == 5 :
-        calc()
-        Input1 = FinalResult
-        Operator = "/"
-        Output.config(text="0")
-        Stage = 3
-    if Stage == 6 :
-        Operator = "/"
-        Stage = 3
-        Output.config(text="0")
-        Input1 = FinalResult
     SizeReload()
 def clear() :
     global Input1, Input2, Output, Stage, Status, StatusBar
@@ -815,54 +554,30 @@ def calc() :
     SizeReload()
 def KeyPress(event):
     Key = event.keysym
-    if Key == "1" :
-        one()
-    if Key == "2" :
-        two()
-    if Key == "3" :
-        three()
-    if Key == "4" :
-        four()
-    if Key == "5" :
-        five()
-    if Key == "6" :
-        six()
-    if Key == "7" :
-        seven()
-    if Key == "8" :
-        eight()
-    if Key == "9" :
-        nine()
+    if Key == "1" or Key == "2" or Key == "3" or Key == "4" or Key == "5" or Key == "6" or Key == "7" or Key == "8" or Key == "9":
+        processNumber(Key)
     if Key == "0" :
         zero()
-    if Key == "equal" :
+    if Key == "equal" or Key == "Return":
         calc()
     if Key == "add" :
-        add()
+        processOperator("+")
     if Key == "subtract" :
-        subtract()
+        processOperator("-")
     if Key == "asterisk" :
-        multiply()
+        processOperator("*")
     if Key == "slash" :
-        divide()
-    if Key == "h" :
+        processOperator("/")
+    if Key == "h" or Key == "H":
         History()
-    if Key == "H" :
-        History()
-    if Key == "c" :
-        clear()
-    if Key == "C" :
+    if Key == "c" or Key == "C":
         clear()
     if Key == "i" :
         info()
-    if Key == "s" :
-        Settings()
-    if Key == "S" :
+    if Key == "s" or Key == "S":
         Settings()
     if Key == "comma" :
         comma()
-    if Key == "Return" :
-        calc()
     if Key == "BackSpace" :
         Backspace()
 def Settings() :
@@ -1224,11 +939,7 @@ def History() :
     SizeReload()
 def minus() :
     global Input1, Input2, Output, Stage
-    if Stage == 5 :
-        if Input2[0] != "-" :
-            Input2 = "-" + str(Input2)
-            Output.config(text=Input2)
-    if Stage == 4 :
+    if Stage == 4 or Stage == 5:
         if Input2[0] != "-" :
             Input2 = "-" + str(Input2)
             Output.config(text=Input2)
@@ -1237,11 +948,7 @@ def minus() :
             Input2 = "-"
             Output.config(text=Input2)
             Stage = 4
-    if Stage == 2 :
-        if Input1[0] != "-" :
-            Input1 = "-" + str(Input1)
-            Output.config(text=Input1)
-    if Stage == 1 :
+    if Stage == 1 or Stage == 2:
         if Input1[0] != "-" :
             Input1 = "-" + str(Input1)
             Output.config(text=Input1)
@@ -1254,9 +961,7 @@ def minus() :
 def rooty() :
     global Operator, Stage
     Operator = "sqrt"
-    if Stage == 1 :
-        Stage = 3
-    if Stage == 2 :
+    if Stage == 1 or Stage == 2:
         Stage = 3
     calc()
 def More() :
@@ -1448,21 +1153,21 @@ WindowFrame.rowconfigure(5, weight=1)
 Outputframe = ttk.Frame(WindowFrame, borderwidth=1, relief="sunken")
 Output = ttk.Label(Outputframe, text="0")
 # Buttons
-PlusButton = ttk.Button(WindowFrame, text="+", command=add)
-MinusButton = ttk.Button(WindowFrame, text="-", command=subtract)
-MultiplyButton = ttk.Button(WindowFrame, text="x", command=multiply)
-DivideButton = ttk.Button(WindowFrame, text="÷", command=divide)
-SevenButton = ttk.Button(WindowFrame, text="7", command=seven)
-EightButton = ttk.Button(WindowFrame, text="8", command=eight)
-NineButton = ttk.Button(WindowFrame, text="9", command=nine)
+PlusButton = ttk.Button(WindowFrame, text="+", command=lambda: processOperator("+"))
+MinusButton = ttk.Button(WindowFrame, text="-", command=lambda: processOperator("-"))
+MultiplyButton = ttk.Button(WindowFrame, text="x", command=lambda: processOperator("*"))
+DivideButton = ttk.Button(WindowFrame, text="÷", command=lambda: processOperator("/"))
+SevenButton = ttk.Button(WindowFrame, text="7", command=lambda: processNumber("7"))
+EightButton = ttk.Button(WindowFrame, text="8", command=lambda: processNumber("8"))
+NineButton = ttk.Button(WindowFrame, text="9", command=lambda: processNumber("9"))
 CEButton = ttk.Button(WindowFrame, text="CE", command=clear)
-FourButton = ttk.Button(WindowFrame, text="4", command=four)
-FiveButton = ttk.Button(WindowFrame, text="5", command=five)
-SixButton = ttk.Button(WindowFrame, text="6", command=six)
+FourButton = ttk.Button(WindowFrame, text="4", command=lambda: processNumber("4"))
+FiveButton = ttk.Button(WindowFrame, text="5", command=lambda: processNumber("5"))
+SixButton = ttk.Button(WindowFrame, text="6", command=lambda: processNumber("6"))
 CommaButton = ttk.Button(WindowFrame, text=",", command=comma)
-OneButton = ttk.Button(WindowFrame, text="1", command=one)
-TwoButton = ttk.Button(WindowFrame, text="2", command=two)
-ThreeButton = ttk.Button(WindowFrame, text="3", command=three)
+OneButton = ttk.Button(WindowFrame, text="1", command=lambda: processNumber("1"))
+TwoButton = ttk.Button(WindowFrame, text="2", command=lambda: processNumber("2"))
+ThreeButton = ttk.Button(WindowFrame, text="3", command=lambda: processNumber("3"))
 EqualButton = ttk.Button(WindowFrame, text="=", command=calc)
 InfoButton = ttk.Button(WindowFrame, text="i", command=info)
 ZeroButton = ttk.Button(WindowFrame, text="0", command=zero)
