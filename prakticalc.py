@@ -705,7 +705,7 @@ def CustomInfo() :
     if CurrentMsgBoxStyle == 0:
         messagebox.showinfo("About PraktiCalc", infotext)
     elif CurrentMsgBoxStyle == 1:
-        CustomInfox = tk.Tk()
+        CustomInfox = tk.Toplevel(MainWindow)
         CustomInfox.title("About PraktiCalc")
         CustomInfox.rowconfigure(0, weight=1)
         CustomInfox.columnconfigure(0, weight=1)
@@ -727,12 +727,15 @@ def CustomInfo() :
         CustomInfoExit = ttk.Button(CustomInfoFrame, text="OK", command=closeCustomInfo)
         ExtendedInfoFrame = ttk.LabelFrame(CustomInfoFrame, relief="sunken", text="[i]")
         ExtendedInfoFrame.rowconfigure(0, weight=1)
+        ExtendedInfoFrame.rowconfigure(1, weight=1)
         ExtendedInfoFrame.columnconfigure(0, weight=1)
+        ExtInfoIcon = ttk.Label(ExtendedInfoFrame, image=MainWindow.icon)
         ExtInfoText1 = ttk.Label(ExtendedInfoFrame, text=infotext, justify="left")
         CustomInfoFrame.grid(row=0, column=0, sticky="nesw")
         CustomInfoExit.grid(row=1, column=1, padx=10, pady=10)
         ExtendedInfoFrame.grid(row=0, column=0, padx=20, pady=10, sticky="nesw")
-        ExtInfoText1.grid(row=0, column=0)
+        ExtInfoIcon.grid(row=0, column=0)
+        ExtInfoText1.grid(row=1, column=0)
     else:
         if platform.system() == "Windows":
             if CurrentMsgBoxStyle == 2:
@@ -744,11 +747,11 @@ def CustomInfo() :
             if CurrentMsgBoxStyle == 2:
                 subprocess.Popen(["xmessage", "-title", "About PraktiCalc", infotext])
             elif CurrentMsgBoxStyle == 3:
-                subprocess.Popen(["yad", "--title=About PraktiCalc", "--info", "--image=dialog-information", "--button=OK", "--text=" + infotext])
+                subprocess.Popen(["yad", "--title=About PraktiCalc", "--info", "--image=PraktiCalculator_icon.png", "--button=OK", "--text=" + infotext])
             elif CurrentMsgBoxStyle == 4:
                 subprocess.Popen(["kdialog", "--title=About PraktiCalc", "--msgbox", infotext])
             elif CurrentMsgBoxStyle == 5:
-                subprocess.Popen(["zenity", "--title=About PraktiCalc", "--info", "--text=" + infotext])
+                subprocess.Popen(["zenity", "--title=About PraktiCalc", "--info", "--icon=PraktiCalculator_icon.png", "--text=" + infotext])
             else:
                 print("ERROR: Unknown Message Box Style")
 def closeCustomInfo() :
@@ -1061,8 +1064,32 @@ if DarkMode == True :
 # main window
 MainWindow = tk.Tk()
 MainWindow.title("PraktiCalc")
+MainWindow.icon_mono = tk.BitmapImage(file="PraktiCalculator_icon.xbm")
+MainWindow.icon = tk.PhotoImage(file="PraktiCalculator_icon.png")
+MainWindow.icon_mono_inverted = tk.BitmapImage(file="PraktiCalculator_icon_inverted.xbm")
+MainWindow.iconphoto(True, MainWindow.icon)
 MainWindow.config(width=256, height=315)
 if console == True:
+    def ConsoleAbout():
+        ConsoleAboutWindow = tk.Toplevel(MainWindow)
+        if platform.system() == "Windows":
+            SettingsWindow.attributes("-toolwindow", True)
+            SettingsWindow.focus_force()
+        ConsoleAboutWindow.columnconfigure(0, weight=1)
+        for cw in range(4):
+            ConsoleAboutWindow.rowconfigure(cw, weight=1)
+        ConsoleAboutWindow.title("About PraktiCalc Console")
+        ConsoleAboutWindow.config(bg="black")
+        ConsoleAboutSpacer1 = tk.Label(ConsoleAboutWindow, bg="black")
+        ConsoleAboutSpacer2 = tk.Label(ConsoleAboutWindow, bg="black")
+        ConsoleIconFrame = tk.Frame(ConsoleAboutWindow, bg="black")
+        ConsoleAboutIcon = tk.Label(ConsoleIconFrame, image=MainWindow.icon_mono_inverted, fg="white")
+        ConsoleAboutText = tk.Label(ConsoleAboutWindow, bg="black", text="PraktiCalc Console\nrunning on PraktiCalc " + PraktiCalcVersion + "\npowered by Python " + platform.python_version(), fg="white")
+        ConsoleAboutSpacer1.grid(row=0, column=0, sticky="nesw")
+        ConsoleIconFrame.grid(row=1, column=0, sticky="nesw")
+        ConsoleAboutIcon.grid(row=0, column=0, padx=152, pady=20)
+        ConsoleAboutText.grid(row=2, column=0, sticky="nesw")
+        ConsoleAboutSpacer2.grid(row=3, column=0, sticky="nesw")
     def executeTheCommand(cominput):
         ConsoleInput.delete(0, tk.END)
         if cominput == "version":
@@ -1077,6 +1104,7 @@ clear: clears the output
 function(<function>: executes a function in the program
 system(<command>: executes a system command and prints the output
 varget(<variable>: shows the value of the given variable
+aboutwindow: opens console about window
 
 Useful Tips:
 - don't close brackets
@@ -1106,6 +1134,9 @@ Useful Tips:
         elif cominput == "clear":
             ConsoleOutput.delete("1.0", tk.END)
             comoutput = ""
+        elif cominput == "aboutwindow":
+            comoutput = "opening console about window"
+            ConsoleAbout()
         elif cominput == "exit":
             exit()
         else:
