@@ -946,6 +946,9 @@ def minus() :
         if Input2[0] != "-" :
             Input2 = "-" + str(Input2)
             Output.config(text=Input2)
+        else:
+            Input2 = Input2[1:]
+            Output.config(text=Input2)
     if Stage == 3 :
         if Input2[0] != "-" :
             Input2 = "-"
@@ -954,6 +957,9 @@ def minus() :
     if Stage == 1 or Stage == 2:
         if Input1[0] != "-" :
             Input1 = "-" + str(Input1)
+            Output.config(text=Input1)
+        else:
+            Input1 = Input1[1:]
             Output.config(text=Input1)
     if Stage == 0 :
         if Input1[0] != "-" :
