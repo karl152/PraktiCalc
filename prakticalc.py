@@ -57,6 +57,7 @@ if CLIVersion == True:
     else:
         print("PraktiCalc " + PraktiCalcVersion)
     exit()
+console = "--console" in sys.argv
 breeze = "--breeze" in sys.argv
 yaru = "--yaru" in sys.argv
 equilux = "--equilux" in sys.argv
@@ -1349,6 +1350,77 @@ def xcheck() :
     print("____________________________")
 def xquit() :
     MainWindow.destroy()
+if console == True:
+    def executeTheCommand(cominput):
+        ConsoleInput.delete(0, tk.END)
+        if cominput == "version":
+            comoutput = "PraktiCalc Console on PraktiCalc " + PraktiCalcVersion
+        elif cominput == "help":
+            comoutput = """PraktiCalc Console Help
+***********************
+This console was mainly created for debugging purposes.
+Available Commands:
+exit: exits the program
+clear: clears the output
+function(<function>: executes a function in the program
+system(<command>: executes a system command and prints the output
+varget(<variable>: shows the value of the given variable
+
+Useful Tips:
+- don't close brackets
+- use the system command with caution
+- don't use sudo with the system command, use run0 instead
+- the console is not interactive, it prints the output after processing
+- there is a Minecraft reference hidden in the console
+"""
+        elif cominput == "/toggledownfall":
+            comoutput = "Toggled downfall"
+        elif cominput.startswith("function("):
+            cominput = cominput[9:]
+            if cominput in globals() and callable(globals()[cominput]):
+                globals()[cominput]()
+                comoutput = "Function executed"
+            else:
+                comoutput = "[!] Unknown function"
+        elif cominput.startswith("system("):
+            cominput = cominput[7:]
+            comoutput = subprocess.getoutput(cominput)
+        elif cominput.startswith("varget("):
+            cominput = cominput[7:]
+            if cominput in globals():
+                comoutput = globals()[cominput]
+            else:
+                comoutput = "[!] Unknown variable"
+        elif cominput == "clear":
+            ConsoleOutput.delete("1.0", tk.END)
+            comoutput = ""
+        elif cominput == "exit":
+            exit()
+        else:
+            comoutput = "[X] Unknown command"
+        ConsoleOutput.insert(tk.END, str(comoutput) + "\n")
+    def ConsoleEnterKey(event):
+        global cominput
+        ConsoleKey = event.keysym
+        if ConsoleKey == "Return":
+            executeTheCommand(ConsoleInput.get())
+    ConsoleWindow = tk.Tk()
+    ConsoleWindow.title("PraktiCalc Console")
+    ConsoleWindow.config(bg="black")
+    ConsoleWindow.rowconfigure(0, weight=1)
+    ConsoleWindow.columnconfigure(0, weight=1)
+    ConsoleWindow.columnconfigure(1, weight=1)
+    ConsoleWindow.columnconfigure(2, weight=1)
+    ConsoleWindow.bind("<Key>", ConsoleEnterKey)
+    ConsoleOutput = tk.Text(ConsoleWindow, bg="black", fg="white")
+    ConsoleInputLabel = tk.Label(ConsoleWindow, text="INPUT: ", bg="black", fg="white")
+    ConsoleInput = tk.Entry(ConsoleWindow, bg="black", fg="white")
+    ConsoleExecuteButton = tk.Button(ConsoleWindow, text="--^", bg="black", fg="white", command=lambda: executeTheCommand(ConsoleInput.get()))
+    ConsoleOutput.grid(row=0, column=0, columnspan=3, sticky="nesw")
+    ConsoleInputLabel.grid(row=1, column=0, sticky="ew")
+    ConsoleInput.grid(row=1, column=1, sticky="ew")
+    ConsoleExecuteButton.grid(row=1, column=2, sticky="ew", pady=2, padx=2)
+    ConsoleInput.focus_set()
 if DarkMode == True :
     usedttktheme = darkttktheme
 
