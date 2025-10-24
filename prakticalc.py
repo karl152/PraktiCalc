@@ -601,21 +601,13 @@ def Settings() :
         style.theme_use(usedttktheme)
     SettingsWindowFrame = ttk.Frame(SettingsWindow)
     SettingsWindowFrame.columnconfigure(0, weight=1)
-    StatusBarToggle = ttk.Checkbutton(SettingsWindowFrame, text="Status Bar", command=ToggleStatusBar)
+    StatusBarToggle = ttk.Checkbutton(SettingsWindowFrame, text="Status Bar", command=ToggleStatusBar, variable=StatusBarTkVar)
     CustomMsgBoxToggle = ttk.Checkbutton(SettingsWindowFrame, text="Alternative Messageboxes", command=ToggleCustomMsgBoxes)
     if CustomMsgBox == False :
         CustomMsgBoxToggle.state(["!selected"])
     if CustomMsgBox == True :
         CustomMsgBoxToggle.state(["selected"])
-    DarkModeToggle = ttk.Checkbutton(SettingsWindowFrame, text="Dark Mode", command=ChangeDarkMode)
-    if StatusBar == True:
-        StatusBarToggle.state(["selected"])
-    elif StatusBar == False:
-        StatusBarToggle.state(["!selected"])
-    if DarkMode == True:
-        DarkModeToggle.state(["selected"])
-    elif DarkMode == False:
-        DarkModeToggle.state(["!selected"])
+    DarkModeToggle = ttk.Checkbutton(SettingsWindowFrame, text="Dark Mode", command=ChangeDarkMode, variable=DarkModeTkVar)
     MsgBoxStyleFrame = ttk.LabelFrame(SettingsWindowFrame, text="Messagebox Style")
     MsgBoxStyleFrame.columnconfigure(0, weight=1)
     MsgBoxStyleSelect = ttk.Combobox(MsgBoxStyleFrame, values=MsgBoxStyles)
@@ -1074,13 +1066,15 @@ MainWindow.icon_mono = tk.BitmapImage(file="PraktiCalculator_icon.xbm")
 MainWindow.icon = tk.PhotoImage(file="PraktiCalculator_icon.png")
 MainWindow.icon_mono_inverted = tk.BitmapImage(file="PraktiCalculator_icon_inverted.xbm")
 MainWindow.iconphoto(True, MainWindow.icon)
+DarkModeTkVar = tk.BooleanVar(value=DarkMode)
+StatusBarTkVar = tk.BooleanVar(value=StatusBar)
 MainWindow.config(width=256, height=315)
 if console == True:
     def ConsoleAbout():
         ConsoleAboutWindow = tk.Toplevel(MainWindow)
         if platform.system() == "Windows":
-            SettingsWindow.attributes("-toolwindow", True)
-            SettingsWindow.focus_force()
+            ConsoleAboutWindow.attributes("-toolwindow", True)
+            ConsoleAboutWindow.focus_force()
         ConsoleAboutWindow.columnconfigure(0, weight=1)
         for cw in range(4):
             ConsoleAboutWindow.rowconfigure(cw, weight=1)
