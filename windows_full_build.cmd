@@ -17,7 +17,7 @@ rem along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 del prakticalc-installer.exe
 echo Building PraktiCalc
-python -m PyInstaller prakticalc.py --onefile --windowed --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --icon PraktiCalculator.ico
+python -m PyInstaller prakticalc.py --onefile --windowed --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data info.vbs:. --add-data error.vbs:. --icon PraktiCalculator.ico
 robocopy .\dist ".\PraktiCalc Installer\content" PraktiCalc.exe
 rmdir /S /Q dist
 rmdir /S /Q build

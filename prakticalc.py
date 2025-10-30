@@ -71,10 +71,14 @@ if RunningAsOneFileExe == True:
     PraktiCalcIconPath = (sys._MEIPASS + "/PraktiCalculator_icon.png")
     PraktiCalcIconMonoPath = (sys._MEIPASS + "/PraktiCalculator_icon.xbm")
     PraktiCalcIconMonoInvertedPath = (sys._MEIPASS + "/PraktiCalculator_icon_inverted.xbm")
+    VBSInfoPath = (sys._MEIPASS + "/info.vbs")
+    VBSErrorPath = (sys._MEIPASS + "/error.vbs")
 else:
     PraktiCalcIconPath = "PraktiCalculator_icon.png"
     PraktiCalcIconMonoPath = "PraktiCalculator_icon.xbm"
     PraktiCalcIconMonoInvertedPath = "PraktiCalculator_icon_inverted.xbm"
+    VBSInfoPath = "info.vbs"
+    VBSErrorPath = "error.vbs"
 
 console = "--console" in sys.argv
 breeze = "--breeze" in sys.argv
@@ -751,7 +755,7 @@ def CustomInfo() :
         if platform.system() == "Windows":
             if CurrentMsgBoxStyle == 2:
                 pyver = platform.python_version()
-                subprocess.getoutput('cmd /C echo(MsgBox "PraktiCalc                                                                              Version ' + PraktiCalcVersion + '                                                                                      running on Python ' + pyver + '                                                      Licensed under GPLv3                                                               read more at https://www.gnu.org/licenses/", 64, "About PraktiCalc"> test.vbs && cscript test.vbs && del test.vbs')
+                subprocess.run(["wscript", VBSInfoPath, PraktiCalcVersion, pyver])
             else:
                 print("ERROR: Unknown Message Box Style")
         else:
@@ -807,7 +811,7 @@ def showError(message):
     else:
         if platform.system() == "Windows":
             if CurrentMsgBoxStyle == 2:
-                subprocess.getoutput('cmd /C echo(MsgBox "' + message + '", 16, "Error"> test.vbs && cscript test.vbs && del test.vbs')
+                subprocess.run(["wscript", VBSErrorPath, message])
             else:
                 print("ERROR: Unknown Message Box Style")
         else:
