@@ -57,6 +57,25 @@ if CLIVersion == True:
     else:
         print("PraktiCalc " + PraktiCalcVersion)
     exit()
+
+def testPyInstallerOneFile():
+    try:
+        print(sys._MEIPASS)
+        return True
+    except:
+        return False
+
+RunningAsOneFileExe = testPyInstallerOneFile()
+
+if RunningAsOneFileExe == True:
+    PraktiCalcIconPath = (sys._MEIPASS + "/PraktiCalculator_icon.png")
+    PraktiCalcIconMonoPath = (sys._MEIPASS + "/PraktiCalculator_icon.xbm")
+    PraktiCalcIconMonoInvertedPath = (sys._MEIPASS + "/PraktiCalculator_icon_inverted.xbm")
+else:
+    PraktiCalcIconPath = "PraktiCalculator_icon.png"
+    PraktiCalcIconMonoPath = "PraktiCalculator_icon.xbm"
+    PraktiCalcIconMonoInvertedPath = "PraktiCalculator_icon_inverted.xbm"
+
 console = "--console" in sys.argv
 breeze = "--breeze" in sys.argv
 yaru = "--yaru" in sys.argv
@@ -739,11 +758,11 @@ def CustomInfo() :
             if CurrentMsgBoxStyle == 2:
                 subprocess.Popen(["xmessage", "-title", "About PraktiCalc", infotext])
             elif CurrentMsgBoxStyle == 3:
-                subprocess.Popen(["yad", "--title=About PraktiCalc", "--info", "--image=PraktiCalculator_icon.png", "--button=OK", "--text=" + infotext])
+                subprocess.Popen(["yad", "--title=About PraktiCalc", "--info", "--image=" + PraktiCalcIconPath, "--button=OK", "--text=" + infotext])
             elif CurrentMsgBoxStyle == 4:
                 subprocess.Popen(["kdialog", "--title=About PraktiCalc", "--msgbox", infotext])
             elif CurrentMsgBoxStyle == 5:
-                subprocess.Popen(["zenity", "--title=About PraktiCalc", "--info", "--icon=PraktiCalculator_icon.png", "--text=" + infotext])
+                subprocess.Popen(["zenity", "--title=About PraktiCalc", "--info", "--icon=" + PraktiCalcIconPath, "--text=" + infotext])
             else:
                 print("ERROR: Unknown Message Box Style")
 def closeCustomInfo() :
@@ -1062,9 +1081,9 @@ if DarkMode == True :
 # main window
 MainWindow = tk.Tk()
 MainWindow.title("PraktiCalc")
-MainWindow.icon_mono = tk.BitmapImage(file="PraktiCalculator_icon.xbm")
-MainWindow.icon = tk.PhotoImage(file="PraktiCalculator_icon.png")
-MainWindow.icon_mono_inverted = tk.BitmapImage(file="PraktiCalculator_icon_inverted.xbm")
+MainWindow.icon_mono = tk.BitmapImage(file=PraktiCalcIconMonoPath)
+MainWindow.icon = tk.PhotoImage(file=PraktiCalcIconPath)
+MainWindow.icon_mono_inverted = tk.BitmapImage(file=PraktiCalcIconMonoInvertedPath)
 MainWindow.iconphoto(True, MainWindow.icon)
 DarkModeTkVar = tk.BooleanVar(value=DarkMode)
 StatusBarTkVar = tk.BooleanVar(value=StatusBar)
