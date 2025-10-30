@@ -103,8 +103,7 @@ StatusBar = False
 CustomMsgBox = True
 DarkMode = "--dark" in sys.argv
 debug = "--debug" in sys.argv
-History1 = History2 = History3 = History4 = History5 = History6 = History7 = History8 = History9 = History10 = History11 = History12 = History13 = History14 = History15 = ""
-HistoryWrite = 1
+historylist = []
 FinalResult = 0
 aFinalResult = 0
 DecimalNumber = 0
@@ -200,300 +199,46 @@ def comma() :
         Stage = 2
     SizeReload()
 def calc() :
-    global historylist, Input1, Stage, Input2, Output, Operator, FinalResult, aFinalResult, HistoryWrite, History1, History2, History3, History4, History5, History6, History7, History8, History9, History10, History11, History12, History13, History14, History15
-    if HistoryWrite >=16 :
-        History1 = History2
-        History2 = History3
-        History3 = History4
-        History4 = History5
-        History5 = History6
-        History6 = History7
-        History7 = History8
-        History8 = History9
-        History9 = History10
-        History10 = History11
-        History11 = History12
-        History12 = History13
-        History13 = History14
-        History14 = History15
-        HistoryWrite = 15
+    global historylist, Input1, Stage, Input2, Output, Operator, FinalResult, aFinalResult
+    if len(historylist) >= 16:
+        historylist.pop(0)
     if Stage == 6 :
         if Operator == "+" :
             aFinalResult = FinalResult
             FinalResult = FinalResult + float(Input2)
             Output.config(text=str(FinalResult))
-            if HistoryWrite == 15 :
-                History15 = str(aFinalResult) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 14 :
-                History14 = str(aFinalResult) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 13 :
-                History13 = str(aFinalResult) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 12 :
-                History12 = str(aFinalResult) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 11 :
-                History11 = str(aFinalResult) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 10 :
-                History10 = str(aFinalResult) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 9 :
-                History9 = str(aFinalResult) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 8 :
-                History8 = str(aFinalResult) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 7 :
-                History7 = str(aFinalResult) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 6 :
-                History6 = str(aFinalResult) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 5 :
-                History5 = str(aFinalResult) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 4 :
-                History4 = str(aFinalResult) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 3 :
-                History3 = str(aFinalResult) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 2 :
-                History2 = str(aFinalResult) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 1 :
-                History1 = str(aFinalResult) + " + " + Input2 + " = " + str(FinalResult)
-            HistoryWrite += 1
+            historylist.append(str(aFinalResult) + " + " + Input2 + " = " + str(FinalResult))
         if Operator == "-" :
             FinalResult = FinalResult - float(Input2)
             Output.config(text=str(FinalResult))
-            if HistoryWrite == 15 :
-                History15 = str(aFinalResult) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 14 :
-                History14 = str(aFinalResult) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 13 :
-                History13 = str(aFinalResult) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 12 :
-                History12 = str(aFinalResult) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 11 :
-                History11 = str(aFinalResult) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 10 :
-                History10 = str(aFinalResult) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 9 :
-                History9 = str(aFinalResult) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 8 :
-                History8 = str(aFinalResult) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 7 :
-                History7 = str(aFinalResult) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 6 :
-                History6 = str(aFinalResult) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 5 :
-                History5 = str(aFinalResult) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 4 :
-                History4 = str(aFinalResult) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 3 :
-                History3 = str(aFinalResult) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 2 :
-                History2 = str(aFinalResult) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 1 :
-                History1 = str(aFinalResult) + " - " + Input2 + " = " + str(FinalResult)
-            HistoryWrite += 1
+            historylist.append(str(aFinalResult) + " - " + Input2 + " = " + str(FinalResult))
         if Operator == "*" :
             FinalResult = FinalResult * float(Input2)
             Output.config(text=str(FinalResult))
-            if HistoryWrite == 15 :
-                History15 = str(aFinalResult) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 14 :
-                History14 = str(aFinalResult) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 13 :
-                History13 = str(aFinalResult) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 12 :
-                History12 = str(aFinalResult) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 11 :
-                History11 = str(aFinalResult) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 10 :
-                History10 = str(aFinalResult) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 9 :
-                History9 = str(aFinalResult) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 8 :
-                History8 = str(aFinalResult) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 7 :
-                History7 = str(aFinalResult) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 6 :
-                History6 = str(aFinalResult) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 5 :
-                History5 = str(aFinalResult) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 4 :
-                History4 = str(aFinalResult) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 3 :
-                History3 = str(aFinalResult) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 2 :
-                History2 = str(aFinalResult) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 1 :
-                History1 = str(aFinalResult) + " * " + Input2 + " = " + str(FinalResult)
-            HistoryWrite += 1
+            historylist.append(str(aFinalResult) + " * " + Input2 + " = " + str(FinalResult))
         if Operator == "/" :
             FinalResult = FinalResult / float(Input2)
             Output.config(text=str(FinalResult))
-            if HistoryWrite == 15 :
-                History15 = str(aFinalResult) + " / " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 14 :
-                History14 = str(aFinalResult) + " / " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 13 :
-                History13 = str(aFinalResult) + " / " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 12 :
-                History12 = str(aFinalResult) + " / " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 11 :
-                History11 = str(aFinalResult) + " / " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 10 :
-                History10 = str(aFinalResult) + " / " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 9 :
-                History9 = str(aFinalResult) + " / " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 8 :
-                History8 = str(aFinalResult) + " / " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 7 :
-                History7 = str(aFinalResult) + " / " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 6 :
-                History6 = str(aFinalResult) + " / " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 5 :
-                History5 = str(aFinalResult) + " / " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 4 :
-                History4 = str(aFinalResult) + " / " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 3 :
-                History3 = str(aFinalResult) + " / " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 2 :
-                History2 = str(aFinalResult) + " / " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 1 :
-                History1 = str(aFinalResult) + " / " + Input2 + " = " + str(FinalResult)
-            HistoryWrite += 1
+            historylist.append(str(aFinalResult) + " / " + Input2 + " = " + str(FinalResult))
         if Operator == "sqrt" :
             aFinalResult = FinalResult
             FinalResult = FinalResult ** 0.5
             Output.config(text=str(FinalResult))
-            if HistoryWrite == 15 :
-                History15 = "√" + str(aFinalResult) + " = " + str(FinalResult)
-            if HistoryWrite == 14 :
-                History15 = "√" + str(aFinalResult) + " = " + str(FinalResult)
-            if HistoryWrite == 13 :
-                History15 = "√" + str(aFinalResult) + " = " + str(FinalResult)
-            if HistoryWrite == 12 :
-                History15 = "√" + str(aFinalResult) + " = " + str(FinalResult)
-            if HistoryWrite == 11 :
-                History15 = "√" + str(aFinalResult) + " = " + str(FinalResult)
-            if HistoryWrite == 10 :
-                History15 = "√" + str(aFinalResult) + " = " + str(FinalResult)
-            if HistoryWrite == 9 :
-                History15 = "√" + str(aFinalResult) + " = " + str(FinalResult)
-            if HistoryWrite == 8 :
-                History15 = "√" + str(aFinalResult) + " = " + str(FinalResult)
-            if HistoryWrite == 7 :
-                History15 = "√" + str(aFinalResult) + " = " + str(FinalResult)
-            if HistoryWrite == 6 :
-                History15 = "√" + str(aFinalResult) + " = " + str(FinalResult)
-            if HistoryWrite == 5 :
-                History15 = "√" + str(aFinalResult) + " = " + str(FinalResult)
-            if HistoryWrite == 4 :
-                History15 = "√" + str(aFinalResult) + " = " + str(FinalResult)
-            if HistoryWrite == 3 :
-                History15 = "√" + str(aFinalResult) + " = " + str(FinalResult)
-            if HistoryWrite == 2 :
-                History15 = "√" + str(aFinalResult) + " = " + str(FinalResult)
-            if HistoryWrite == 1 :
-                History15 = "√" + str(aFinalResult) + " = " + str(FinalResult)
-            HistoryWrite += 1
+            historylist.append("√" + str(aFinalResult) + " = " + str(FinalResult))
     if Stage != 0 and Stage != 1 and Stage != 2 and Stage != 3 and Stage != 6 :
         Stage = 6
         if Operator == "+" :
             FinalResult = (float(Input1) + float(Input2))
             Output.config(text=float(Input1) + float(Input2))
-            if HistoryWrite == 15 :
-                History15 = str(Input1) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 14 :
-                History14 = str(Input1) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 13 :
-                History13 = str(Input1) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 12 :
-                History12 = str(Input1) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 11 :
-                History11 = str(Input1) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 10 :
-                History10 = str(Input1) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 9 :
-                History9 = str(Input1) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 8 :
-                History8 = str(Input1) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 7 :
-                History7 = str(Input1) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 6 :
-                History6 = str(Input1) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 5 :
-                History5 = str(Input1) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 4 :
-                History4 = str(Input1) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 3 :
-                History3 = str(Input1) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 2 :
-                History2 = str(Input1) + " + " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 1 :
-                History1 = str(Input1) + " + " + Input2 + " = " + str(FinalResult)
-            HistoryWrite += 1
+            historylist.append(str(Input1) + " + " + Input2 + " = " + str(FinalResult))
         if Operator == "-" :
             FinalResult = (float(Input1) - float(Input2))
             Output.config(text=float(Input1) - float(Input2))
-            if HistoryWrite == 15 :
-                History15 = str(Input1) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 14 :
-                History14 = str(Input1) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 13 :
-                History13 = str(Input1) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 12 :
-                History12 = str(Input1) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 11 :
-                History11 = str(Input1) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 10 :
-                History10 = str(Input1) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 9 :
-                History9 = str(Input1) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 8 :
-                History8 = str(Input1) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 7 :
-                History7 = str(Input1) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 6 :
-                History6 = str(Input1) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 5 :
-                History5 = str(Input1) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 4 :
-                History4 = str(Input1) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 3 :
-                History3 = str(Input1) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 2 :
-                History2 = str(Input1) + " - " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 1 :
-                History1 = str(Input1) + " - " + Input2 + " = " + str(FinalResult)
-            HistoryWrite += 1
+            historylist.append(str(Input1) + " - " + Input2 + " = " + str(FinalResult))
         if Operator == "*" :
             FinalResult = (float(Input1) * float(Input2))
             Output.config(text=float(Input1) * float(Input2))
-            if HistoryWrite == 15 :
-                History15 = str(Input1) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 14 :
-                History14 = str(Input1) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 13 :
-                History13 = str(Input1) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 12 :
-                History12 = str(Input1) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 11 :
-                History11 = str(Input1) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 10 :
-                History10 = str(Input1) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 9 :
-                History9 = str(Input1) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 8 :
-                History8 = str(Input1) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 7 :
-                History7 = str(Input1) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 6 :
-                History6 = str(Input1) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 5 :
-                History5 = str(Input1) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 4 :
-                History4 = str(Input1) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 3 :
-                History3 = str(Input1) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 2 :
-                History2 = str(Input1) + " * " + Input2 + " = " + str(FinalResult)
-            if HistoryWrite == 1 :
-                History1 = str(Input1) + " * " + Input2 + " = " + str(FinalResult)
-            HistoryWrite += 1
+            historylist.append(str(Input1) + " * " + Input2 + " = " + str(FinalResult))
         if Operator == "/" :
             if Input2 == "0" :
                 if StatusBar == False :
@@ -504,37 +249,7 @@ def calc() :
             else :
                 FinalResult = (float(Input1) / float(Input2))
                 Output.config(text=float(Input1) / float(Input2))
-                if HistoryWrite == 15 :
-                    History15 = str(Input1) + " / " + Input2 + " = " + str(FinalResult)
-                if HistoryWrite == 14 :
-                    History14 = str(Input1) + " / " + Input2 + " = " + str(FinalResult)
-                if HistoryWrite == 13 :
-                    History13 = str(Input1) + " / " + Input2 + " = " + str(FinalResult)
-                if HistoryWrite == 12 :
-                    History12 = str(Input1) + " / " + Input2 + " = " + str(FinalResult)
-                if HistoryWrite == 11 :
-                    History11 = str(Input1) + " / " + Input2 + " = " + str(FinalResult)
-                if HistoryWrite == 10 :
-                    History10 = str(Input1) + " / " + Input2 + " = " + str(FinalResult)
-                if HistoryWrite == 9 :
-                    History9 = str(Input1) + " / " + Input2 + " = " + str(FinalResult)
-                if HistoryWrite == 8 :
-                    History8 = str(Input1) + " / " + Input2 + " = " + str(FinalResult)
-                if HistoryWrite == 7 :
-                    History7 = str(Input1) + " / " + Input2 + " = " + str(FinalResult)
-                if HistoryWrite == 6 :
-                    History6 = str(Input1) + " / " + Input2 + " = " + str(FinalResult)
-                if HistoryWrite == 5 :
-                    History5 = str(Input1) + " / " + Input2 + " = " + str(FinalResult)
-                if HistoryWrite == 4 :
-                    History4 = str(Input1) + " / " + Input2 + " = " + str(FinalResult)
-                if HistoryWrite == 3 :
-                    History3 = str(Input1) + " / " + Input2 + " = " + str(FinalResult)
-                if HistoryWrite == 2 :
-                    History2 = str(Input1) + " / " + Input2 + " = " + str(FinalResult)
-                if HistoryWrite == 1 :
-                    History1 = str(Input1) + " / " + Input2 + " = " + str(FinalResult)
-                HistoryWrite += 1
+                historylist.append(str(Input1) + " / " + Input2 + " = " + str(FinalResult))
         if Operator == "sqrt" :
             Input2 = str(float(Input1) ** 0.5)
             Output.config(text=Input2)
@@ -542,37 +257,7 @@ def calc() :
         if Stage == 3 :
             FinalResult = float(Input1) ** 0.5
             Output.config(text=FinalResult)
-            if HistoryWrite == 15 :
-                History15 = "√" + str(Input1) + " = " + str(FinalResult)
-            if HistoryWrite == 14 :
-                History14 = "√" + str(Input1) + " = " + str(FinalResult)
-            if HistoryWrite == 13 :
-                History13 = "√" + str(Input1) + " = " + str(FinalResult)
-            if HistoryWrite == 12 :
-                History12 = "√" + str(Input1) + " = " + str(FinalResult)
-            if HistoryWrite == 11 :
-                History11 = "√" + str(Input1) + " = " + str(FinalResult)
-            if HistoryWrite == 10 :
-                History10 = "√" + str(Input1) + " = " + str(FinalResult)
-            if HistoryWrite == 9 :
-                History9 = "√" + str(Input1) + " = " + str(FinalResult)
-            if HistoryWrite == 8 :
-                History8 = "√" + str(Input1) + " = " + str(FinalResult)
-            if HistoryWrite == 7 :
-                History7 = "√" + str(Input1) + " = " + str(FinalResult)
-            if HistoryWrite == 6 :
-                History6 = "√" + str(Input1) + " = " + str(FinalResult)
-            if HistoryWrite == 5 :
-                History5 = "√" + str(Input1) + " = " + str(FinalResult)
-            if HistoryWrite == 4 :
-                History4 = "√" + str(Input1) + " = " + str(FinalResult)
-            if HistoryWrite == 3 :
-                History3 = "√" + str(Input1) + " = " + str(FinalResult)
-            if HistoryWrite == 2 :
-                History2 = "√" + str(Input1) + " = " + str(FinalResult)
-            if HistoryWrite == 1 :
-                History1 = "√" + str(Input1) + " = " + str(FinalResult)
-            HistoryWrite += 1
+            historylist.append("√" + str(Input1) + " = " + str(FinalResult))
             Stage = 6
     SizeReload()
 def KeyPress(event):
@@ -869,7 +554,7 @@ def updateDisplay() :
         Output.config(text="0")
     SizeReload()
 def History() :
-    global HistoryX, History1, History2, History3, History4, History5, History6, History7, History8, History9, History10, History11, History12, History13, History14, History15
+    global HistoryX
     HistoryX = tk.Toplevel(MainWindow)
     HistoryX.rowconfigure(0, weight=1)
     HistoryX.columnconfigure(0, weight=1)
@@ -892,69 +577,18 @@ def History() :
     for i in range(31):
         HistoryWindowFrame.rowconfigure(i, weight=1)
     HistoryWindowFrame.grid(row=0, column=0, sticky="nesw")
-    HistoryLabel1 = ttk.Label(HistoryWindowFrame, text=History1)
-    HistoryLabel2 = ttk.Label(HistoryWindowFrame, text=History2)
-    HistoryLabel3 = ttk.Label(HistoryWindowFrame, text=History3)
-    HistoryLabel4 = ttk.Label(HistoryWindowFrame, text=History4)
-    HistoryLabel5 = ttk.Label(HistoryWindowFrame, text=History5)
-    HistoryLabel6 = ttk.Label(HistoryWindowFrame, text=History6)
-    HistoryLabel7 = ttk.Label(HistoryWindowFrame, text=History7)
-    HistoryLabel8 = ttk.Label(HistoryWindowFrame, text=History8)
-    HistoryLabel9 = ttk.Label(HistoryWindowFrame, text=History9)
-    HistoryLabel10 = ttk.Label(HistoryWindowFrame, text=History10)
-    HistoryLabel11 = ttk.Label(HistoryWindowFrame, text=History11)
-    HistoryLabel12 = ttk.Label(HistoryWindowFrame, text=History12)
-    HistoryLabel13 = ttk.Label(HistoryWindowFrame, text=History13)
-    HistoryLabel14 = ttk.Label(HistoryWindowFrame, text=History14)
-    HistoryLabel15 = ttk.Label(HistoryWindowFrame, text=History15)
-    HistorySeparator1 = ttk.Separator(HistoryWindowFrame, orient="horizontal")
-    HistorySeparator2 = ttk.Separator(HistoryWindowFrame, orient="horizontal")
-    HistorySeparator3 = ttk.Separator(HistoryWindowFrame, orient="horizontal")
-    HistorySeparator4 = ttk.Separator(HistoryWindowFrame, orient="horizontal")
-    HistorySeparator5 = ttk.Separator(HistoryWindowFrame, orient="horizontal")
-    HistorySeparator6 = ttk.Separator(HistoryWindowFrame, orient="horizontal")
-    HistorySeparator7 = ttk.Separator(HistoryWindowFrame, orient="horizontal")
-    HistorySeparator8 = ttk.Separator(HistoryWindowFrame, orient="horizontal")
-    HistorySeparator9 = ttk.Separator(HistoryWindowFrame, orient="horizontal")
-    HistorySeparator10 = ttk.Separator(HistoryWindowFrame, orient="horizontal")
-    HistorySeparator11 = ttk.Separator(HistoryWindowFrame, orient="horizontal")
-    HistorySeparator12 = ttk.Separator(HistoryWindowFrame, orient="horizontal")
-    HistorySeparator13 = ttk.Separator(HistoryWindowFrame, orient="horizontal")
-    HistorySeparator14 = ttk.Separator(HistoryWindowFrame, orient="horizontal")
-    HistorySeparator15 = ttk.Separator(HistoryWindowFrame, orient="horizontal")
+    labelrow = -2
+    separatorrow = -1
+    for widgetnumber in range(15):
+        labelrow += 2
+        separatorrow += 2
+        try:
+            ttk.Label(HistoryWindowFrame, text=historylist[widgetnumber]).grid(row=labelrow, column=0, sticky="nesw")
+            ttk.Separator(HistoryWindowFrame, orient="horizontal").grid(row=separatorrow, column=0, sticky="nesw")
+        except:
+            break
     HistoryClearButton = ttk.Button(HistoryWindowFrame, text="Clear History", command=clearHistory)
-    HistoryLabel1.grid(row=0, column=0, sticky="nesw")
-    HistorySeparator1.grid(row=1, column=0, sticky="nesw")
-    HistoryLabel2.grid(row=2, column=0, sticky="nesw")
-    HistorySeparator2.grid(row=3, column=0, sticky="nesw")
-    HistoryLabel3.grid(row=4, column=0, sticky="nesw")
-    HistorySeparator3.grid(row=5, column=0, sticky="nesw")
-    HistoryLabel4.grid(row=6, column=0, sticky="nesw")
-    HistorySeparator4.grid(row=7, column=0, sticky="nesw")
-    HistoryLabel5.grid(row=8, column=0, sticky="nesw")
-    HistorySeparator5.grid(row=9, column=0, sticky="nesw")
-    HistoryLabel6.grid(row=10, column=0, sticky="nesw")
-    HistorySeparator6.grid(row=11, column=0, sticky="nesw")
-    HistoryLabel7.grid(row=12, column=0, sticky="nesw")
-    HistorySeparator7.grid(row=13, column=0, sticky="nesw")
-    HistoryLabel8.grid(row=14, column=0, sticky="nesw")
-    HistorySeparator8.grid(row=15, column=0, sticky="nesw")
-    HistoryLabel9.grid(row=16, column=0, sticky="nesw")
-    HistorySeparator9.grid(row=17, column=0, sticky="nesw")
-    HistoryLabel10.grid(row=18, column=0, sticky="nesw")
-    HistorySeparator10.grid(row=19, column=0, sticky="nesw")
-    HistoryLabel11.grid(row=20, column=0, sticky="nesw")
-    HistorySeparator11.grid(row=21, column=0, sticky="nesw")
-    HistoryLabel12.grid(row=22, column=0, sticky="nesw")
-    HistorySeparator12.grid(row=23, column=0, sticky="nesw")
-    HistoryLabel13.grid(row=24, column=0, sticky="nesw")
-    HistorySeparator13.grid(row=25, column=0, sticky="nesw")
-    HistoryLabel14.grid(row=26, column=0, sticky="nesw")
-    HistorySeparator14.grid(row=27, column=0, sticky="nesw")
-    HistoryLabel15.grid(row=28, column=0, sticky="nesw")
-    HistorySeparator15.grid(row=29, column=0, sticky="nesw")
     HistoryClearButton.grid(row=30, column=0, sticky="nesw", padx=5, pady=5)
-    SizeReload()
 def minus() :
     global Input1, Input2, Output, Stage
     if Stage == 4 or Stage == 5:
@@ -1063,9 +697,8 @@ def copyhex() :
     # win32clipboard.CloseClipboard()
     pass
 def clearHistory() :
-    global HistoryX, HistoryWrite, History1, History2, History3, History4, History5, History6, History7, History8, History9, History10, History11, History12, History13, History14, History15
-    History1 = History2 = History3 = History4 = History5 = History6 = History7 = History8 = History9 = History10 = History11 = History12 = History13 = History14 = History15 = ""
-    HistoryWrite = 1
+    global HistoryX
+    historylist.clear()
     HistoryX.destroy()
     History()
 def xcheck() :
