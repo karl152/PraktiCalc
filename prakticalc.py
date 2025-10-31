@@ -22,6 +22,7 @@ from ttkthemes import ThemedStyle
 import platform
 import subprocess
 import sys
+import shutil
 # variables
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
@@ -41,7 +42,11 @@ if platform.system() == "Windows":
         WingWebDings = False
 else:
     WingWebDings = False
-    MsgBoxStyles = ["Tkinter", "Alternative", "XMessage", "YAD", "KDialog", "Zenity"]
+    MsgBoxStyles = ["Tkinter", "Alternative"]
+    AdditionalLinuxMsgBoxStyles = ["xmessage", "yad", "kdialog", "zenity"]
+    for MsgBoxStyle in AdditionalLinuxMsgBoxStyles:
+        if shutil.which(MsgBoxStyle):
+            MsgBoxStyles.append(MsgBoxStyle)
 CurrentMsgBoxStyle = 1
 if CLIHelp == True:
     if platform.system() == "Windows":
@@ -512,17 +517,17 @@ def showError(message):
     else:
         if platform.system() == "Windows":
             if CurrentMsgBoxStyle == 2:
-                subprocess.run(["wscript", VBSErrorPath, message])
+                subprocess.Popen(["wscript", VBSErrorPath, message])
             else:
                 print("ERROR: Unknown Message Box Style")
         else:
-            if CurrentMsgBoxStyle == 2:
+            if MsgBoxStyles[CurrentMsgBoxStyle] == "xmessage":
                 subprocess.Popen(["xmessage", "-title", "Error", "[X] " + message])
-            elif CurrentMsgBoxStyle == 3:
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "yad":
                 subprocess.Popen(["yad", "--title=Error", "--error", "--image=dialog-error", "--button=OK", "--text=" + message])
-            elif CurrentMsgBoxStyle == 4:
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "kdialog":
                 subprocess.Popen(["kdialog", "--title=Error", "--error", message])
-            elif CurrentMsgBoxStyle == 5:
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "zenity":
                 subprocess.Popen(["zenity", "--title=Error", "--error", "--text=" + message])
             else:
                 print("ERROR: Unknown Message Box Style")
