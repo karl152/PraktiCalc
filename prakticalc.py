@@ -936,6 +936,5 @@ MainWindow.bind("<Key>", KeyPress)
 More.grid(row=3, column=0, sticky="nesw")
 if debug == True:
     Checkb.grid(row=1, column=0, sticky="nesw")
-    MainWindow.geometry("250x250")
-MainWindow.geometry("250x200")
+MainWindow.geometry("250x250")
 MainWindow.mainloop()
