@@ -80,7 +80,7 @@ def pageReload():
         clearMainFrame()
         InstallWizardWindow.geometry("408x420")
         WelcomeImage = ttk.Label(MainFrame, image=InstallWizardWindow.Banner)
-        WelcomeText = ttk.Label(MainFrame, text="Welcome to the PraktiCalc Installer for Windows!\nThis Wizard will help you installing PraktiCalc.\n\nThe installer is open source from this step on.")
+        WelcomeText = ttk.Label(MainFrame, text="Welcome to the PraktiCalc Installer for Windows!\nThis Wizard will help you installing PraktiCalc.")
         WelcomeImage.grid(row=0, column=0)
         WelcomeText.grid(row=1, column=0, padx=10, pady=10)
     elif WizardPage == 1:
