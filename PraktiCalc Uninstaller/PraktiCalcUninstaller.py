@@ -1,5 +1,5 @@
 # PraktiCalc - a calculator with GUI I started at my student internship in 2024
-# Copyright (C) 2024-2025 karl152
+# Copyright (C) 2024-2025 Karl "karl152"
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
