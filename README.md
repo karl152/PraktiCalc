@@ -1,3 +1,4 @@
 # PraktiCalc
-A calculator with GUI i started at my student internship in 2024, featuring a calculating history, a hexadecimal converter & dark mode. I may be working on Linux support and full English translations, as well as some general improvements. 
-<img width="1676" height="1005" alt="grafik" src="https://github.com/user-attachments/assets/1ef36ad2-90c0-4531-a163-46f3a400b598" />
+A practical calculator with GUI featuring a calculating history, a hexadecimal converter & dark mode, as well as integration for many dialog tools.
+It supports Windows (6+) and Linux, MacOS support may be coming in the far future.
+<img width="1014" height="590" alt="PraktiCalc Screenshot" src="https://github.com/user-attachments/assets/e3fc0cb4-c356-44a8-ab74-58fb12ddd7aa"/>
