@@ -540,6 +540,7 @@ def updateDisplay() :
         Output.config(text=Input2)
         if len(Input2) == 0 :
             Stage = 3
+            Input2 = "0"
     if Stage == 3 :
         Output.config(text=Input2)
     if Stage == 2 :
