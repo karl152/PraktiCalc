@@ -820,7 +820,7 @@ Useful Tips:
             comoutput = "opening console about window"
             ConsoleAbout()
         elif cominput == "exit":
-            exit()
+            MainWindow.destroy()
         else:
             comoutput = "[X] Unknown command"
         ConsoleOutput.insert(tk.END, str(comoutput) + "\n")
