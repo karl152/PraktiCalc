@@ -21,7 +21,6 @@ from ttkthemes import ThemedStyle
 import platform
 import subprocess
 import sys
-# import win32clipboard
 # variables
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
@@ -629,10 +628,15 @@ def rooty() :
         Stage = 3
     calc()
 def More() :
+    def MoreWindowEnterKey(event):
+        MoreWindowKey = event.keysym
+        if MoreWindowKey == "Return":
+            paste()
     global DarkMode, MoreWindow, DecimalFrame, DecimalInput, DecimalNumber, BinaryLabel, HexLabel, usedttktheme
     MoreWindow = tk.Toplevel(MainWindow)
     MoreWindow.title("Decimal Converter")
     MoreWindow.config(height=200, width=500)
+    MoreWindow.bind("<Key>", MoreWindowEnterKey)
     MoreWindow.rowconfigure(0, weight=1)
     MoreWindow.columnconfigure(0, weight=1)
     if platform.system() == "Windows":
@@ -663,6 +667,8 @@ def More() :
     hexFrame.columnconfigure(0, weight=1)
     BinaryLabel = ttk.Label(binFrame, text="")
     HexLabel = ttk.Label(hexFrame, text="")
+    BinCopyButton = ttk.Button(binFrame, text="Copy", command=copybin)
+    HexCopyButton = ttk.Button(hexFrame, text="Copy", command=copyhex)
     ConverterWindowFrame.grid(row=0, column=0, sticky="nesw")
     DecimalFrame.grid(row=0, column=0, columnspan=2, sticky="nesw", padx=5)
     DecimalInput.grid(row=0, column=0, pady=5, padx=5, sticky="nesw")
@@ -671,13 +677,12 @@ def More() :
     hexFrame.grid(row=1, column=1, sticky="nesw", padx=5)
     BinaryLabel.grid(row=0, column=0)
     HexLabel.grid(row=0, column=0)
+    BinCopyButton.grid(row=1, column=0)
+    HexCopyButton.grid(row=1, column=0)
     if platform.system() != "Windows":
         DecimalInput.focus_set()
 def paste() :
     global DecimalNumber, DecimalInput, BinaryNumber, HexadecimalNumber, BinaryLabel, HexLabel
-    # win32clipboard.OpenClipboard()
-    # cp = win32clipboard.GetClipboardData()
-    # win32clipboard.CloseClipboard()
     cp = str(DecimalInput.get())
     try:
         DecimalNumber = int(cp)
@@ -689,19 +694,15 @@ def paste() :
     BinaryLabel.config(text=str(BinaryNumber))
     HexLabel.config(text=str(HexadecimalNumber))
 def copybin() :
-    # global BinaryNumber
-    # win32clipboard.OpenClipboard()
-    # win32clipboard.EmptyClipboard()
-    # win32clipboard.SetClipboardText(BinaryNumber)
-    # win32clipboard.CloseClipboard()
-    pass
+    global BinaryNumber, MainWindow
+    MainWindow.clipboard_clear()
+    MainWindow.clipboard_append(BinaryNumber)
+    MainWindow.update()
 def copyhex() :
-    # global HexadecimalNumber
-    # win32clipboard.OpenClipboard()
-    # win32clipboard.EmptyClipboard()
-    # win32clipboard.SetClipboardText(HexadecimalNumber)
-    # win32clipboard.CloseClipboard()
-    pass
+    global HexadecimalNumber, MainWindow
+    MainWindow.clipboard_clear()
+    MainWindow.clipboard_append(HexadecimalNumber)
+    MainWindow.update()
 def clearHistory() :
     global HistoryX
     historylist.clear()
