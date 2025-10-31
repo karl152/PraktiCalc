@@ -139,7 +139,8 @@ def processOperator(TheOneAndOnlyOperatorThatShouldBeProcessed):
         calc()
         Input1 = FinalResult
         Operator = TheOneAndOnlyOperatorThatShouldBeProcessed
-        Output.config(text="0")
+        Input2 = "0"
+        Output.config(text=Input2)
         Stage = 3
     if Stage == 6 :
         Operator = TheOneAndOnlyOperatorThatShouldBeProcessed
@@ -148,18 +149,13 @@ def processOperator(TheOneAndOnlyOperatorThatShouldBeProcessed):
         Input1 = FinalResult
 def zero() :
     global Input1, Input2, Output, Stage
-    if Stage == 5 :
-        Input2 = str(Input2) + "0"
-        Output.config(text=Input2)
-    if Stage == 4 :
+    if Stage == 4 or Stage == 5:
         Input2 = str(Input2) + "0"
         Output.config(text=Input2)
     if Stage == 3 :
+        Input2 = "0"
         Stage = 4
-    if Stage == 2 :
-        Input1 = str(Input1) + "0"
-        Output.config(text=Input1)
-    if Stage == 1 :
+    if Stage == 1 or Stage == 2:
         Input1 = str(Input1) + "0"
         Output.config(text=Input1)
     if Stage == 0 :
@@ -172,7 +168,9 @@ def clear() :
     Stage = 0
     Output.config(text="0")
     if StatusBar == True :
-        Status.config(text="Bereit")
+        Status.config(text="Ready")
+    FinalResult = 0
+    aFinalResult = 0
     SizeReload()
 def comma() :
     global Input1, Input2, Output, Stage
@@ -703,13 +701,12 @@ def clearHistory() :
     HistoryX.destroy()
     History()
 def xcheck() :
-    global Stage, Input1, Input2, HistoryWrite, FinalResult, Operator
     print("Stage: " + str(Stage))
-    print("Input1: " + Input1)
-    print("Input2: " + Input2)
-    print("Operator: " + Operator)
+    print("Input1: " + str(Input1))
+    print("Input2: " + str(Input2))
+    print("Operator: " + str(Operator))
     print("FinalResult: " + str(FinalResult))
-    print("HistoryWrite: " + str(HistoryWrite))
+    print("aFinalResult: " + str(aFinalResult))
     print("____________________________")
 def xquit() :
     MainWindow.destroy()
