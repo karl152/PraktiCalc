@@ -140,7 +140,6 @@ def processOperator(TheOneAndOnlyOperatorThatShouldBeProcessed):
         Input1 = FinalResult
         Operator = TheOneAndOnlyOperatorThatShouldBeProcessed
         Input2 = "0"
-        Output.config(text=Input2)
         Stage = 3
     if Stage == 6 :
         Operator = TheOneAndOnlyOperatorThatShouldBeProcessed
