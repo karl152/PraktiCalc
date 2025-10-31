@@ -37,7 +37,10 @@ if platform.system() == "Windows":
             pass
     if platform.release() == "Vista" or "7" or "8" or "8.1":
         WingWebDings = True
+    else:
+        WingWebDings = False
 else:
+    WingWebDings = False
     MsgBoxStyles = ["Tkinter", "Alternative", "XMessage", "YAD", "KDialog", "Zenity"]
 CurrentMsgBoxStyle = 1
 if CLIHelp == True:
