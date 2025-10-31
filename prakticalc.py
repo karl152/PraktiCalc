@@ -17,6 +17,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import font
 from ttkthemes import ThemedStyle
 import platform
 import subprocess
@@ -34,6 +35,8 @@ if platform.system() == "Windows":
             ctypes.windll.shcore.SetProcessDpiAwareness(1)
         except:
             pass
+    if platform.release() == "Vista" or "7" or "8" or "8.1":
+        WingWebDings = True
 else:
     MsgBoxStyles = ["Tkinter", "Alternative", "XMessage", "YAD", "KDialog", "Zenity"]
 CurrentMsgBoxStyle = 1
@@ -362,6 +365,9 @@ def ChangeDarkMode() :
         usedttktheme = darkttktheme
         style = ThemedStyle(MainWindow)
         style.theme_use(usedttktheme)
+        if WingWebDings == True:
+            style.configure("Webdings.TButton", font=webdingsfont)
+            style.configure("Wingdings.TButton", font=wingdingsfont)
         style = ThemedStyle(SettingsWindow)
         style.theme_use(usedttktheme)
         style = ThemedStyle(HistoryX)
@@ -378,6 +384,9 @@ def ChangeDarkMode() :
         if platform.system() == "Windows":
             style = ttk.Style(MainWindow)
             style.theme_use("vista")
+            if WingWebDings == True:
+                style.configure("Webdings.TButton", font=webdingsfont)
+                style.configure("Wingdings.TButton", font=wingdingsfont)
             style = ttk.Style(SettingsWindow)
             style.theme_use("vista")
             style = ttk.Style(HistoryX)
@@ -728,6 +737,9 @@ MainWindow.icon_mono = tk.BitmapImage(file=PraktiCalcIconMonoPath)
 MainWindow.icon = tk.PhotoImage(file=PraktiCalcIconPath)
 MainWindow.icon_mono_inverted = tk.BitmapImage(file=PraktiCalcIconMonoInvertedPath)
 MainWindow.iconphoto(True, MainWindow.icon)
+if WingWebDings == True:
+    wingdingsfont = font.Font(family="Wingdings")
+    webdingsfont = font.Font(family="Webdings")
 DarkModeTkVar = tk.BooleanVar(value=DarkMode)
 StatusBarTkVar = tk.BooleanVar(value=StatusBar)
 MainWindow.config(width=256, height=315)
@@ -840,8 +852,8 @@ else:
     style.theme_use(usedttktheme)
 WindowFrame = ttk.Frame(MainWindow)
 for colrow in range(5):
-    WindowFrame.rowconfigure(colrow, weight=1)
-    WindowFrame.columnconfigure(colrow, weight=1)
+    WindowFrame.rowconfigure(colrow, weight=1, uniform="buttons")
+    WindowFrame.columnconfigure(colrow, weight=1, uniform="buttons")
 WindowFrame.rowconfigure(5, weight=1)
 Outputframe = ttk.Frame(WindowFrame, borderwidth=1, relief="sunken")
 Output = ttk.Label(Outputframe, text="0")
@@ -868,9 +880,16 @@ ExitButton = ttk.Button(WindowFrame, text="X", command=xquit)
 Status = ttk.Label(WindowFrame, text="")
 StatusDecoration = ttk.Label(WindowFrame, text="")
 NewStatusDecoration = ttk.Separator(WindowFrame, orient="horizontal")
-SettingsButton = ttk.Button(WindowFrame, text="🔧", command=Settings)
-BackspaceButton = ttk.Button(WindowFrame, text="<", command=Backspace)
-HistoryButton = ttk.Button(WindowFrame, text="📜", command=History)
+if WingWebDings == True:
+    SettingsButton = ttk.Button(WindowFrame, text="@", command=Settings, style="Webdings.TButton")
+    BackspaceButton = ttk.Button(WindowFrame, text="Õ", command=Backspace, style="Wingdings.TButton")
+    HistoryButton = ttk.Button(WindowFrame, text="0", command=History, style="Wingdings.TButton")
+    style.configure("Webdings.TButton", font=webdingsfont)
+    style.configure("Wingdings.TButton", font=wingdingsfont)
+else:
+    SettingsButton = ttk.Button(WindowFrame, text="🔧", command=Settings)
+    BackspaceButton = ttk.Button(WindowFrame, text="<", command=Backspace)
+    HistoryButton = ttk.Button(WindowFrame, text="📜", command=History)
 MButton = ttk.Button(WindowFrame, text="±", command=minus)
 Checkb = ttk.Button(MainWindow, text="Check", command=xcheck) # some debug thing
 sqrtButton = ttk.Button(WindowFrame, text="√", command=rooty)
@@ -909,4 +928,6 @@ MainWindow.bind("<Key>", KeyPress)
 More.grid(row=3, column=0, sticky="nesw")
 if debug == True:
     Checkb.grid(row=1, column=0, sticky="nesw")
+    MainWindow.geometry("250x250")
+MainWindow.geometry("250x200")
 MainWindow.mainloop()
