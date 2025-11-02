@@ -18,11 +18,19 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import font
-from ttkthemes import ThemedStyle
+try:
+    from ttkthemes import ThemedStyle
+    theming = 1
+except:
+    theming = 0
+# 0 = no theming
+# 1 = theming from ttkthemes
+# 2 = manual theming
 import platform
 import subprocess
 import sys
 import shutil
+import os
 # variables
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
@@ -85,6 +93,11 @@ def testPyInstallerOneFile():
 
 RunningAsOneFileExe = testPyInstallerOneFile()
 
+# ttkthemes directory workaround for AppImage
+if os.path.exists("./usr/share/tcltk/ttkthemes"):
+    # Wenn innerhalb des AppImage/AppDir gestartet:
+    tcl_dir = os.path.abspath("./usr/share/tcltk/ttkthemes")
+
 if RunningAsOneFileExe == True:
     PraktiCalcIconPath = (sys._MEIPASS + "/PraktiCalculator_icon.png")
     PraktiCalcIconMonoPath = (sys._MEIPASS + "/PraktiCalculator_icon.xbm")
@@ -129,6 +142,40 @@ BinaryNumber = 0
 HexadecimalNumber = 0
 
 # functions
+def changeTheme(WindowName):
+    global theming
+    if platform.system() == "Windows":
+        if DarkMode == True:
+            style = ThemedStyle(WindowName)
+            style.theme_use(usedttktheme)
+        else:
+            style = ttk.Style(WindowName)
+            style.theme_use("vista")
+        if WingWebDings == True:
+            style.configure("Webdings.TButton", font=webdingsfont)
+            style.configure("Wingdings.TButton", font=wingdingsfont)
+    else:
+        if theming == 1 or 2:
+            try:
+                style = ThemedStyle(WindowName)
+                style.theme_use(usedttktheme)
+            except:
+                theming = 2
+                theme_base = os.path.join(sys._MEIPASS, "ttkthemes", "themes")
+                theme_path = os.path.join(theme_base, usedttktheme)
+                WindowName.tk.call("lappend", "auto_path", theme_base)
+                try:
+                    WindowName.tk.call("package", "require", f"ttk::theme::{usedttktheme}")
+                except:
+                    theme_tcl = os.path.join(theme_path, usedttktheme + ".tcl")
+                    if os.path.exists(theme_tcl):
+                        WindowName.tk.call("source", theme_tcl)
+                    else:
+                        print(f"Couldn't find theme {theme_tcl}")
+                try:
+                    ttk.Style().theme_use(usedttktheme)
+                except:
+                    print("Using default ttk theme")
 def info() :
     CustomInfo()
 def processNumber(number):
@@ -313,15 +360,7 @@ def Settings() :
     if platform.system() == "Windows":
         SettingsWindow.attributes("-toolwindow", True)
         SettingsWindow.focus_force()
-        if DarkMode == True:
-            style = ThemedStyle(SettingsWindow)
-            style.theme_use(usedttktheme)
-        else:
-            style = ttk.Style(SettingsWindow)
-            style.theme_use("vista")
-    else:
-        style = ThemedStyle(SettingsWindow)
-        style.theme_use(usedttktheme)
+    changeTheme(SettingsWindow)
     SettingsWindowFrame = ttk.Frame(SettingsWindow)
     SettingsWindowFrame.columnconfigure(0, weight=1)
     StatusBarToggle = ttk.Checkbutton(SettingsWindowFrame, text="Status Bar", command=ToggleStatusBar, variable=StatusBarTkVar)
@@ -371,53 +410,21 @@ def ChangeDarkMode() :
     if DarkMode == False :
         DarkMode = True
         usedttktheme = darkttktheme
-        style = ThemedStyle(MainWindow)
-        style.theme_use(usedttktheme)
-        if WingWebDings == True:
-            style.configure("Webdings.TButton", font=webdingsfont)
-            style.configure("Wingdings.TButton", font=wingdingsfont)
-        style = ThemedStyle(SettingsWindow)
-        style.theme_use(usedttktheme)
-        style = ThemedStyle(HistoryX)
-        style.theme_use(usedttktheme)
-        style = ThemedStyle(MoreWindow)
-        style.theme_use(usedttktheme)
-        style = ThemedStyle(ErrorWindow)
-        style.theme_use(usedttktheme)
-        style = ThemedStyle(CustomInfox)
-        style.theme_use(usedttktheme)
+        changeTheme(MainWindow)
+        changeTheme(SettingsWindow)
+        changeTheme(HistoryX)
+        changeTheme(MoreWindow)
+        changeTheme(ErrorWindow)
+        changeTheme(CustomInfox)
     elif DarkMode == True :
         DarkMode = False
         usedttktheme = thettktheme
-        if platform.system() == "Windows":
-            style = ttk.Style(MainWindow)
-            style.theme_use("vista")
-            if WingWebDings == True:
-                style.configure("Webdings.TButton", font=webdingsfont)
-                style.configure("Wingdings.TButton", font=wingdingsfont)
-            style = ttk.Style(SettingsWindow)
-            style.theme_use("vista")
-            style = ttk.Style(HistoryX)
-            style.theme_use("vista")
-            style = ttk.Style(MoreWindow)
-            style.theme_use("vista")
-            style = ttk.Style(ErrorWindow)
-            style.theme_use("vista")
-            style = ttk.Style(CustomInfox)
-            style.theme_use("vista")
-        else:
-            style = ThemedStyle(MainWindow)
-            style.theme_use(usedttktheme)
-            style = ThemedStyle(SettingsWindow)
-            style.theme_use(usedttktheme)
-            style = ThemedStyle(HistoryX)
-            style.theme_use(usedttktheme)
-            style = ThemedStyle(MoreWindow)
-            style.theme_use(usedttktheme)
-            style = ThemedStyle(ErrorWindow)
-            style.theme_use(usedttktheme)
-            style = ThemedStyle(CustomInfox)
-            style.theme_use(usedttktheme)
+        changeTheme(MainWindow)
+        changeTheme(SettingsWindow)
+        changeTheme(HistoryX)
+        changeTheme(MoreWindow)
+        changeTheme(ErrorWindow)
+        changeTheme(CustomInfox)
 def CustomDiv0() :
     showError("Division by 0")
 def CustomInfo() :
@@ -433,15 +440,7 @@ def CustomInfo() :
         if platform.system() == "Windows":
             CustomInfox.attributes("-toolwindow", True)
             CustomInfox.focus_force()
-            if DarkMode == True:
-                style = ThemedStyle(CustomInfox)
-                style.theme_use(usedttktheme)
-            else:
-                style = ttk.Style(CustomInfox)
-                style.theme_use("vista")
-        else:
-            style = ThemedStyle(CustomInfox)
-            style.theme_use(usedttktheme)
+        changeTheme(CustomInfox)
         CustomInfoFrame = ttk.Frame(CustomInfox)
         CustomInfoFrame.rowconfigure(0, weight=1)
         CustomInfoFrame.columnconfigure(0, weight=1)
@@ -465,13 +464,13 @@ def CustomInfo() :
             else:
                 print("ERROR: Unknown Message Box Style")
         else:
-            if CurrentMsgBoxStyle == 2:
+            if MsgBoxStyles[CurrentMsgBoxStyle] == "xmessage":
                 subprocess.Popen(["xmessage", "-title", "About PraktiCalc", infotext])
-            elif CurrentMsgBoxStyle == 3:
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "yad":
                 subprocess.Popen(["yad", "--title=About PraktiCalc", "--info", "--image=" + PraktiCalcIconPath, "--button=OK", "--text=" + infotext])
-            elif CurrentMsgBoxStyle == 4:
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "kdialog":
                 subprocess.Popen(["kdialog", "--title=About PraktiCalc", "--msgbox", infotext])
-            elif CurrentMsgBoxStyle == 5:
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "zenity":
                 subprocess.Popen(["zenity", "--title=About PraktiCalc", "--info", "--icon=" + PraktiCalcIconPath, "--text=" + infotext])
             else:
                 print("ERROR: Unknown Message Box Style")
@@ -493,15 +492,7 @@ def showError(message):
         if platform.system() == "Windows":
             ErrorWindow.attributes("-toolwindow", True)
             ErrorWindow.focus_force()
-            if DarkMode == True:
-                style = ThemedStyle(ErrorWindow)
-                style.theme_use(usedttktheme)
-            else:
-                style = ttk.Style(ErrorWindow)
-                style.theme_use("vista")
-        else:
-            style = ThemedStyle(ErrorWindow)
-            style.theme_use(usedttktheme)
+        changeTheme(ErrorWindow)
         ErrorWindowFrame = ttk.Frame(ErrorWindow)
         ErrorWindowFrame.rowconfigure(0, weight=1)
         ErrorWindowFrame.columnconfigure(0, weight=1)
@@ -585,15 +576,7 @@ def History() :
     if platform.system() == "Windows":
         HistoryX.attributes("-toolwindow", True)
         HistoryX.focus_force()
-        if DarkMode == True:
-            style = ThemedStyle(HistoryX)
-            style.theme_use(usedttktheme)
-        else:
-            style = ttk.Style(HistoryX)
-            style.theme_use("vista")
-    else:
-        style = ThemedStyle(HistoryX)
-        style.theme_use(usedttktheme)
+    changeTheme(HistoryX)
     HistoryWindowFrame = ttk.Frame(HistoryX)
     HistoryWindowFrame.columnconfigure(0, weight=1)
     for i in range(31):
@@ -659,15 +642,7 @@ def More() :
     if platform.system() == "Windows":
         MoreWindow.attributes("-toolwindow", True)
         MoreWindow.focus_force()
-        if DarkMode == True:
-            style = ThemedStyle(MoreWindow)
-            style.theme_use(usedttktheme)
-        else:
-            style = ttk.Style(MoreWindow)
-            style.theme_use("vista")
-    else:
-        style = ThemedStyle(MoreWindow)
-        style.theme_use(usedttktheme)
+    changeTheme(MoreWindow)
     ConverterWindowFrame = ttk.Frame(MoreWindow)
     DecimalFrame = ttk.LabelFrame(ConverterWindowFrame, text="Decimal")
     DecimalInput = ttk.Entry(DecimalFrame, width=70)
@@ -848,16 +823,7 @@ Useful Tips:
     ConsoleInput.focus_set()
 MainWindow.rowconfigure(0, weight=1)
 MainWindow.columnconfigure(0, weight=1)
-if platform.system() == "Windows":
-    if DarkMode == True:
-        style = ThemedStyle(MainWindow)
-        style.theme_use(usedttktheme)
-    else:
-        style = ttk.Style(MainWindow)
-        style.theme_use("vista")
-else:
-    style = ThemedStyle(MainWindow)
-    style.theme_use(usedttktheme)
+changeTheme(MainWindow)
 WindowFrame = ttk.Frame(MainWindow)
 for colrow in range(5):
     WindowFrame.rowconfigure(colrow, weight=1, uniform="buttons")
@@ -892,8 +858,6 @@ if WingWebDings == True:
     SettingsButton = ttk.Button(WindowFrame, text="@", command=Settings, style="Webdings.TButton")
     BackspaceButton = ttk.Button(WindowFrame, text="Õ", command=Backspace, style="Wingdings.TButton")
     HistoryButton = ttk.Button(WindowFrame, text="0", command=History, style="Wingdings.TButton")
-    style.configure("Webdings.TButton", font=webdingsfont)
-    style.configure("Wingdings.TButton", font=wingdingsfont)
 else:
     SettingsButton = ttk.Button(WindowFrame, text="🔧", command=Settings)
     BackspaceButton = ttk.Button(WindowFrame, text="<", command=Backspace)
