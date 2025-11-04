@@ -76,6 +76,8 @@ def back():
 def pageReload():
     global WizardPage
     if WizardPage == 0:
+        MainFrame.columnconfigure(0, weight=0)
+        MainFrame.rowconfigure(1, weight=0)
         MainFrame.config(text="Welcome")
         clearMainFrame()
         InstallWizardWindow.geometry("408x420")
@@ -85,6 +87,8 @@ def pageReload():
         WelcomeText.grid(row=1, column=0, padx=10, pady=10)
     elif WizardPage == 1:
         MainFrame.config(text="License")
+        MainFrame.columnconfigure(0, weight=1)
+        MainFrame.rowconfigure(1, weight=1)
         clearMainFrame()
         InstallWizardWindow.geometry("870x620")
         LicensePreText = ttk.Label(MainFrame, text="This software is licensed under the GNU General Public License, Version 3.\nContinue if you accept that.")
@@ -95,10 +99,12 @@ def pageReload():
             LicenseText.insert(tk.END, LicenseToInsert.read())
         LicenseText.config(state="disabled")
         LicensePreText.grid(row=0, column=0, padx=10, pady=10)
-        LicenseText.grid(row=1, column=0, padx=10, pady=10)
-        LicenseTextScrollbar.grid(row=1, column=1, padx=10, pady=10, sticky="nsw")
+        LicenseText.grid(row=1, column=0, padx=10, pady=10, sticky="nesw")
+        LicenseTextScrollbar.grid(row=1, column=1, padx=10, pady=10, sticky="nes")
     elif WizardPage == 2:
         MainFrame.config(text="Destination")
+        MainFrame.columnconfigure(0, weight=0)
+        MainFrame.rowconfigure(1, weight=0)
         clearMainFrame()
         InstallWizardWindow.geometry("408x420")
         DestinationText = ttk.Label(MainFrame, text="PraktiCalc will be installed into the following directory:")
