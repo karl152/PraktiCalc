@@ -2,6 +2,8 @@
 A practical calculator with GUI featuring a calculating history, a hexadecimal converter & dark mode, as well as integration for many dialog tools.
 
 ### Basic Calculations
+<img width="382" height="409" alt="image" src="https://github.com/user-attachments/assets/8ffe58ad-7ff1-45a1-801f-2b420623cb29" />
+
 PraktiCalc helps you with basic calculations, something everyone needs and every calculator should provide.
 
 ### Keyboard Input
@@ -14,6 +16,8 @@ PraktiCalc uses the native windows theme for the user interface to stay consiste
 You have the choice between some UI themes on Linux using command line arguments. Huge thanks to the contributors of ttkthemes for creating these amazing designs. You can find the copyright information of each theme on the ttkthemes GitHub or the PyPi page.
 
 ### Dark Mode
+<img width="382" height="409" alt="image" src="https://github.com/user-attachments/assets/c2554e3c-1c7f-4946-92a8-4b65927bd37c" />
+
 If you use a system with a dark theme, you can make use of the dark mode in PraktiCalc, again made possible by ttkthemes.
 
 ### Broad Support
@@ -26,6 +30,8 @@ MacOS is currently not supported as I don’t have any MacOS hardware, but you c
 Tired of crunchy blurred apps that don’t scale well on modern high-resolution displays? PraktiCalc supports DPI-Scaling and looks crisp on every screen.
 
 ### Decimal Converter
+<img width="820" height="290" alt="image" src="https://github.com/user-attachments/assets/8082ad2a-6d49-4c17-b801-f15c9e492aee" />
+
 Easily convert decimal numbers into binary or hexadecimal ones with the decimal converter in PraktiCalc.
 You can also copy the output, if you need to.
 
@@ -33,6 +39,8 @@ You can also copy the output, if you need to.
 Don’t like the style of the messageboxes? Use PraktiCalc‘s integration for VBScript MsgBoxes, xmessage, yad, kdialog or zenity, or use the native tkinter style.
 
 ### A Calculating History
+<img width="357" height="267" alt="image" src="https://github.com/user-attachments/assets/704bfcb7-ea58-4f8a-9411-41aed35d8b2a" />
+
 Forgot what you have calculated seconds ago? See your last 15 calculations in the history.
 
 ### Easy to install
