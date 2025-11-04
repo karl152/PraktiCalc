@@ -12,6 +12,7 @@ mkdir -p linux-pkg-builds/AppImage/PraktiCalc.AppDir/usr/bin
 echo "Building Executable"
 python3 -m PyInstaller prakticalc.py --onedir --strip --clean --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data /usr/share/tcltk/ttkthemes:ttkthemes --icon PraktiCalculator.ico
 mv ./dist/prakticalc/* ./linux-pkg-builds/AppImage/PraktiCalc.AppDir/usr/bin/
+chmod +x ./linux-pkg-builds/AppImage/PraktiCalc.AppDir/AppRun
 chmod +x ./linux-pkg-builds/AppImage/PraktiCalc.AppDir/usr/bin/prakticalc
 echo ""
 echo "------------------------------------------"
