@@ -44,7 +44,7 @@ if platform.system() == "Windows":
             ctypes.windll.shcore.SetProcessDpiAwareness(1)
         except:
             pass
-    if platform.release() == "Vista" or "7" or "8" or "8.1":
+    if platform.release() == "Vista" or platform.release() == "7" or platform.release() == "8" or platform.release() == "8.1":
         WingWebDings = True
     else:
         WingWebDings = False
