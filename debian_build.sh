@@ -7,6 +7,8 @@
 # clean up last build
 rm linux-pkg-builds/debian/prakticalc.deb
 
+mkdir linux-pkg-builds/debian/prakticalc/usr/share/prakticalc
+
 # copy files
 cp ./prakticalc.py linux-pkg-builds/debian/prakticalc/usr/share/prakticalc/
 cp ./LICENSE linux-pkg-builds/debian/prakticalc/usr/share/prakticalc/
@@ -30,7 +32,7 @@ cd ..
 dpkg-deb --build --root-owner-group prakticalc/
 
 # clean up
-rm ./prakticalc/usr/share/prakticalc/*
+rm -rf ./prakticalc/usr/share/prakticalc
 
 # show errors if lintian is installed
 lintian prakticalc.deb
