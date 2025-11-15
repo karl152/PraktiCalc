@@ -47,9 +47,6 @@ Forgot what you have calculated seconds ago? See your last 15 calculations in th
 Many hours were spent to make installations quick and easy. 
 * On Windows, just download the PraktiCalc Installer for your version of Windows and open it.
 * On Debian(-based) systems, download the PraktiCalc deb package for your architecture and install it by opening it with a software manager or by using ```sudo apt install prakticalc-xxx.deb```. 
-* On Fedora, download the rpm package and install it with a software manager or with dnf.
-* On Alpine, install the apk package. This package is for Alpine Linux only and not for Android. 
-* On TinyCore, download the tcz package and install it by running ```tce-load -wi prakticalc-xxx.tcz```.
 
 ### Developer tools
 If you want to contribute to PraktiCalc and help with development, there are some developer tools for you. Use the Check button to print the values of the calculation variables, or use the more advanced PraktiCalc Console to get values of all global variables and manually execute functions within PraktiCalc. 
