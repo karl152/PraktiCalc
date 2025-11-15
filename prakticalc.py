@@ -95,7 +95,7 @@ RunningAsOneFileExe = testPyInstallerOneFile()
 
 # ttkthemes directory workaround for AppImage
 if os.path.exists("./usr/share/tcltk/ttkthemes"):
-    # Wenn innerhalb des AppImage/AppDir gestartet:
+    # If started as AppImage:
     tcl_dir = os.path.abspath("./usr/share/tcltk/ttkthemes")
 
 if RunningAsOneFileExe == True:
@@ -154,28 +154,27 @@ def changeTheme(WindowName):
         if WingWebDings == True:
             style.configure("Webdings.TButton", font=webdingsfont)
             style.configure("Wingdings.TButton", font=wingdingsfont)
-    else:
-        if theming == 1 or 2:
+    elif theming == 1 or theming == 2:
+        try:
+            style = ThemedStyle(WindowName)
+            style.theme_use(usedttktheme)
+        except:
+            theming = 2
+            theme_base = os.path.join(sys._MEIPASS, "ttkthemes", "themes")
+            theme_path = os.path.join(theme_base, usedttktheme)
+            WindowName.tk.call("lappend", "auto_path", theme_base)
             try:
-                style = ThemedStyle(WindowName)
-                style.theme_use(usedttktheme)
+                WindowName.tk.call("package", "require", f"ttk::theme::{usedttktheme}")
             except:
-                theming = 2
-                theme_base = os.path.join(sys._MEIPASS, "ttkthemes", "themes")
-                theme_path = os.path.join(theme_base, usedttktheme)
-                WindowName.tk.call("lappend", "auto_path", theme_base)
-                try:
-                    WindowName.tk.call("package", "require", f"ttk::theme::{usedttktheme}")
-                except:
-                    theme_tcl = os.path.join(theme_path, usedttktheme + ".tcl")
-                    if os.path.exists(theme_tcl):
-                        WindowName.tk.call("source", theme_tcl)
-                    else:
-                        print(f"Couldn't find theme {theme_tcl}")
-                try:
-                    ttk.Style().theme_use(usedttktheme)
-                except:
-                    print("Using default ttk theme")
+                theme_tcl = os.path.join(theme_path, usedttktheme + ".tcl")
+                if os.path.exists(theme_tcl):
+                    WindowName.tk.call("source", theme_tcl)
+                else:
+                    print(f"Couldn't find theme {theme_tcl}")
+            try:
+                ttk.Style().theme_use(usedttktheme)
+            except:
+                print("Using default ttk theme")
 def info() :
     CustomInfo()
 def processNumber(number):
