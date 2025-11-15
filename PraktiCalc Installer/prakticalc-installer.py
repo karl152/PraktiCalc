@@ -30,6 +30,16 @@ try:
 except:
     pass
 
+if Path("C:/Program Files/PraktiCalc").exists() == True:
+    UninstallBaseString = "PraktiCalc is already installed on your system. If you want to reinstall or update it, please uninstall it first using "
+    UninstallWinString = "Control Panel -> Programs -> Programs and Features -> PraktiCalc -> Uninstall/Change"
+    UninstallWin11String = "Settings -> Apps -> Installed Apps -> PraktiCalc -> Uninstall"
+    if platform.release() == "11":
+        messagebox.showerror("Not installing", UninstallBaseString + UninstallWin11String)
+    else:
+        messagebox.showerror("Not installing", UninstallBaseString + UninstallWinString)
+    sys.exit(1)
+
 WizardPage = 0
 
 def testPyInstallerOneFile():
