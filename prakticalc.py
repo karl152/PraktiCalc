@@ -282,10 +282,14 @@ def calc() :
             Output.config(text=str(FinalResult))
             historylist.append(str(aFinalResult) + " / " + Input2 + " = " + str(FinalResult))
         if Operator == "sqrt" :
-            aFinalResult = FinalResult
-            FinalResult = FinalResult ** 0.5
-            Output.config(text=str(FinalResult))
-            historylist.append("√" + str(aFinalResult) + " = " + str(FinalResult))
+            if aFinalResult < 0:
+                showError("Result is a complex number")
+                clear()
+            else:
+                aFinalResult = FinalResult
+                FinalResult = FinalResult ** 0.5
+                Output.config(text=str(FinalResult))
+                historylist.append("√" + str(aFinalResult) + " = " + str(FinalResult))
     if Stage != 0 and Stage != 1 and Stage != 2 and Stage != 3 and Stage != 6 :
         Stage = 6
         if Operator == "+" :
@@ -312,14 +316,21 @@ def calc() :
                 Output.config(text=float(Input1) / float(Input2))
                 historylist.append(str(Input1) + " / " + Input2 + " = " + str(FinalResult))
         if Operator == "sqrt" :
-            Input2 = str(float(Input1) ** 0.5)
-            Output.config(text=Input2)
-    if Operator == "sqrt" :
-        if Stage == 3 :
-            FinalResult = float(Input1) ** 0.5
-            Output.config(text=FinalResult)
-            historylist.append("√" + str(Input1) + " = " + str(FinalResult))
-            Stage = 6
+            if float(Input1) < 0:
+                showError("Result is a complex number")
+                clear()
+            else:
+                Input2 = str(float(Input1) ** 0.5)
+                Output.config(text=Input2)
+    if Operator == "sqrt" and Stage == 3:
+            if float(Input1) < 0:
+                showError("Result is a complex number")
+                clear()
+            else:
+                FinalResult = float(Input1) ** 0.5
+                Output.config(text=FinalResult)
+                historylist.append("√" + str(Input1) + " = " + str(FinalResult))
+                Stage = 6
     SizeReload()
 def KeyPress(event):
     Key = event.keysym
