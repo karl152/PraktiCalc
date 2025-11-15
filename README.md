@@ -10,6 +10,8 @@ PraktiCalc helps you with basic calculations, something everyone needs and every
 You can use your keyboard to type more quickly to get more efficiency when calculating.
 
 ### Native Design on Windows
+<img width="252" height="282" alt="grafik" src="https://github.com/user-attachments/assets/d4d6464a-7699-4a7c-ba70-16ffc97f77c3" />
+
 PraktiCalc uses the native windows theme for the user interface to stay consistent with your other applications.
 
 ### Great themes on Linux
