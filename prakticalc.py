@@ -34,7 +34,7 @@ import os
 # variables
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.3"
+PraktiCalcVersion = "1.3 Beta 1"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 if platform.system() == "Windows":
     MsgBoxStyles = ["Tkinter", "Alternative", "VBS"]
@@ -471,7 +471,7 @@ def CustomDiv0() :
 # info window
 def CustomInfo() :
     global CustomInfox
-    infotext = "PraktiCalc\nVersion " + PraktiCalcVersion + " (in development)\nrunning on Python "+ platform.python_version() + "\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/"
+    infotext = "PraktiCalc\nVersion " + PraktiCalcVersion + "\nrunning on Python "+ platform.python_version() + "\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/"
     if CurrentMsgBoxStyle == 0:
         messagebox.showinfo("About PraktiCalc", infotext)
     elif CurrentMsgBoxStyle == 1:
