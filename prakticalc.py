@@ -142,6 +142,8 @@ BinaryNumber = 0
 HexadecimalNumber = 0
 
 # functions
+
+# sets the theme for a given window
 def changeTheme(WindowName):
     global theming
     if platform.system() == "Windows":
@@ -175,8 +177,12 @@ def changeTheme(WindowName):
                 ttk.Style().theme_use(usedttktheme)
             except:
                 print("Using default ttk theme")
+
+# LEGACY: used to decide if custom messageboxes should be used for showing the info dialog
 def info() :
     CustomInfo()
+
+# processes a number when a button is pressed
 def processNumber(number):
     global Input1, Input2, Output, Stage
     if Stage == 4 or Stage == 5:
@@ -193,6 +199,8 @@ def processNumber(number):
         Input1 = number
         Output.config(text=Input1)
         Stage = 1
+
+# processes an operator for calculation
 def processOperator(TheOneAndOnlyOperatorThatShouldBeProcessed):
     global Stage, Output, Operator, FinalResult, aFinalResult, Input1, Input2
     if Stage != 0 and Stage != 3 and Stage != 4 and Stage != 5 and Stage != 6 :
@@ -210,6 +218,8 @@ def processOperator(TheOneAndOnlyOperatorThatShouldBeProcessed):
         Stage = 3
         Output.config(text="0")
         Input1 = FinalResult
+
+# processes the number zero, which is a special case and seperate
 def zero() :
     global Input1, Input2, Output, Stage
     if Stage == 4 or Stage == 5:
@@ -224,6 +234,8 @@ def zero() :
     if Stage == 0 :
         pass
     SizeReload()
+
+# resets the calculator main window
 def clear() :
     global Input1, Input2, Output, Stage, Status, StatusBar
     Input1 = "0"
@@ -235,6 +247,8 @@ def clear() :
     FinalResult = 0
     aFinalResult = 0
     SizeReload()
+
+# comma button
 def comma() :
     global Input1, Input2, Output, Stage
     if Stage == 5 :
@@ -259,6 +273,8 @@ def comma() :
         Output.config(text=Input1)
         Stage = 2
     SizeReload()
+
+# does the actual calculation, used to include 171 if-statements
 def calc() :
     global historylist, Input1, Stage, Input2, Output, Operator, FinalResult, aFinalResult
     if len(historylist) >= 16:
@@ -332,6 +348,8 @@ def calc() :
                 historylist.append("√" + str(Input1) + " = " + str(FinalResult))
                 Stage = 6
     SizeReload()
+
+# processes keyboard input
 def KeyPress(event):
     Key = event.keysym
     if Key == "1" or Key == "2" or Key == "3" or Key == "4" or Key == "5" or Key == "6" or Key == "7" or Key == "8" or Key == "9":
@@ -360,6 +378,8 @@ def KeyPress(event):
         comma()
     if Key == "BackSpace" :
         Backspace()
+
+# settings window
 def Settings() :
     global Status, SettingsWindow, StatusBar, StatusBarToggle, CustomMsgBox, CustomMsgBoxToggle, DarkMode, DarkModeToggle, MsgBoxStyles, CurrentMsgBoxStyle, MsgBoxStyleSelect
     SettingsWindow = tk.Toplevel(MainWindow)
@@ -392,17 +412,23 @@ def Settings() :
     MsgBoxStyleFrame.grid(row=3, column=0, sticky="ew", padx=10)
     MsgBoxStyleSelect.grid(row=0, column=0, sticky="ew")
     SettingsOKButton.grid(row=4, column=0, sticky="ew", padx=10, pady=10)
+
+# saves the selected theme choice in the settigns window
 def loadTheme():
     global SettingsWindow, CurrentMsgBoxStyle, MsgBoxStyleSelect
     CurrentMsgBoxStyle = MsgBoxStyleSelect.current()
     # print(CurrentMsgBoxStyle)
     SettingsWindow.destroy()
+
+# LEGACY: used to toggle whether custom messageboxes should be used in general
 def ToggleCustomMsgBoxes():
     global CustomMsgBox, CustomMsgBoxToggle
     if CustomMsgBox == False:
         CustomMsgBox = True
     elif CustomMsgBox == True:
         CustomMsgBox = False
+
+# LEGACY: toggles the status bar, which I would consider deprecated
 def ToggleStatusBar():
     global Status, StatusBar, StatusBarToggle, StatusDecoration, MainWindow
     if StatusBar == True:
@@ -415,6 +441,8 @@ def ToggleStatusBar():
         Status.config(text="Ready")
         StatusBar = True
         StatusDecoration.config(text="__________________________________________________")
+
+# toggled dark mode
 def ChangeDarkMode() :
     global DarkMode, usedttktheme, SettingsWindow, style, HistoryX, MoreWindow
     if DarkMode == False :
@@ -435,8 +463,12 @@ def ChangeDarkMode() :
         changeTheme(MoreWindow)
         changeTheme(ErrorWindow)
         changeTheme(CustomInfox)
+
+# LEGACY: used to show a custom error messagebox dialog for dividing by zero
 def CustomDiv0() :
     showError("Division by 0")
+
+# info window
 def CustomInfo() :
     global CustomInfox
     infotext = "PraktiCalc\nVersion " + PraktiCalcVersion + " (in development)\nrunning on Python "+ platform.python_version() + "\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/"
@@ -484,12 +516,18 @@ def CustomInfo() :
                 subprocess.Popen(["zenity", "--title=About PraktiCalc", "--info", "--icon=" + PraktiCalcIconPath, "--text=" + infotext])
             else:
                 print("ERROR: Unknown Message Box Style")
+
+# closes custom info window
 def closeCustomInfo() :
     global CustomInfox
     CustomInfox.destroy()
+
+# LEGACY: closes custom division by zero error dialog, which doesn't exist anymore
 def closeCustomDiv0() :
     global Div0Error
     Div0Error.destroy()
+
+# shows error dialogs
 def showError(message):
     global ErrorWindow
     if CurrentMsgBoxStyle == 0:
@@ -532,15 +570,23 @@ def showError(message):
                 subprocess.Popen(["zenity", "--title=Error", "--error", "--text=" + message])
             else:
                 print("ERROR: Unknown Message Box Style")
+
+# closes custom error dialogs
 def closeError():
     global ErrorWindow
     ErrorWindow.destroy()
+
+# LEGACY: used to change the font size of the calculator output dynamically
 def SizeReload() :
     pass
+
+# LEGACY: informed the user about the former 15 character limit
 def CharacterStatus() :
     global Status, StatusBar
     if StatusBar == True :
         Status.config(text="PraktiCalc only supports up to 15 characters!")
+
+# backspace button
 def Backspace() :
     global Input1, Input2
     if Stage == 1 :
@@ -552,6 +598,8 @@ def Backspace() :
     if Stage == 5 :
         Input2 = Input2[:len(Input2) - 1]
     updateDisplay()
+
+# updates output
 def updateDisplay() :
     global Input1, Output, Input2, Stage
     if Stage == 5 :
@@ -576,6 +624,8 @@ def updateDisplay() :
     if Stage == 0 :
         Output.config(text="0")
     SizeReload()
+
+# history window
 def History() :
     global HistoryX
     HistoryX = tk.Toplevel(MainWindow)
@@ -604,6 +654,8 @@ def History() :
             break
     HistoryClearButton = ttk.Button(HistoryWindowFrame, text="Clear History", command=clearHistory)
     HistoryClearButton.grid(row=30, column=0, sticky="nesw", padx=5, pady=5)
+
+# +/- button function
 def minus() :
     global Input1, Input2, Output, Stage
     if Stage == 4 or Stage == 5:
@@ -631,13 +683,19 @@ def minus() :
             Output.config(text=Input1)
             Stage = 1
     SizeReload()
+
+# sqrt button
 def rooty() :
     global Operator, Stage
     Operator = "sqrt"
     if Stage == 1 or Stage == 2:
         Stage = 3
     calc()
+
+# window for additional calculating stuff, cuttently only with a decimal number converter
 def More() :
+
+    # processes the enter key inside the window
     def MoreWindowEnterKey(event):
         MoreWindowKey = event.keysym
         if MoreWindowKey == "Return":
@@ -683,6 +741,9 @@ def More() :
     HexCopyButton.grid(row=1, column=0)
     if platform.system() != "Windows":
         DecimalInput.focus_set()
+
+# converts decimal numbers into binary and hexadecimal
+# still called "paste" because it used to take the decimal number from the Windows clipboard
 def paste() :
     global DecimalNumber, DecimalInput, BinaryNumber, HexadecimalNumber, BinaryLabel, HexLabel
     cp = str(DecimalInput.get())
@@ -695,21 +756,29 @@ def paste() :
     HexadecimalNumber = hex(DecimalNumber)
     BinaryLabel.config(text=str(BinaryNumber))
     HexLabel.config(text=str(HexadecimalNumber))
+
+# copies the binary output
 def copybin() :
     global BinaryNumber, MainWindow
     MainWindow.clipboard_clear()
     MainWindow.clipboard_append(BinaryNumber)
     MainWindow.update()
+
+# copies the hexadecimal output
 def copyhex() :
     global HexadecimalNumber, MainWindow
     MainWindow.clipboard_clear()
     MainWindow.clipboard_append(HexadecimalNumber)
     MainWindow.update()
+
+# clears the history
 def clearHistory() :
     global HistoryX
     historylist.clear()
     HistoryX.destroy()
     History()
+
+# debug function to print some variables
 def xcheck() :
     print("Stage: " + str(Stage))
     print("Input1: " + str(Input1))
@@ -718,6 +787,8 @@ def xcheck() :
     print("FinalResult: " + str(FinalResult))
     print("aFinalResult: " + str(aFinalResult))
     print("____________________________")
+
+# quits the program
 def xquit() :
     MainWindow.destroy()
 if DarkMode == True :
@@ -737,6 +808,8 @@ DarkModeTkVar = tk.BooleanVar(value=DarkMode)
 StatusBarTkVar = tk.BooleanVar(value=StatusBar)
 MainWindow.config(width=256, height=315)
 if console == True:
+
+    # shows console about window
     def ConsoleAbout():
         ConsoleAboutWindow = tk.Toplevel(MainWindow)
         if platform.system() == "Windows":
@@ -757,6 +830,8 @@ if console == True:
         ConsoleAboutIcon.grid(row=0, column=0, padx=152, pady=20)
         ConsoleAboutText.grid(row=2, column=0, sticky="nesw")
         ConsoleAboutSpacer2.grid(row=3, column=0, sticky="nesw")
+
+    # interpretes and executed a given command in the console
     def executeTheCommand(cominput):
         ConsoleInput.delete(0, tk.END)
         if cominput == "version":
@@ -809,6 +884,8 @@ Useful Tips:
         else:
             comoutput = "[X] Unknown command"
         ConsoleOutput.insert(tk.END, str(comoutput) + "\n")
+
+    # processes the enter key in the console
     def ConsoleEnterKey(event):
         global cominput
         ConsoleKey = event.keysym
