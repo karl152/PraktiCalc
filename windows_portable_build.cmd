@@ -1,0 +1,23 @@
+@echo off
+
+rem PraktiCalc - a practical calculator written in Python
+rem Copyright (C) 2024-2025 Karl "karl152"
+rem
+rem This program is free software: you can redistribute it and/or modify
+rem it under the terms of the GNU General Public License as published by
+rem the Free Software Foundation, version 3.
+rem
+rem This program is distributed in the hope that it will be useful,
+rem but WITHOUT ANY WARRANTY; without even the implied warranty of
+rem MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+rem See the GNU General Public License for more details.
+rem
+rem You should have received a copy of the GNU General Public License
+rem along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+del prakticalc.exe
+python -m PyInstaller prakticalc.py --onefile --windowed --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data info.vbs:. --add-data error.vbs:. --icon PraktiCalculator.ico
+robocopy .\dist . prakticalc.exe
+rmdir /S /Q dist
+rmdir /S /Q build
+del prakticalc.spec
