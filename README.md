@@ -1,55 +1,27 @@
 # PraktiCalc
-A practical calculator with GUI featuring a calculating history, a hexadecimal converter & dark mode, as well as integration for many dialog tools.
+A practical calculator with GUI featuring a calculating history, a decimal number converter & dark mode, as well as integration for many dialog tools.
+<img width="1014" height="590" alt="grafik" src="https://github.com/user-attachments/assets/2e6c59b2-81a8-4b9a-91c1-4b521ef12e2a" />
 
-### Basic Calculations
-<img width="382" height="409" alt="image" src="https://github.com/user-attachments/assets/8ffe58ad-7ff1-45a1-801f-2b420623cb29" />
+PraktiCalc is a simple calculator written in Python, compatible with Windows 7+ and Linux. MacOS support is planned but not possible at the moment, as I don't have any MacOS hardware yet.
+There are not that many actually useful functions provided by PraktiCalc which don't exist in a modern calculator. But you have support and integration for Linux and Windows, especially for messagebox dialog tools like zenity, kdialog and xmessage on Linux and VBS MsgBoxes on Windows. 
+All that together with number conversion and great DPI scaling, it can be great and it will be even better in the future. 
+I plan to continue development after this one-year-break, because it's great for learning. And why develop some testing thing to throw away to learn, when you can put that work to improve an existing project?
+Back to the features, you can also use your keyboard to type numbers into the calculator. You can also build it yourself using the build scripts. In theory, you can also even build on Windows Vista, because Python 3.8 is compatible with it, and I keep supporting Python 3.8 because I want Windows 7 compatibility. 
+Windows XP is basically confirmed to be incompatible, at least because of f-Strings. Building on there won't work.
 
-PraktiCalc helps you with basic calculations, something everyone needs and every calculator should provide.
+#### Get PraktiCalc
+You can download PraktiCalc on the right at the Releases section. There should be a few files for each release there:
+| file name example                      | description                                                   |
+|----------------------------------------|---------------------------------------------------------------|
+| prakticalc-x.x-win-amd64-installer.exe | PraktiCalc Installer for Windows 11 on 64-Bit x86 Processors  |
+| prakticalc-x.x-win-amd64-portable.exe  | PraktiCalc for Windows 11 on 64-Bit x86 Processors (Portable) |
+| prakticalc-x.x-debian.deb              | Installable PraktiCalc Debian Package                         |
+| prakticalc-x.x-linux-amd64.AppImage    | Portable AppImage file for Linux on 64-Bit x86 Processors     |
+| prakticalc-x.x-linux-arm64.AppImage    | Portable AppImage file for Linux on 64-Bit ARM Processors     |
+| prakticalc-x.x-linux-ia32.AppImage     | Portable AppImage file for Linux on 32-Bit x86 Processors     |
+| Source code (zip)                      | ZIP archive with the source code                              |
+| Source code (tar.gz)                   | gzipped tar archive with the source code                      |
 
-### Keyboard Input
-You can use your keyboard to type more quickly to get more efficiency when calculating.
-
-### Native Design on Windows
-<img width="252" height="282" alt="grafik" src="https://github.com/user-attachments/assets/d4d6464a-7699-4a7c-ba70-16ffc97f77c3" />
-
-PraktiCalc uses the native windows theme for the user interface to stay consistent with your other applications.
-
-### Great themes on Linux
-You have the choice between some UI themes on Linux using command line arguments. Huge thanks to the contributors of ttkthemes for creating these amazing designs. You can find the copyright information of each theme on the ttkthemes GitHub or the PyPi page.
-
-### Dark Mode
-<img width="382" height="409" alt="image" src="https://github.com/user-attachments/assets/c2554e3c-1c7f-4946-92a8-4b65927bd37c" />
-
-If you use a system with a dark theme, you can make use of the dark mode in PraktiCalc, again made possible by ttkthemes.
-
-### Broad Support
-PraktiCalc supports Windows 7, 8, 8.1, 10 and 11, as well as Debian and Debian-based distributions, Fedora, Alpine and TinyCore. Other distributions should be covered by the AppImage. 
-If you use a newer Windows version, you can use compatibility mode in the file properties of the installer to install PraktiCalc. If you use Windows Vista, the installer for Windows 7 might work. You can also try to build PraktiCalc yourself. 
-If you are on Windows XP, you can try to run PraktiCalc from the source code or build it yourself, that might be painful though. 
-MacOS is currently not supported as I don’t have any MacOS hardware, but you can try to run PraktiCalc from the source code directly.
-
-### High-DPI-Support
-Tired of crunchy blurred apps that don’t scale well on modern high-resolution displays? PraktiCalc supports DPI-Scaling and looks crisp on every screen.
-
-### Decimal Converter
-<img width="820" height="290" alt="image" src="https://github.com/user-attachments/assets/8082ad2a-6d49-4c17-b801-f15c9e492aee" />
-
-Easily convert decimal numbers into binary or hexadecimal ones with the decimal converter in PraktiCalc.
-You can also copy the output, if you need to.
-
-### Great Dialog Messgebox Support
-Don’t like the style of the messageboxes? Use PraktiCalc‘s integration for VBScript MsgBoxes, xmessage, yad, kdialog or zenity, or use the native tkinter style.
-
-### A Calculating History
-<img width="357" height="267" alt="image" src="https://github.com/user-attachments/assets/704bfcb7-ea58-4f8a-9411-41aed35d8b2a" />
-
-Forgot what you have calculated seconds ago? See your last 15 calculations in the history.
-
-### Easy to install
-Many hours were spent to make installations quick and easy. 
-* On Windows, just download the PraktiCalc Installer for your version of Windows and open it.
-* On Debian(-based) systems, download the PraktiCalc deb package for your architecture and install it by opening it with a software manager or by using ```sudo apt install prakticalc-xxx.deb```. 
-
-### Developer tools
-If you want to contribute to PraktiCalc and help with development, there are some developer tools for you. Use the Check button to print the values of the calculation variables, or use the more advanced PraktiCalc Console to get values of all global variables and manually execute functions within PraktiCalc. 
+#### Developing tools
+If you want to contribute to PraktiCalc and help with development, there are some developer tools for you. Use the Check button to print the values of the calculation variables, or use the more advanced PraktiCalc Console to get values of all global variables and manually execute functions within PraktiCalc. Just start it with the ```--console``` argument and use the ```help``` command to get started.
 The Build scripts will help you to build PraktiCalc into installable packages.
