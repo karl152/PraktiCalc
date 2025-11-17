@@ -19,7 +19,7 @@ You can download PraktiCalc on the right at the Releases section. There should b
 | prakticalc-x.x-win7-amd64-portable.exe  | PraktiCalc for Windows 7+ on 64-Bit x86 Processors (Portable) |
 | prakticalc-x.x-debian.deb               | installable PraktiCalc Debian Package                         |
 | prakticalc-x.x-linux-amd64.AppImage     | portable AppImage file for Linux on 64-Bit x86 Processors     |
-| prakticalc-x.x-linux-arm64.AppImage     | portable AppImage file for Linux on 64-Bit ARM Processors     |
+| prakticalc-x.x-linux-aarch64.AppImage   | portable AppImage file for Linux on 64-Bit ARM Processors     |
 | Source code (zip)                       | ZIP archive with the source code                              |
 | Source code (tar.gz)                    | gzipped tar archive with the source code                      |
 
