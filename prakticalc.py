@@ -502,7 +502,7 @@ def CustomInfo() :
         if platform.system() == "Windows":
             if CurrentMsgBoxStyle == 2:
                 pyver = platform.python_version()
-                subprocess.run(["wscript", VBSInfoPath, PraktiCalcVersion, pyver])
+                subprocess.Popen(["wscript", VBSInfoPath, PraktiCalcVersion, pyver])
             else:
                 print("ERROR: Unknown Message Box Style")
         else:
