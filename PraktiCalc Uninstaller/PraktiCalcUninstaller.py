@@ -21,6 +21,11 @@ import time
 import threading
 from pathlib import Path
 import os
+import ctypes
+try:
+    ctypes.windll.shcore.SetProcessDpiAwareness(1)
+except:
+    pass
 
 def actuallyUninstall():
     username = os.getlogin()
@@ -40,7 +45,7 @@ def actuallyUninstall():
 Window = tk.Tk()
 Window.title("Uninstalling...")
 Desc = ttk.Label(Window, text="Please wait...")
-Progress = ttk.Progressbar(Window, mode="indeterminate", length=220)
+Progress = ttk.Progressbar(Window, mode="indeterminate", length=300)
 Progress.start()
 Desc.pack(padx=20, pady=10)
 Progress.pack(padx=20, pady=10)
