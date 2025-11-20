@@ -76,13 +76,13 @@ if CLIHelp == True:
         print("--equilux | set the dark theme to equilux")
         print("--help    | display this help text and exit")
         print("--version | display version and exit")
-    exit()
+    sys.exit(0)
 if CLIVersion == True:
     if platform.system() == "Windows":
         messagebox.showinfo("PraktiCalc " + PraktiCalcVersion, "PraktiCalc " + PraktiCalcVersion)
     else:
         print("PraktiCalc " + PraktiCalcVersion)
-    exit()
+    sys.exit(0)
 
 def testPyInstallerOneFile():
     try:
