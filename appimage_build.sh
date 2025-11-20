@@ -11,6 +11,34 @@ mkdir -p linux-pkg-builds/AppImage/PraktiCalc.AppDir/usr/bin
 
 echo "Building Executable"
 python3 -m PyInstaller prakticalc.py --onedir --strip --clean --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data /usr/share/tcltk/ttkthemes:ttkthemes --icon PraktiCalculator.ico
+cd ./dist/prakticalc/_internal/
+echo "Cleaning libraries..."
+rm libX11.so.6
+rm libXext.so.6
+rm libXft.so.2
+rm libXrender.so.1
+rm libXau.so.6
+rm libXdmcp.so.6
+rm libfontconfig.so.1
+rm libfreetype.so.6
+rm libbz2.so.1.0
+rm libbrotlicommon.so.1
+rm libbrotlidec.so.1
+rm libbrotlienc.so.1
+rm libzstd.so.1
+rm libz.so.1
+rm libyaml-0.so.2
+rm libtiff.so.6
+rm libjpeg.so.62
+rm libpng16.so.16
+rm libsharpyuv.so.0
+rm libwebp.so.7
+rm libwebpmux.so.3
+rm libwebpdemux.so.2
+rm libimagequant.so.0
+rm liblcms2.so.2
+rm libopenjp2.so.7
+cd ../../../
 mv ./dist/prakticalc/* ./linux-pkg-builds/AppImage/PraktiCalc.AppDir/usr/bin/
 chmod +x ./linux-pkg-builds/AppImage/PraktiCalc.AppDir/AppRun
 chmod +x ./linux-pkg-builds/AppImage/PraktiCalc.AppDir/usr/bin/prakticalc
