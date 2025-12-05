@@ -946,9 +946,9 @@ if WingWebDings == True:
     BackspaceButton = ttk.Button(WindowFrame, text="Õ", command=Backspace, style="Wingdings.TButton")
     HistoryButton = ttk.Button(WindowFrame, text="0", command=History, style="Wingdings.TButton")
 else:
-    SettingsButton = ttk.Button(WindowFrame, text="🔧", command=Settings)
-    BackspaceButton = ttk.Button(WindowFrame, text="<", command=Backspace)
-    HistoryButton = ttk.Button(WindowFrame, text="📜", command=History)
+    SettingsButton = ttk.Button(WindowFrame, text="⛭", command=Settings)
+    BackspaceButton = ttk.Button(WindowFrame, text="⌫", command=Backspace)
+    HistoryButton = ttk.Button(WindowFrame, text="⏲", command=History)
 MButton = ttk.Button(WindowFrame, text="±", command=minus)
 Checkb = ttk.Button(MainWindow, text="Check", command=xcheck) # some debug thing
 sqrtButton = ttk.Button(WindowFrame, text="√", command=rooty)
