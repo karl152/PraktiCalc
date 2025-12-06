@@ -156,10 +156,13 @@ def changeTheme(WindowName):
         if WingWebDings == True:
             style.configure("Webdings.TButton", font=webdingsfont)
             style.configure("Wingdings.TButton", font=wingdingsfont)
+        else:
+            style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
     elif theming == 1 or theming == 2:
         try:
             style = ThemedStyle(WindowName)
             style.theme_use(usedttktheme)
+            style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
         except:
             theming = 2
             theme_base = os.path.join(sys._MEIPASS, "ttkthemes", "themes")
@@ -173,10 +176,15 @@ def changeTheme(WindowName):
                     WindowName.tk.call("source", theme_tcl)
                 else:
                     print(f"Couldn't find theme {theme_tcl}")
+            style = ttk.Style()
             try:
-                ttk.Style().theme_use(usedttktheme)
+                style.theme_use(usedttktheme)
             except:
                 print("Using default ttk theme")
+        try:
+            style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
+        except:
+            print("Unable to increase font size of some buttons")
 
 # LEGACY: used to decide if custom messageboxes should be used for showing the info dialog
 def info() :
@@ -804,6 +812,8 @@ MainWindow.iconphoto(True, MainWindow.icon)
 if WingWebDings == True:
     wingdingsfont = font.Font(family="Wingdings")
     webdingsfont = font.Font(family="Webdings")
+else:
+    LargeUnicodeFont = font.Font(family="TkDefaultFont", size=14)
 DarkModeTkVar = tk.BooleanVar(value=DarkMode)
 StatusBarTkVar = tk.BooleanVar(value=StatusBar)
 MainWindow.config(width=256, height=315)
@@ -946,9 +956,9 @@ if WingWebDings == True:
     BackspaceButton = ttk.Button(WindowFrame, text="Õ", command=Backspace, style="Wingdings.TButton")
     HistoryButton = ttk.Button(WindowFrame, text="0", command=History, style="Wingdings.TButton")
 else:
-    SettingsButton = ttk.Button(WindowFrame, text="⛭", command=Settings)
-    BackspaceButton = ttk.Button(WindowFrame, text="⌫", command=Backspace)
-    HistoryButton = ttk.Button(WindowFrame, text="⏲", command=History)
+    SettingsButton = ttk.Button(WindowFrame, text="\u26ed", command=Settings, style="LargeUnicode.TButton")
+    BackspaceButton = ttk.Button(WindowFrame, text="\u232b", command=Backspace)
+    HistoryButton = ttk.Button(WindowFrame, text="\u23f2", command=History, style="LargeUnicode.TButton")
 MButton = ttk.Button(WindowFrame, text="±", command=minus)
 Checkb = ttk.Button(MainWindow, text="Check", command=xcheck) # some debug thing
 sqrtButton = ttk.Button(WindowFrame, text="√", command=rooty)
