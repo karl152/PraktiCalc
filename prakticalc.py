@@ -298,7 +298,12 @@ def calc() :
             elif Operator == "*":
                 FinalResult = FinalResult * float(Input2)
             elif Operator == "/":
-                FinalResult = FinalResult / float(Input2)
+                if float(Input2) == 0.0:
+                    CustomDiv0()
+                    clear()
+                    return
+                else:
+                    FinalResult = FinalResult / float(Input2)
             Output.config(text=str(FinalResult))
             historylist.append(f"{aFinalResult} {Operator} {Input2} = {FinalResult}")
         elif Operator == "sqrt" :
@@ -323,6 +328,7 @@ def calc() :
                 if float(Input2) == 0.0:
                     CustomDiv0()
                     clear()
+                    return
                 else:
                     FinalResult = (float(Input1) / float(Input2))
             Output.config(text=FinalResult)
