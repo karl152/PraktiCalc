@@ -331,7 +331,7 @@ def calc() :
                     return
                 else:
                     FinalResult = (float(Input1) / float(Input2))
-            Output.config(text=FinalResult)
+            Output.config(text=str(FinalResult))
             historylist.append(f"{Input1} {Operator} {Input2} = {FinalResult}")
         elif Operator == "sqrt" :
             if float(Input1) < 0:
@@ -346,7 +346,7 @@ def calc() :
                 clear()
             else:
                 FinalResult = float(Input1) ** 0.5
-                Output.config(text=FinalResult)
+                Output.config(text=str(FinalResult))
                 historylist.append(f"√{Input1} = {FinalResult}")
                 Stage = 6
 
