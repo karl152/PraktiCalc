@@ -373,7 +373,8 @@ def calc() :
 # processes keyboard input
 def KeyPress(event):
     Key = event.keysym
-    if Key == "1" or Key == "2" or Key == "3" or Key == "4" or Key == "5" or Key == "6" or Key == "7" or Key == "8" or Key == "9":
+    NumberKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    if Key in NumberKeys:
         processNumber(Key)
     if Key == "0" :
         zero()
