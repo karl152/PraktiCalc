@@ -59,6 +59,7 @@ CurrentMsgBoxStyle = 1
 if CLIHelp == True:
     if platform.system() == "Windows":
         messagebox.showinfo("PraktiCalc CLI Options", "PraktiCalc " + PraktiCalcVersion + """ CLI Options:
+--big: start with bigger main window
 --debug: add a test button for debugging
 --nodpiawareness: disable Windows DPI Awareness
 --dark: enable dark mode by default
@@ -68,6 +69,7 @@ if CLIHelp == True:
 --version: display version and exit""")
     else:
         print("PraktiCalc " + PraktiCalcVersion + " CLI Options")
+        print("--big     | start with bigger main window")
         print("--debug   | add a test button for debugging")
         print("--dark    | enable dark mode by default")
         print("--console | show console for debugging")
@@ -115,6 +117,7 @@ console = "--console" in sys.argv
 breeze = "--breeze" in sys.argv
 yaru = "--yaru" in sys.argv
 equilux = "--equilux" in sys.argv
+big = "--big" in sys.argv
 if breeze == True:
     thettktheme = "breeze"
 elif yaru == True:
@@ -1011,5 +1014,8 @@ MainWindow.bind("<Key>", KeyPress)
 More.grid(row=3, column=0, sticky="nesw")
 if debug == True:
     Checkb.grid(row=1, column=0, sticky="nesw")
-MainWindow.geometry("250x250")
+if big == False:
+    MainWindow.geometry("250x250")
+else:
+    MainWindow.geometry("400x400")
 MainWindow.mainloop()
