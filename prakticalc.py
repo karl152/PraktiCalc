@@ -133,8 +133,6 @@ Input1 = "0"
 Input2 = "0"
 Stage = 0
 Operator = "op"
-StatusBar = False
-CustomMsgBox = True
 DarkMode = "--dark" in sys.argv
 debug = "--debug" in sys.argv
 historylist = []
@@ -189,10 +187,6 @@ def changeTheme(WindowName):
         except:
             print("Unable to increase font size of some buttons")
 
-# LEGACY: used to decide if custom messageboxes should be used for showing the info dialog
-def info() :
-    CustomInfo()
-
 # processes a number when a button is pressed
 def processNumber(number):
     global Input1, Input2, Output, Stage
@@ -244,20 +238,16 @@ def zero() :
         Output.config(text=Input1)
     if Stage == 0 :
         pass
-    SizeReload()
 
 # resets the calculator main window
 def clear() :
-    global Input1, Input2, Output, Stage, Status, StatusBar
+    global Input1, Input2, Output, Stage
     Input1 = "0"
     Input2 = "0"
     Stage = 0
     Output.config(text="0")
-    if StatusBar == True :
-        Status.config(text="Ready")
     FinalResult = 0
     aFinalResult = 0
-    SizeReload()
 
 # comma button
 def comma() :
@@ -283,7 +273,6 @@ def comma() :
         Input1 = "0."
         Output.config(text=Input1)
         Stage = 2
-    SizeReload()
 
 # does the actual calculation, used to include 171 if-statements
 def calc() :
@@ -305,7 +294,7 @@ def calc() :
                 FinalResult = FinalResult * float(Input2)
             elif Operator == "/":
                 if float(Input2) == 0.0:
-                    CustomDiv0()
+                    showError("Division by 0")
                     clear()
                     return
                 else:
@@ -335,7 +324,7 @@ def calc() :
                 FinalResult = (float(Input1) * float(Input2))
             elif Operator == "/":
                 if float(Input2) == 0.0:
-                    CustomDiv0()
+                    showError("Division by 0")
                     clear()
                     return
                 else:
@@ -388,7 +377,7 @@ def KeyPress(event):
     if Key == "c" or Key == "C":
         clear()
     if Key == "i" :
-        info()
+        CustomInfo()
     if Key == "s" or Key == "S":
         Settings()
     if Key == "comma" :
@@ -398,7 +387,7 @@ def KeyPress(event):
 
 # settings window
 def Settings() :
-    global Status, SettingsWindow, StatusBar, StatusBarToggle, CustomMsgBox, CustomMsgBoxToggle, DarkMode, DarkModeToggle, MsgBoxStyles, CurrentMsgBoxStyle, MsgBoxStyleSelect
+    global SettingsWindow, DarkMode, DarkModeToggle, MsgBoxStyles, CurrentMsgBoxStyle, MsgBoxStyleSelect
     SettingsWindow = tk.Toplevel(MainWindow)
     SettingsWindow.title("Settings")
     SettingsWindow.config(width=250, height=152)
@@ -410,12 +399,6 @@ def Settings() :
     changeTheme(SettingsWindow)
     SettingsWindowFrame = ttk.Frame(SettingsWindow)
     SettingsWindowFrame.columnconfigure(0, weight=1)
-    StatusBarToggle = ttk.Checkbutton(SettingsWindowFrame, text="Status Bar", command=ToggleStatusBar, variable=StatusBarTkVar)
-    CustomMsgBoxToggle = ttk.Checkbutton(SettingsWindowFrame, text="Alternative Messageboxes", command=ToggleCustomMsgBoxes)
-    if CustomMsgBox == False :
-        CustomMsgBoxToggle.state(["!selected"])
-    if CustomMsgBox == True :
-        CustomMsgBoxToggle.state(["selected"])
     DarkModeToggle = ttk.Checkbutton(SettingsWindowFrame, text="Dark Mode", command=ChangeDarkMode, variable=DarkModeTkVar)
     MsgBoxStyleFrame = ttk.LabelFrame(SettingsWindowFrame, text="Messagebox Style")
     MsgBoxStyleFrame.columnconfigure(0, weight=1)
@@ -423,8 +406,6 @@ def Settings() :
     MsgBoxStyleSelect.current(CurrentMsgBoxStyle)
     SettingsOKButton = ttk.Button(SettingsWindowFrame, text="OK", command=loadTheme)
     SettingsWindowFrame.grid(row=0, column=0, sticky="nesw")
-    StatusBarToggle.grid(row=0, column=0, sticky="w", padx=10)
-    # CustomMsgBoxToggle.grid(row=1, column=0, sticky="w", padx=10)
     DarkModeToggle.grid(row=2, column=0, sticky="w", padx=10)
     MsgBoxStyleFrame.grid(row=3, column=0, sticky="ew", padx=10)
     MsgBoxStyleSelect.grid(row=0, column=0, sticky="ew")
@@ -436,28 +417,6 @@ def loadTheme():
     CurrentMsgBoxStyle = MsgBoxStyleSelect.current()
     # print(CurrentMsgBoxStyle)
     SettingsWindow.destroy()
-
-# LEGACY: used to toggle whether custom messageboxes should be used in general
-def ToggleCustomMsgBoxes():
-    global CustomMsgBox, CustomMsgBoxToggle
-    if CustomMsgBox == False:
-        CustomMsgBox = True
-    elif CustomMsgBox == True:
-        CustomMsgBox = False
-
-# LEGACY: toggles the status bar, which I would consider deprecated
-def ToggleStatusBar():
-    global Status, StatusBar, StatusBarToggle, StatusDecoration, MainWindow
-    if StatusBar == True:
-        Status.config(text="")
-        StatusBar = False
-        StatusDecoration.config(text="")
-        MainWindow.config(width=256, height=315)
-    elif StatusBar == False:
-        MainWindow.config(width=256, height=330)
-        Status.config(text="Ready")
-        StatusBar = True
-        StatusDecoration.config(text="__________________________________________________")
 
 # toggled dark mode
 def ChangeDarkMode() :
@@ -480,10 +439,6 @@ def ChangeDarkMode() :
         changeTheme(MoreWindow)
         changeTheme(ErrorWindow)
         changeTheme(CustomInfox)
-
-# LEGACY: used to show a custom error messagebox dialog for dividing by zero
-def CustomDiv0() :
-    showError("Division by 0")
 
 # info window
 def CustomInfo() :
@@ -539,11 +494,6 @@ def closeCustomInfo() :
     global CustomInfox
     CustomInfox.destroy()
 
-# LEGACY: closes custom division by zero error dialog, which doesn't exist anymore
-def closeCustomDiv0() :
-    global Div0Error
-    Div0Error.destroy()
-
 # shows error dialogs
 def showError(message):
     global ErrorWindow
@@ -593,16 +543,6 @@ def closeError():
     global ErrorWindow
     ErrorWindow.destroy()
 
-# LEGACY: used to change the font size of the calculator output dynamically
-def SizeReload() :
-    pass
-
-# LEGACY: informed the user about the former 15 character limit
-def CharacterStatus() :
-    global Status, StatusBar
-    if StatusBar == True :
-        Status.config(text="PraktiCalc only supports up to 15 characters!")
-
 # backspace button
 def Backspace() :
     global Input1, Input2
@@ -640,7 +580,6 @@ def updateDisplay() :
             Stage= 0
     if Stage == 0 :
         Output.config(text="0")
-    SizeReload()
 
 # history window
 def History() :
@@ -699,7 +638,6 @@ def minus() :
             Input1 = "-"
             Output.config(text=Input1)
             Stage = 1
-    SizeReload()
 
 # sqrt button
 def rooty() :
@@ -824,7 +762,6 @@ if WingWebDings == True:
 else:
     LargeUnicodeFont = font.Font(family="TkDefaultFont", size=14)
 DarkModeTkVar = tk.BooleanVar(value=DarkMode)
-StatusBarTkVar = tk.BooleanVar(value=StatusBar)
 MainWindow.config(width=256, height=315)
 if console == True:
 
@@ -954,12 +891,9 @@ OneButton = ttk.Button(WindowFrame, text="1", command=lambda: processNumber("1")
 TwoButton = ttk.Button(WindowFrame, text="2", command=lambda: processNumber("2"))
 ThreeButton = ttk.Button(WindowFrame, text="3", command=lambda: processNumber("3"))
 EqualButton = ttk.Button(WindowFrame, text="=", command=calc)
-InfoButton = ttk.Button(WindowFrame, text="i", command=info)
+InfoButton = ttk.Button(WindowFrame, text="i", command=CustomInfo)
 ZeroButton = ttk.Button(WindowFrame, text="0", command=zero)
 ExitButton = ttk.Button(WindowFrame, text="X", command=xquit)
-Status = ttk.Label(WindowFrame, text="")
-StatusDecoration = ttk.Label(WindowFrame, text="")
-NewStatusDecoration = ttk.Separator(WindowFrame, orient="horizontal")
 if WingWebDings == True:
     SettingsButton = ttk.Button(WindowFrame, text="@", command=Settings, style="Webdings.TButton")
     BackspaceButton = ttk.Button(WindowFrame, text="Õ", command=Backspace, style="Wingdings.TButton")
@@ -996,9 +930,6 @@ ZeroButton.grid(row=5, column=1, columnspan=2, sticky="nesw")
 MButton.grid(row=4, column=4, sticky="nesw")
 sqrtButton.grid(row=3, column=4, sticky="nesw")
 ExitButton.grid(row=5, column=0, sticky="nesw")
-Status.grid(row=7, column=0, columnspan=5, sticky="nesw")
-# StatusDecoration.grid(row=6, column=0, columnspan=5, sticky="nesw")
-NewStatusDecoration.grid(row=6, column=0, columnspan=5, sticky="nesw", pady=2)
 SettingsButton.grid(row=2, column=0, sticky="nesw")
 BackspaceButton.grid(row=0, column=4, sticky="nesw")
 HistoryButton.grid(row=4, column=0, sticky="nesw")
