@@ -1,5 +1,6 @@
 [Desktop Entry]
 Categories=Utility;
-Icon=PraktiCalc
+Icon=com.github.karl152.prakticalc
 Name=PraktiCalc
 Type=Application
+Name[de_DE]=PraktiCalc

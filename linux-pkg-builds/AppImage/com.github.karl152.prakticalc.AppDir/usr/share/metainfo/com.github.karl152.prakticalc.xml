@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+	<id>com.github.karl152.prakticalc</id>
+	<metadata_license>CC0-1.0</metadata_license>
+	<project_license>GPL-3.0</project_license>
+	<name>PraktiCalc</name>
+	<summary>A practical calculator written in Python</summary>
+	<description>
+		<p>A practical calculator with GUI featuring a calculating history, a decimal number converter and dark mode, as well as integration for many dialog tools.</p>
+	</description>
+	<launchable type="desktop-id">com.github.karl152.prakticalc.desktop</launchable>
+	<url type="homepage">https://github.com/karl152/PraktiCalc</url>
+	<screenshots>
+		<screenshot type="default">
+			<image>https://raw.githubusercontent.com/karl152/PraktiCalcScreenshots/refs/heads/main/PraktiCalc1.3.png</image>
+		</screenshot>
+	</screenshots>
+    <content_rating type="oars-1.1"/>
+    <developer id="com.github.karl152">
+        <name>Karl "karl152"</name>
+    </developer>
+	<provides>
+		<id>com.github.karl152.prakticalc.desktop</id>
+	</provides>
+</component>
