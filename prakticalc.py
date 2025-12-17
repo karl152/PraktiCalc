@@ -364,9 +364,9 @@ def KeyPress(event):
         zero()
     if Key == "equal" or Key == "Return":
         calc()
-    if Key == "add" :
+    if Key == "plus":
         processOperator("+")
-    if Key == "subtract" :
+    if Key == "minus":
         processOperator("-")
     if Key == "asterisk" :
         processOperator("*")
