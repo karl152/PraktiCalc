@@ -293,6 +293,9 @@ def calc() :
     if len(historylist) >= 16:
         historylist.pop(0)
     if Stage == 6 :
+        aFinalResult = FinalResult
+        if str(aFinalResult).endswith(".0"):
+            aFinalResult = int(str(aFinalResult)[:-2])
         if Operator in SimpleOperators:
             if Operator == "+":
                 FinalResult = FinalResult + float(Input2)
@@ -308,24 +311,19 @@ def calc() :
                 else:
                     FinalResult = FinalResult / float(Input2)
             if str(FinalResult).endswith(".0"):
-                out = str(FinalResult)[:-2]
-            else:
-                out = str(FinalResult)
-            Output.config(text=out)
-            historylist.append(f"{aFinalResult} {Operator} {Input2} = {out}")
+                FinalResult = int(str(FinalResult)[:-2])
+            Output.config(text=str(FinalResult))
+            historylist.append(f"{aFinalResult} {Operator} {Input2} = {FinalResult}")
         elif Operator == "sqrt" :
             if aFinalResult < 0:
                 showError("Result is a complex number")
                 clear()
             else:
-                aFinalResult = FinalResult
                 FinalResult = FinalResult ** 0.5
                 if str(FinalResult).endswith(".0"):
-                    out = str(FinalResult)[:-2]
-                else:
-                    out = str(FinalResult)
-                Output.config(text=out)
-                historylist.append(f"√{aFinalResult} = {out}")
+                    FinalResult = int(str(FinalResult)[:-2])
+                Output.config(text=str(FinalResult))
+                historylist.append(f"√{aFinalResult} = {FinalResult}")
     if Stage not in SpecifiedStages:
         Stage = 6
         if Operator in SimpleOperators:
@@ -343,22 +341,18 @@ def calc() :
                 else:
                     FinalResult = (float(Input1) / float(Input2))
             if str(FinalResult).endswith(".0"):
-                out = str(FinalResult)[:-2]
-            else:
-                out = str(FinalResult)
-            Output.config(text=out)
-            historylist.append(f"{Input1} {Operator} {Input2} = {out}")
+                FinalResult = int(str(FinalResult)[:-2])
+            Output.config(text=str(FinalResult))
+            historylist.append(f"{Input1} {Operator} {Input2} = {FinalResult}")
         elif Operator == "sqrt" :
             if float(Input1) < 0:
                 showError("Result is a complex number")
                 clear()
             else:
-                Input2 = float(Input1) ** 0.5 # ???
+                Input2 = float(Input1) ** 0.5
                 if str(Input2).endswith(".0"):
-                    out = str(Input2)[:-2]
-                else:
-                    out = str(Input2)
-                Output.config(text=out)
+                    Input2 = int(str(Input2)[:-2])
+                Output.config(text=str(Input2))
     if Operator == "sqrt" and Stage == 3:
             if float(Input1) < 0:
                 showError("Result is a complex number")
@@ -366,11 +360,9 @@ def calc() :
             else:
                 FinalResult = float(Input1) ** 0.5
                 if str(FinalResult).endswith(".0"):
-                    out = str(FinalResult)[:-2]
-                else:
-                    out = str(FinalResult)
-                Output.config(text=out)
-                historylist.append(f"√{Input1} = {out}")
+                    FinalResult = int(str(FinalResult)[:-2])
+                Output.config(text=str(FinalResult))
+                historylist.append(f"√{Input1} = {FinalResult}")
                 Stage = 6
 
 # processes keyboard input
