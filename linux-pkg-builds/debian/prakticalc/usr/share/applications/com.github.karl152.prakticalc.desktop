@@ -1,0 +1,16 @@
+[Desktop Entry]
+Categories=Utility;
+Comment[de_DE]=Praktischer Taschenrechner
+Comment=Practical calculator written in Python
+Exec=prakticalc
+GenericName[de_DE]=Taschenrechner
+GenericName=Calculator
+Icon=com.github.karl152.prakticalc
+Name[de_DE]=PraktiCalc
+Name=PraktiCalc
+Path=
+StartupNotify=true
+Terminal=false
+Type=Application
+X-KDE-SubstituteUID=false
+X-KDE-Username=

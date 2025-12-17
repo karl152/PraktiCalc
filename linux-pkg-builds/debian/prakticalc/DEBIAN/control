@@ -1,0 +1,10 @@
+Package: prakticalc
+Version: 1.3.1
+Section: utils
+Priority: optional
+Architecture: all
+Maintainer: Karl <karldpbkz@gmail.com>
+Description: practical calculator written in Python
+ A practical calculator written in Python with Tkinter and TTK
+Depends: python3, python3-tk, python3-ttkthemes
+Suggests: x11-utils, yad, kdialog, zenity
