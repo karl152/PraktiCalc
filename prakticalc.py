@@ -19,6 +19,7 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkinter import font
 from simpleeval import SimpleEval
+from pathlib import Path
 try:
     from ttkthemes import ThemedStyle
     theming = 1
@@ -31,7 +32,6 @@ import platform
 import subprocess
 import sys
 import shutil
-import os
 import math
 
 # variables
@@ -108,9 +108,9 @@ def testPyInstallerOneFile():
 RunningAsOneFileExe = testPyInstallerOneFile()
 
 # ttkthemes directory workaround for AppImage
-if os.path.exists("./usr/share/tcltk/ttkthemes"):
+if Path("./usr/share/tcltk/ttkthemes").exists():
     # If started as AppImage:
-    tcl_dir = os.path.abspath("./usr/share/tcltk/ttkthemes")
+    tcl_dir = Path("./usr/share/tcltk/ttkthemes").resolve()
 
 if RunningAsOneFileExe == True:
     PraktiCalcIconPath = (sys._MEIPASS + "/PraktiCalculator_icon.png")
@@ -176,14 +176,14 @@ def changeTheme(WindowName):
             style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
         except:
             theming = 2
-            theme_base = os.path.join(sys._MEIPASS, "ttkthemes", "themes")
-            theme_path = os.path.join(theme_base, usedttktheme)
+            theme_base = Path(sys._MEIPASS).joinpath("ttkthemes", "themes")
+            theme_path = Path(theme_base).joinpath(usedttktheme)
             WindowName.tk.call("lappend", "auto_path", theme_base)
             try:
                 WindowName.tk.call("package", "require", f"ttk::theme::{usedttktheme}")
             except:
-                theme_tcl = os.path.join(theme_path, usedttktheme + ".tcl")
-                if os.path.exists(theme_tcl):
+                theme_tcl = Path(theme_path).joinpath(usedttktheme + ".tcl")
+                if Path(theme_tcl).exists():
                     WindowName.tk.call("source", theme_tcl)
                 else:
                     print(f"Couldn't find theme {theme_tcl}")
