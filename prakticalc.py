@@ -91,6 +91,12 @@ if CLIVersion == True:
 
 calculate = SimpleEval()
 calculate.functions["sqrt"] = math.sqrt
+calculate.functions["sin"] = math.sin
+calculate.functions["cos"] = math.cos
+calculate.functions["tan"] = math.tan
+calculate.functions["ld"] = math.log2
+calculate.functions["ln"] = math.log
+calculate.functions["lg"] = math.log10
 
 def testPyInstallerOneFile():
     try:
@@ -135,10 +141,7 @@ if equilux == True:
 else:
     darkttktheme = "black"
 usedttktheme = thettktheme
-Input1 = "0"
-Input2 = "0"
-Stage = 0
-Operator = "op"
+M = "0"
 DarkMode = "--dark" in sys.argv
 debug = "--debug" in sys.argv
 historylist = []
@@ -197,9 +200,7 @@ def changeTheme(WindowName):
 # processes the number zero, which is a special case and seperate
 def zero() :
     global Calculation
-    if Calculation == "0":
-        pass
-    else:
+    if Calculation != "0":
         Calculation += "0"
     updateDisplay()
 
@@ -216,6 +217,7 @@ def calc() :
         historylist.pop(0)
     TheCalc = Calculation.replace("\u221a", "sqrt")
     TheCalc = TheCalc.replace("x", "*")
+    TheCalc = TheCalc.replace("^", "**")
     try:
         Result = calculate.eval(TheCalc)
     except ZeroDivisionError:
@@ -556,6 +558,26 @@ def copyhex() :
     MainWindow.clipboard_append(HexadecimalNumber)
     MainWindow.update()
 
+# copies the result
+def copyResult():
+    global MainWindow
+    MainWindow.clipboard_clear()
+    MainWindow.clipboard_append(Output.cget("text"))
+    MainWindow.update()
+
+# sets the memory to the output
+def setMemory():
+    global M
+    M = Output.cget("text")
+
+def getMemory():
+    global M, Calculation
+    if Calculation == "0":
+        Calculation = M
+    else:
+        Calculation += M
+    updateDisplay()
+
 # clears the history
 def clearHistory() :
     global HistoryX
@@ -698,10 +720,10 @@ MainWindow.rowconfigure(0, weight=1)
 MainWindow.columnconfigure(0, weight=1)
 changeTheme(MainWindow)
 WindowFrame = ttk.Frame(MainWindow)
-for colrow in range(5):
+for colrow in range(6):
     WindowFrame.rowconfigure(colrow, weight=1, uniform="buttons")
     WindowFrame.columnconfigure(colrow, weight=1, uniform="buttons")
-WindowFrame.rowconfigure(5, weight=1)
+WindowFrame.rowconfigure(6, weight=1)
 Outputframe = ttk.Frame(WindowFrame, borderwidth=1, relief="sunken")
 Output = ttk.Label(Outputframe, text="0")
 # Buttons
@@ -724,45 +746,70 @@ EqualButton = ttk.Button(WindowFrame, text="=", command=calc)
 InfoButton = ttk.Button(WindowFrame, text="i", command=CustomInfo)
 ZeroButton = ttk.Button(WindowFrame, text="0", command=zero)
 ExitButton = ttk.Button(WindowFrame, text="X", command=xquit)
+LeftParenButton = ttk.Button(WindowFrame, text="(", command=lambda: appendToCalculation("parenleft"))
+RightParenButton = ttk.Button(WindowFrame, text=")", command=lambda: appendToCalculation("parenright"))
 if WingWebDings == True:
     SettingsButton = ttk.Button(WindowFrame, text="@", command=Settings, style="Webdings.TButton")
     BackspaceButton = ttk.Button(WindowFrame, text="Õ", command=Backspace, style="Wingdings.TButton")
     HistoryButton = ttk.Button(WindowFrame, text="0", command=History, style="Wingdings.TButton")
+    CopyButton = ttk.Button(WindowFrame, text="\u2398", command=copyResult, style="LargeUnicode.TButton")
 else:
     SettingsButton = ttk.Button(WindowFrame, text="\u26ed", command=Settings, style="LargeUnicode.TButton")
     BackspaceButton = ttk.Button(WindowFrame, text="\u232b", command=Backspace)
     HistoryButton = ttk.Button(WindowFrame, text="\u23f2", command=History, style="LargeUnicode.TButton")
+    CopyButton = ttk.Button(WindowFrame, text="\u2398", command=copyResult, style="LargeUnicode.TButton")
 HelpButton = ttk.Button(WindowFrame, text="?", command=helpGUI)
 Checkb = ttk.Button(MainWindow, text="Check", command=xcheck) # some debug thing
 sqrtButton = ttk.Button(WindowFrame, text="\u221a", command=lambda: appendToCalculation("\u221a" + "("))
 More = ttk.Button(WindowFrame, text="...", command=More)
+PowerButton = ttk.Button(WindowFrame, text="x^y", command=lambda: appendToCalculation("^"))
+SetMemoryButton = ttk.Button(WindowFrame, text="SM", command=setMemory)
+GetMemoryButton = ttk.Button(WindowFrame, text="GM", command=getMemory)
+SinButton = ttk.Button(WindowFrame, text="sin", command=lambda: appendToCalculation("sin("))
+CosButton = ttk.Button(WindowFrame, text="cos", command=lambda: appendToCalculation("cos("))
+TanButton = ttk.Button(WindowFrame, text="tan", command=lambda: appendToCalculation("tan("))
+LdButton = ttk.Button(WindowFrame, text="ld", command=lambda: appendToCalculation("ld("))
+LnButton = ttk.Button(WindowFrame, text="ln", command=lambda: appendToCalculation("ln("))
+LgButton = ttk.Button(WindowFrame, text="lg", command=lambda: appendToCalculation("lg("))
 WindowFrame.grid(row=0, column=0, sticky="nesw")
 Outputframe.grid(row=0, column=0, columnspan=4, sticky="nesw")
 Output.pack(pady=1)
-PlusButton.grid(row=1, column=1, sticky="nesw")
-MinusButton.grid(row=1, column=2, sticky="nesw")
-MultiplyButton.grid(row=1, column=3, sticky="nesw")
-DivideButton.grid(row=1, column=4, sticky="nesw")
-SevenButton.grid(row=2, column=1, sticky="nesw")
-EightButton.grid(row=2, column=2, sticky="nesw")
-NineButton.grid(row=2, column=3, sticky="nesw")
+PlusButton.grid(row=1, column=5, sticky="nesw")
+MinusButton.grid(row=2, column=5, sticky="nesw")
+MultiplyButton.grid(row=3, column=5, sticky="nesw")
+DivideButton.grid(row=4, column=5, sticky="nesw")
+SevenButton.grid(row=3, column=2, sticky="nesw")
+EightButton.grid(row=3, column=3, sticky="nesw")
+NineButton.grid(row=3, column=4, sticky="nesw")
 CEButton.grid(row=2, column=4, sticky="nesw")
-FourButton.grid(row=3, column=1, sticky="nesw")
-FiveButton.grid(row=3, column=2, sticky="nesw")
-SixButton.grid(row=3, column=3, sticky="nesw")
-CommaButton.grid(row=5, column=3, sticky="nesw")
-OneButton.grid(row=4, column=1, sticky="nesw")
-TwoButton.grid(row=4, column=2, sticky="nesw")
-ThreeButton.grid(row=4, column=3, sticky="nesw")
-EqualButton.grid(row=5, column=4, sticky="nesw")
+FourButton.grid(row=4, column=2, sticky="nesw")
+FiveButton.grid(row=4, column=3, sticky="nesw")
+SixButton.grid(row=4, column=4, sticky="nesw")
+CommaButton.grid(row=6, column=4, sticky="nesw")
+OneButton.grid(row=5, column=2, sticky="nesw")
+TwoButton.grid(row=5, column=3, sticky="nesw")
+ThreeButton.grid(row=5, column=4, sticky="nesw")
+EqualButton.grid(row=6, column=5, sticky="nesw")
 InfoButton.grid(row=1, column=0, sticky="nesw")
-ZeroButton.grid(row=5, column=1, columnspan=2, sticky="nesw")
-HelpButton.grid(row=4, column=4, sticky="nesw")
-sqrtButton.grid(row=3, column=4, sticky="nesw")
-ExitButton.grid(row=5, column=0, sticky="nesw")
+ZeroButton.grid(row=6, column=2, columnspan=2, sticky="nesw")
+HelpButton.grid(row=5, column=0, sticky="nesw")
+sqrtButton.grid(row=5, column=5, sticky="nesw")
+ExitButton.grid(row=6, column=0, sticky="nesw")
 SettingsButton.grid(row=2, column=0, sticky="nesw")
-BackspaceButton.grid(row=0, column=4, sticky="nesw")
+BackspaceButton.grid(row=0, column=5, sticky="nesw")
 HistoryButton.grid(row=4, column=0, sticky="nesw")
+LeftParenButton.grid(row=2, column=2, sticky="nesw")
+RightParenButton.grid(row=2, column=3, sticky="nesw")
+CopyButton.grid(row=0, column=4, sticky="nesw")
+PowerButton.grid(row=1, column=4, sticky="nesw")
+SetMemoryButton.grid(row=1, column=2, sticky="nesw")
+GetMemoryButton.grid(row=1, column=3, sticky="nesw")
+SinButton.grid(row=1, column=1, sticky="nesw")
+CosButton.grid(row=2, column=1, sticky="nesw")
+TanButton.grid(row=3, column=1, sticky="nesw")
+LdButton.grid(row=4, column=1, sticky="nesw")
+LnButton.grid(row=5, column=1, sticky="nesw")
+LgButton.grid(row=6, column=1, sticky="nesw")
 MainWindow.bind("<Key>", KeyPress)
 More.grid(row=3, column=0, sticky="nesw")
 if debug == True:
