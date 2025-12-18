@@ -18,6 +18,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import font
+from simpleeval import SimpleEval
 try:
     from ttkthemes import ThemedStyle
     theming = 1
@@ -31,10 +32,12 @@ import subprocess
 import sys
 import shutil
 import os
+import math
+
 # variables
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.3.1"
+PraktiCalcVersion = "1.4"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 if platform.system() == "Windows":
     MsgBoxStyles = ["Tkinter", "Alternative", "VBS"]
@@ -85,6 +88,9 @@ if CLIVersion == True:
     else:
         print("PraktiCalc " + PraktiCalcVersion)
     sys.exit(0)
+
+calculate = SimpleEval()
+calculate.functions["sqrt"] = math.sqrt
 
 def testPyInstallerOneFile():
     try:
@@ -141,6 +147,7 @@ aFinalResult = 0
 DecimalNumber = 0
 BinaryNumber = 0
 HexadecimalNumber = 0
+Calculation = "0"
 
 # functions
 
@@ -187,203 +194,78 @@ def changeTheme(WindowName):
         except:
             print("Unable to increase font size of some buttons")
 
-# processes a number when a button is pressed
-def processNumber(number):
-    global Input1, Input2, Output, Stage
-    if Stage == 4 or Stage == 5:
-        Input2 = str(Input2) + number
-        Output.config(text=Input2)
-    if Stage == 3 :
-        Input2 = number
-        Output.config(text=Input2)
-        Stage = 4
-    if Stage == 1 or Stage == 2:
-        Input1 = str(Input1) + number
-        Output.config(text=Input1)
-    if Stage == 0 :
-        Input1 = number
-        Output.config(text=Input1)
-        Stage = 1
-
-# processes an operator for calculation
-def processOperator(TheOneAndOnlyOperatorThatShouldBeProcessed):
-    global Stage, Output, Operator, FinalResult, aFinalResult, Input1, Input2
-    if Stage != 0 and Stage != 3 and Stage != 4 and Stage != 5 and Stage != 6 :
-        Stage = 3
-        Operator = TheOneAndOnlyOperatorThatShouldBeProcessed
-        Output.config(text="0")
-    if Stage == 4 or Stage == 5 :
-        calc()
-        Input1 = FinalResult
-        Operator = TheOneAndOnlyOperatorThatShouldBeProcessed
-        Input2 = "0"
-        Stage = 3
-    if Stage == 6 :
-        Operator = TheOneAndOnlyOperatorThatShouldBeProcessed
-        Stage = 3
-        Output.config(text="0")
-        Input1 = FinalResult
-
 # processes the number zero, which is a special case and seperate
 def zero() :
-    global Input1, Input2, Output, Stage
-    if Stage == 4 or Stage == 5:
-        Input2 = str(Input2) + "0"
-        Output.config(text=Input2)
-    if Stage == 3 :
-        Input2 = "0"
-        Stage = 4
-    if Stage == 1 or Stage == 2:
-        Input1 = str(Input1) + "0"
-        Output.config(text=Input1)
-    if Stage == 0 :
+    global Calculation
+    if Calculation == "0":
         pass
+    else:
+        Calculation += "0"
+    updateDisplay()
 
 # resets the calculator main window
 def clear() :
-    global Input1, Input2, Output, Stage
-    Input1 = "0"
-    Input2 = "0"
-    Stage = 0
-    Output.config(text="0")
-    FinalResult = 0
-    aFinalResult = 0
-
-# comma button
-def comma() :
-    global Input1, Input2, Output, Stage
-    if Stage == 5 :
-        Input2 = str(Input2) + "."
-        Output.config(text=Input2)
-    if Stage == 4 :
-        Input2 = str(Input2) + "."
-        Output.config(text=Input2)
-        Stage = 5
-    if Stage == 3 :
-        Input2 = "0."
-        Output.config(text=Input2)
-        Stage = 5
-    if Stage == 2 :
-        pass
-    if Stage == 1 :
-        Input1 = str(Input1) + "."
-        Output.config(text=Input1)
-        Stage = 2
-    if Stage == 0 :
-        Input1 = "0."
-        Output.config(text=Input1)
-        Stage = 2
+    global Calculation
+    Calculation = "0"
+    updateDisplay()
 
 # does the actual calculation, used to include 171 if-statements
 def calc() :
-    global historylist, Input1, Stage, Input2, Output, Operator, FinalResult, aFinalResult
-    SimpleOperators = ["+", "-", "*", "/"]
-    SpecifiedStages = [0, 1, 2, 3, 6]
+    global Calculation, historylist
     if len(historylist) >= 16:
         historylist.pop(0)
-    if Stage == 6 :
-        aFinalResult = FinalResult
-        if str(aFinalResult).endswith(".0"):
-            aFinalResult = int(str(aFinalResult)[:-2])
-        if Operator in SimpleOperators:
-            if Operator == "+":
-                FinalResult = FinalResult + float(Input2)
-            elif Operator == "-":
-                FinalResult = FinalResult - float(Input2)
-            elif Operator == "*":
-                FinalResult = FinalResult * float(Input2)
-            elif Operator == "/":
-                if float(Input2) == 0.0:
-                    showError("Division by 0")
-                    clear()
-                    return
-                else:
-                    FinalResult = FinalResult / float(Input2)
-            if str(FinalResult).endswith(".0"):
-                FinalResult = int(str(FinalResult)[:-2])
-            Output.config(text=str(FinalResult))
-            historylist.append(f"{aFinalResult} {Operator} {Input2} = {FinalResult}")
-        elif Operator == "sqrt" :
-            if aFinalResult < 0:
-                showError("Result is a complex number")
-                clear()
-            else:
-                FinalResult = FinalResult ** 0.5
-                if str(FinalResult).endswith(".0"):
-                    FinalResult = int(str(FinalResult)[:-2])
-                Output.config(text=str(FinalResult))
-                historylist.append(f"√{aFinalResult} = {FinalResult}")
-    if Stage not in SpecifiedStages:
-        Stage = 6
-        if Operator in SimpleOperators:
-            if Operator == "+":
-                FinalResult = (float(Input1) + float(Input2))
-            elif Operator == "-":
-                FinalResult = (float(Input1) - float(Input2))
-            elif Operator == "*":
-                FinalResult = (float(Input1) * float(Input2))
-            elif Operator == "/":
-                if float(Input2) == 0.0:
-                    showError("Division by 0")
-                    clear()
-                    return
-                else:
-                    FinalResult = (float(Input1) / float(Input2))
-            if str(FinalResult).endswith(".0"):
-                FinalResult = int(str(FinalResult)[:-2])
-            Output.config(text=str(FinalResult))
-            historylist.append(f"{Input1} {Operator} {Input2} = {FinalResult}")
-        elif Operator == "sqrt" :
-            if float(Input1) < 0:
-                showError("Result is a complex number")
-                clear()
-            else:
-                Input2 = float(Input1) ** 0.5
-                if str(Input2).endswith(".0"):
-                    Input2 = int(str(Input2)[:-2])
-                Output.config(text=str(Input2))
-    if Operator == "sqrt" and Stage == 3:
-            if float(Input1) < 0:
-                showError("Result is a complex number")
-                clear()
-            else:
-                FinalResult = float(Input1) ** 0.5
-                if str(FinalResult).endswith(".0"):
-                    FinalResult = int(str(FinalResult)[:-2])
-                Output.config(text=str(FinalResult))
-                historylist.append(f"√{Input1} = {FinalResult}")
-                Stage = 6
+    TheCalc = Calculation.replace("\u221a", "sqrt")
+    TheCalc = TheCalc.replace("x", "*")
+    try:
+        Result = calculate.eval(TheCalc)
+    except ZeroDivisionError:
+        showError("Division by zero")
+    except Exception:
+        showError("Error, please check your input for mistakes")
+    if str(Result).endswith(".0"):
+        Result = str(Result)[:-2]
+    else:
+        Result = str(Result)
+    historylist.append(f"{Calculation}={Result}")
+    Output.config(text=Result)
 
 # processes keyboard input
 def KeyPress(event):
     Key = event.keysym
-    NumberKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-    if Key in NumberKeys:
-        processNumber(Key)
-    if Key == "0" :
+    # print(Key)
+    Keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "plus", "minus", "asterisk", "slash", "comma", "parenleft", "parenright"]
+    if Key in Keys:
+        appendToCalculation(Key)
+    elif Key == "0":
         zero()
-    if Key == "equal" or Key == "Return":
+    elif Key == "equal" or Key == "Return":
         calc()
-    if Key == "plus":
-        processOperator("+")
-    if Key == "minus":
-        processOperator("-")
-    if Key == "asterisk" :
-        processOperator("*")
-    if Key == "slash" :
-        processOperator("/")
-    if Key == "h" or Key == "H":
+    elif Key == "h" or Key == "H":
         History()
-    if Key == "c" or Key == "C":
+    elif Key == "c" or Key == "C":
         clear()
-    if Key == "i" :
+    elif Key == "i":
         CustomInfo()
-    if Key == "s" or Key == "S":
+    elif Key == "s" or Key == "S":
         Settings()
-    if Key == "comma" :
-        comma()
-    if Key == "BackSpace" :
+    elif Key == "BackSpace":
         Backspace()
+
+# append a character to the Calculation string
+def appendToCalculation(char):
+    global Calculation
+    char = char.replace("plus", "+")
+    char = char.replace("minus", "-")
+    char = char.replace("asterisk", "x")
+    char = char.replace("slash", "/")
+    char = char.replace("comma", ".")
+    char = char.replace("parenleft", "(")
+    char = char.replace("parenright", ")")
+    if Calculation == "0":
+        Calculation = char
+    else:
+        Calculation += char
+    updateDisplay()
 
 # settings window
 def Settings() :
@@ -543,43 +425,25 @@ def closeError():
     global ErrorWindow
     ErrorWindow.destroy()
 
+# help GUI
+def helpGUI():
+    showError("Not implemented")
+
 # backspace button
 def Backspace() :
-    global Input1, Input2
-    if Stage == 1 :
-        Input1 = Input1[:len(Input1) - 1]
-    if Stage == 2 :
-        Input1 = Input1[:len(Input1) - 1]
-    if Stage == 4 :
-        Input2 = Input2[:len(Input2) - 1]
-    if Stage == 5 :
-        Input2 = Input2[:len(Input2) - 1]
+    global Calculation
+    if Calculation == "0":
+        pass
+    elif len(Calculation) <= 1:
+        Calculation = "0"
+    else:
+        Calculation = Calculation[:-1]
     updateDisplay()
 
 # updates output
 def updateDisplay() :
-    global Input1, Output, Input2, Stage
-    if Stage == 5 :
-        Output.config(text=Input2)
-        if not "." in Input2 :
-            Stage = 4
-    if Stage == 4 :
-        Output.config(text=Input2)
-        if len(Input2) == 0 :
-            Stage = 3
-            Input2 = "0"
-    if Stage == 3 :
-        Output.config(text=Input2)
-    if Stage == 2 :
-        Output.config(text=Input1)
-        if not "." in Input1 :
-            Stage = 1
-    if Stage == 1 :
-        Output.config(text=Input1)
-        if len(Input1) == 0 :
-            Stage= 0
-    if Stage == 0 :
-        Output.config(text="0")
+    global Calculation
+    Output.config(text=Calculation)
 
 # history window
 def History() :
@@ -610,42 +474,6 @@ def History() :
             break
     HistoryClearButton = ttk.Button(HistoryWindowFrame, text="Clear History", command=clearHistory)
     HistoryClearButton.grid(row=30, column=0, sticky="nesw", padx=5, pady=5)
-
-# +/- button function
-def minus() :
-    global Input1, Input2, Output, Stage
-    if Stage == 4 or Stage == 5:
-        if Input2[0] != "-" :
-            Input2 = "-" + str(Input2)
-            Output.config(text=Input2)
-        else:
-            Input2 = Input2[1:]
-            Output.config(text=Input2)
-    if Stage == 3 :
-        if Input2[0] != "-" :
-            Input2 = "-"
-            Output.config(text=Input2)
-            Stage = 4
-    if Stage == 1 or Stage == 2:
-        if Input1[0] != "-" :
-            Input1 = "-" + str(Input1)
-            Output.config(text=Input1)
-        else:
-            Input1 = Input1[1:]
-            Output.config(text=Input1)
-    if Stage == 0 :
-        if Input1[0] != "-" :
-            Input1 = "-"
-            Output.config(text=Input1)
-            Stage = 1
-
-# sqrt button
-def rooty() :
-    global Operator, Stage
-    Operator = "sqrt"
-    if Stage == 1 or Stage == 2:
-        Stage = 3
-    calc()
 
 # window for additional calculating stuff, cuttently only with a decimal number converter
 def More() :
@@ -875,21 +703,21 @@ WindowFrame.rowconfigure(5, weight=1)
 Outputframe = ttk.Frame(WindowFrame, borderwidth=1, relief="sunken")
 Output = ttk.Label(Outputframe, text="0")
 # Buttons
-PlusButton = ttk.Button(WindowFrame, text="+", command=lambda: processOperator("+"))
-MinusButton = ttk.Button(WindowFrame, text="-", command=lambda: processOperator("-"))
-MultiplyButton = ttk.Button(WindowFrame, text="x", command=lambda: processOperator("*"))
-DivideButton = ttk.Button(WindowFrame, text="÷", command=lambda: processOperator("/"))
-SevenButton = ttk.Button(WindowFrame, text="7", command=lambda: processNumber("7"))
-EightButton = ttk.Button(WindowFrame, text="8", command=lambda: processNumber("8"))
-NineButton = ttk.Button(WindowFrame, text="9", command=lambda: processNumber("9"))
+PlusButton = ttk.Button(WindowFrame, text="+", command=lambda: appendToCalculation("plus"))
+MinusButton = ttk.Button(WindowFrame, text="-", command=lambda: appendToCalculation("minus"))
+MultiplyButton = ttk.Button(WindowFrame, text="x", command=lambda: appendToCalculation("asterisk"))
+DivideButton = ttk.Button(WindowFrame, text="÷", command=lambda: appendToCalculation("slash"))
+SevenButton = ttk.Button(WindowFrame, text="7", command=lambda: appendToCalculation("7"))
+EightButton = ttk.Button(WindowFrame, text="8", command=lambda: appendToCalculation("8"))
+NineButton = ttk.Button(WindowFrame, text="9", command=lambda: appendToCalculation("9"))
 CEButton = ttk.Button(WindowFrame, text="CE", command=clear)
-FourButton = ttk.Button(WindowFrame, text="4", command=lambda: processNumber("4"))
-FiveButton = ttk.Button(WindowFrame, text="5", command=lambda: processNumber("5"))
-SixButton = ttk.Button(WindowFrame, text="6", command=lambda: processNumber("6"))
-CommaButton = ttk.Button(WindowFrame, text=",", command=comma)
-OneButton = ttk.Button(WindowFrame, text="1", command=lambda: processNumber("1"))
-TwoButton = ttk.Button(WindowFrame, text="2", command=lambda: processNumber("2"))
-ThreeButton = ttk.Button(WindowFrame, text="3", command=lambda: processNumber("3"))
+FourButton = ttk.Button(WindowFrame, text="4", command=lambda: appendToCalculation("4"))
+FiveButton = ttk.Button(WindowFrame, text="5", command=lambda: appendToCalculation("5"))
+SixButton = ttk.Button(WindowFrame, text="6", command=lambda: appendToCalculation("6"))
+CommaButton = ttk.Button(WindowFrame, text=",", command=lambda: appendToCalculation("comma"))
+OneButton = ttk.Button(WindowFrame, text="1", command=lambda: appendToCalculation("1"))
+TwoButton = ttk.Button(WindowFrame, text="2", command=lambda: appendToCalculation("2"))
+ThreeButton = ttk.Button(WindowFrame, text="3", command=lambda: appendToCalculation("3"))
 EqualButton = ttk.Button(WindowFrame, text="=", command=calc)
 InfoButton = ttk.Button(WindowFrame, text="i", command=CustomInfo)
 ZeroButton = ttk.Button(WindowFrame, text="0", command=zero)
@@ -902,9 +730,9 @@ else:
     SettingsButton = ttk.Button(WindowFrame, text="\u26ed", command=Settings, style="LargeUnicode.TButton")
     BackspaceButton = ttk.Button(WindowFrame, text="\u232b", command=Backspace)
     HistoryButton = ttk.Button(WindowFrame, text="\u23f2", command=History, style="LargeUnicode.TButton")
-MButton = ttk.Button(WindowFrame, text="±", command=minus)
+HelpButton = ttk.Button(WindowFrame, text="?", command=helpGUI)
 Checkb = ttk.Button(MainWindow, text="Check", command=xcheck) # some debug thing
-sqrtButton = ttk.Button(WindowFrame, text="√", command=rooty)
+sqrtButton = ttk.Button(WindowFrame, text="\u221a", command=lambda: appendToCalculation("\u221a" + "("))
 More = ttk.Button(WindowFrame, text="...", command=More)
 WindowFrame.grid(row=0, column=0, sticky="nesw")
 Outputframe.grid(row=0, column=0, columnspan=4, sticky="nesw")
@@ -927,7 +755,7 @@ ThreeButton.grid(row=4, column=3, sticky="nesw")
 EqualButton.grid(row=5, column=4, sticky="nesw")
 InfoButton.grid(row=1, column=0, sticky="nesw")
 ZeroButton.grid(row=5, column=1, columnspan=2, sticky="nesw")
-MButton.grid(row=4, column=4, sticky="nesw")
+HelpButton.grid(row=4, column=4, sticky="nesw")
 sqrtButton.grid(row=3, column=4, sticky="nesw")
 ExitButton.grid(row=5, column=0, sticky="nesw")
 SettingsButton.grid(row=2, column=0, sticky="nesw")
