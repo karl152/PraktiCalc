@@ -151,6 +151,7 @@ DecimalNumber = 0
 BinaryNumber = 0
 HexadecimalNumber = 0
 Calculation = "0"
+lcc = "" # last console command
 
 # functions
 
@@ -641,6 +642,8 @@ if console == True:
 
     # interpretes and executed a given command in the console
     def executeTheCommand(cominput):
+        global lcc
+        lcc = cominput
         ConsoleInput.delete(0, tk.END)
         if cominput == "version":
             comoutput = "PraktiCalc Console on PraktiCalc " + PraktiCalcVersion
@@ -699,6 +702,9 @@ Useful Tips:
         ConsoleKey = event.keysym
         if ConsoleKey == "Return":
             executeTheCommand(ConsoleInput.get())
+        elif ConsoleKey == "Up":
+            ConsoleInput.delete(0, tk.END)
+            ConsoleInput.insert(0, lcc)
     ConsoleWindow = tk.Toplevel(MainWindow)
     ConsoleWindow.title("PraktiCalc Console")
     ConsoleWindow.config(bg="black")
