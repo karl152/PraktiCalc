@@ -168,11 +168,13 @@ def changeTheme(WindowName):
             style.configure("Wingdings.TButton", font=wingdingsfont)
         else:
             style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
+        style.configure("Treeview", rowheight=32)
     elif theming == 1 or theming == 2:
         try:
             style = ThemedStyle(WindowName)
             style.theme_use(usedttktheme)
             style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
+            style.configure("Treeview", rowheight=32)
         except:
             theming = 2
             theme_base = Path(sys._MEIPASS).joinpath("ttkthemes", "themes")
@@ -193,8 +195,9 @@ def changeTheme(WindowName):
                 print("Using default ttk theme")
         try:
             style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
+            style.configure("Treeview", rowheight=32)
         except:
-            print("Unable to increase font size of some buttons")
+            print("Unable to increase font size of some buttons and row height in the history window")
 
 # processes the number zero, which is a special case and seperate
 def zero() :
@@ -212,8 +215,6 @@ def clear() :
 # does the actual calculation, used to include 171 if-statements
 def calc() :
     global Calculation, historylist
-    if len(historylist) >= 16:
-        historylist.pop(0)
     TheCalc = Calculation.replace("\u221a", "sqrt")
     TheCalc = TheCalc.replace("x", "*")
     TheCalc = TheCalc.replace("^", "**")
@@ -462,21 +463,15 @@ def History() :
     changeTheme(HistoryX)
     HistoryWindowFrame = ttk.Frame(HistoryX)
     HistoryWindowFrame.columnconfigure(0, weight=1)
-    for i in range(31):
-        HistoryWindowFrame.rowconfigure(i, weight=1)
+    HistoryWindowFrame.rowconfigure(0, weight=1)
     HistoryWindowFrame.grid(row=0, column=0, sticky="nesw")
-    labelrow = -2
-    separatorrow = -1
-    for widgetnumber in range(15):
-        labelrow += 2
-        separatorrow += 2
-        try:
-            ttk.Label(HistoryWindowFrame, text=historylist[widgetnumber]).grid(row=labelrow, column=0, sticky="nesw")
-            ttk.Separator(HistoryWindowFrame, orient="horizontal").grid(row=separatorrow, column=0, sticky="nesw")
-        except:
-            break
+    HistoryTreeview = ttk.Treeview(HistoryWindowFrame, height=15)
+    HistoryTreeview.heading("#0", text="History")
+    for entry in historylist:
+        HistoryTreeview.insert("", tk.END, text=entry)
     HistoryClearButton = ttk.Button(HistoryWindowFrame, text="Clear History", command=clearHistory)
-    HistoryClearButton.grid(row=30, column=0, sticky="nesw", padx=5, pady=5)
+    HistoryTreeview.grid(row=0, column=0, sticky="nesw")
+    HistoryClearButton.grid(row=1, column=0, sticky="nesw", padx=5, pady=5)
 
 # window for additional calculating stuff, cuttently only with a decimal number converter
 def More() :
