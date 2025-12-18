@@ -168,13 +168,13 @@ def changeTheme(WindowName):
             style.configure("Wingdings.TButton", font=wingdingsfont)
         else:
             style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
-        style.configure("Treeview", rowheight=32)
+        style.configure("Treeview", rowheight=40)
     elif theming == 1 or theming == 2:
         try:
             style = ThemedStyle(WindowName)
             style.theme_use(usedttktheme)
             style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
-            style.configure("Treeview", rowheight=32)
+            style.configure("Treeview", rowheight=40)
         except:
             theming = 2
             theme_base = Path(sys._MEIPASS).joinpath("ttkthemes", "themes")
@@ -195,7 +195,7 @@ def changeTheme(WindowName):
                 print("Using default ttk theme")
         try:
             style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
-            style.configure("Treeview", rowheight=32)
+            style.configure("Treeview", rowheight=40)
         except:
             print("Unable to increase font size of some buttons and row height in the history window")
 
