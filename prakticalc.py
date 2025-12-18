@@ -145,8 +145,6 @@ M = "0"
 DarkMode = "--dark" in sys.argv
 debug = "--debug" in sys.argv
 historylist = []
-FinalResult = 0
-aFinalResult = 0
 DecimalNumber = 0
 BinaryNumber = 0
 HexadecimalNumber = 0
@@ -588,13 +586,10 @@ def clearHistory() :
 
 # debug function to print some variables
 def xcheck() :
-    print("Stage: " + str(Stage))
-    print("Input1: " + str(Input1))
-    print("Input2: " + str(Input2))
-    print("Operator: " + str(Operator))
-    print("FinalResult: " + str(FinalResult))
-    print("aFinalResult: " + str(aFinalResult))
-    print("____________________________")
+    print(f"""----------------------------------------------------
+Calculation: {Calculation}
+M: {M}
+----------------------------------------------------""")
 
 # quits the program
 def xquit() :
