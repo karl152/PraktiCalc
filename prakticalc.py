@@ -220,8 +220,10 @@ def calc() :
         Result = calculate.eval(TheCalc)
     except ZeroDivisionError:
         showError("Division by zero")
+        return
     except Exception:
         showError("Error, please check your input for mistakes")
+        return
     if str(Result).endswith(".0"):
         Result = str(Result)[:-2]
     else:
