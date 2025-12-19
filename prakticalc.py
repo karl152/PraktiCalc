@@ -794,7 +794,7 @@ if WingWebDings == True:
     SettingsButton = ttk.Button(WindowFrame, text="@", command=Settings, style="Webdings.TButton")
     BackspaceButton = ttk.Button(WindowFrame, text="Õ", command=Backspace, style="Wingdings.TButton")
     HistoryButton = ttk.Button(WindowFrame, text="0", command=History, style="Wingdings.TButton")
-    CopyButton = ttk.Button(WindowFrame, text="\u2398", command=copyResult, style="LargeUnicode.TButton")
+    CopyButton = ttk.Button(WindowFrame, text="4", command=copyResult, style="Wingdings.TButton")
 else:
     SettingsButton = ttk.Button(WindowFrame, text="\u26ed", command=Settings, style="LargeUnicode.TButton")
     BackspaceButton = ttk.Button(WindowFrame, text="\u232b", command=Backspace)
