@@ -26,8 +26,8 @@ Remove-Item .\build -Recurse -Force
 Remove-Item .\prakticalc.spec
 Write-Host "[2/3] Building Uninstaller..."
 Set-Location '.\PraktiCalc Uninstaller'
-python.exe -m PyInstaller .\PraktiCalcUninstaller.py --onefile --clean --windowed --icon ..\PraktiCalculatorMono.ico
-Copy-Item .\dist\PraktiCalcUninstaller.exe '..\PraktiCalc Installer\content'
+python.exe -m PyInstaller .\PraktiCalcUninstaller.py --onedir --clean --windowed --icon ..\PraktiCalculatorMono.ico
+Copy-Item .\dist\PraktiCalcUninstaller '..\PraktiCalc Installer\content' -Recurse -Verbose
 Remove-Item .\dist -Recurse -Force
 Remove-Item .\build -Recurse -Force
 Remove-Item .\PraktiCalcUninstaller.spec
@@ -42,7 +42,7 @@ Remove-Item .\build -Recurse -Force
 Remove-Item .\prakticalc-installer.spec
 Remove-Item .\PraktiCalcProgramContent.zip
 Remove-Item .\content\prakticalc.exe
-Remove-Item .\content\PraktiCalcUninstaller.exe
+Remove-Item .\content\PraktiCalcUninstaller -Recurse -Force
 Remove-Item .\content\_internal -Recurse -Force
 Write-Host "Done!"
 }
