@@ -227,7 +227,7 @@ def clear() :
 
 # does the actual calculation, used to include 171 if-statements
 def calc() :
-    global Calculation, historylist
+    global Calculation, historylist, BorderDisplay, MainWindow
     TheCalc = Calculation.replace("\u221a", "sqrt")
     TheCalc = TheCalc.replace("x", "*")
     TheCalc = TheCalc.replace("^", "**")
@@ -244,7 +244,10 @@ def calc() :
     else:
         Result = str(Result)
     historylist.append(f"{Calculation}={Result}")
-    Output.config(text=Result)
+    if BorderDisplay == True:
+        MainWindow.title(Result)
+    else:
+        Output.config(text=Result)
 
 # processes keyboard input
 def KeyPress(event):
