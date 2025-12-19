@@ -73,6 +73,7 @@ if CLIHelp == True:
         messagebox.showinfo("PraktiCalc CLI Options", "PraktiCalc " + PraktiCalcVersion + """ CLI Options:
 --allowShutdownDialog: allow the use of the shutdown command to display messages
 --big: start with bigger main window
+--borderdisplay: uses window title to show output
 --debug: add a test button for debugging
 --nodpiawareness: disable Windows DPI Awareness
 --dark: enable dark mode by default
@@ -82,15 +83,16 @@ if CLIHelp == True:
 --version: display version and exit""")
     else:
         print("PraktiCalc " + PraktiCalcVersion + " CLI Options")
-        print("--big     | start with bigger main window")
-        print("--debug   | add a test button for debugging")
-        print("--dark    | enable dark mode by default")
-        print("--console | show console for debugging")
-        print("--breeze  | set the light theme to breeze")
-        print("--yaru    | set the light theme to yaru")
-        print("--equilux | set the dark theme to equilux")
-        print("--help    | display this help text and exit")
-        print("--version | display version and exit")
+        print("--big           | start with bigger main window")
+        print("--borderdisplay | uses window title to show output")
+        print("--debug         | add a test button for debugging")
+        print("--dark          | enable dark mode by default")
+        print("--console       | show console for debugging")
+        print("--breeze        | set the light theme to breeze")
+        print("--yaru          | set the light theme to yaru")
+        print("--equilux       | set the dark theme to equilux")
+        print("--help          | display this help text and exit")
+        print("--version       | display version and exit")
     sys.exit(0)
 if CLIVersion == True:
     if platform.system() == "Windows":
@@ -153,6 +155,7 @@ else:
 usedttktheme = thettktheme
 M = "0"
 DarkMode = "--dark" in sys.argv
+BorderDisplay = "--borderdisplay" in sys.argv
 debug = "--debug" in sys.argv
 historylist = []
 DecimalNumber = 0
@@ -283,7 +286,7 @@ def appendToCalculation(char):
 
 # settings window
 def Settings() :
-    global SettingsWindow, DarkMode, DarkModeToggle, MsgBoxStyles, CurrentMsgBoxStyle, MsgBoxStyleSelect
+    global SettingsWindow, DarkMode, DarkModeToggle, MsgBoxStyles, CurrentMsgBoxStyle, MsgBoxStyleSelect, BorderDisplay
     SettingsWindow = tk.Toplevel(MainWindow)
     SettingsWindow.title("Settings")
     SettingsWindow.config(width=250, height=152)
@@ -296,6 +299,7 @@ def Settings() :
     SettingsWindowFrame = ttk.Frame(SettingsWindow)
     SettingsWindowFrame.columnconfigure(0, weight=1)
     DarkModeToggle = ttk.Checkbutton(SettingsWindowFrame, text="Dark Mode", command=ChangeDarkMode, variable=DarkModeTkVar)
+    BorderDisplayToggle = ttk.Checkbutton(SettingsWindowFrame, text="Border Display", command=toggleBorderDisplay, variable=BorderDisplayTkVar)
     MsgBoxStyleFrame = ttk.LabelFrame(SettingsWindowFrame, text="Messagebox Style")
     MsgBoxStyleFrame.columnconfigure(0, weight=1)
     MsgBoxStyleSelect = ttk.Combobox(MsgBoxStyleFrame, values=MsgBoxStyles)
@@ -303,6 +307,7 @@ def Settings() :
     SettingsOKButton = ttk.Button(SettingsWindowFrame, text="OK", command=loadTheme)
     SettingsWindowFrame.grid(row=0, column=0, sticky="nesw")
     DarkModeToggle.grid(row=2, column=0, sticky="w", padx=10)
+    BorderDisplayToggle.grid(row=1, column=0, sticky="w", padx=10)
     MsgBoxStyleFrame.grid(row=3, column=0, sticky="ew", padx=10)
     MsgBoxStyleSelect.grid(row=0, column=0, sticky="ew")
     SettingsOKButton.grid(row=4, column=0, sticky="ew", padx=10, pady=10)
@@ -337,6 +342,29 @@ def ChangeDarkMode() :
         changeTheme(ErrorWindow)
         changeTheme(CustomInfox)
         changeTheme(HelpWindow)
+
+# toggles border display
+def toggleBorderDisplay():
+    global BorderDisplay, MainWindow
+    if BorderDisplay == True:
+        BorderDisplay = False
+        MainWindow.title("PraktiCalc")
+        Outputframe.grid(row=0, column=0, columnspan=4, sticky="nesw")
+        CopyButton.grid(row=0, column=4, sticky="nesw")
+        BackspaceButton.grid(row=0, column=5, sticky="nesw")
+        ExitButton.grid(row=6, column=0, sticky="nesw")
+        WindowFrame.rowconfigure(0, weight=1)
+        updateDisplay()
+    elif BorderDisplay == False:
+        BorderDisplay = True
+        MainWindow.title("Border Display")
+        Outputframe.grid_remove()
+        CopyButton.grid_remove()
+        BackspaceButton.grid_remove()
+        ExitButton.grid_remove()
+        BackspaceButton.grid(row=6, column=0, sticky="nesw")
+        WindowFrame.rowconfigure(0, weight=0, uniform="")
+        updateDisplay()
 
 # info window
 def CustomInfo() :
@@ -492,8 +520,11 @@ def Backspace() :
 
 # updates output
 def updateDisplay() :
-    global Calculation
-    Output.config(text=Calculation)
+    global Calculation, BorderDisplay, MainWindow
+    if BorderDisplay == True:
+        MainWindow.title(Calculation)
+    else:
+        Output.config(text=Calculation)
 
 # history window
 def History() :
@@ -651,6 +682,7 @@ if WingWebDings == True:
 else:
     LargeUnicodeFont = font.Font(family="TkDefaultFont", size=14)
 DarkModeTkVar = tk.BooleanVar(value=DarkMode)
+BorderDisplayTkVar = tk.BooleanVar(value=BorderDisplay)
 MainWindow.config(width=256, height=315)
 if console == True:
 
@@ -766,6 +798,8 @@ for colrow in range(6):
     WindowFrame.rowconfigure(colrow, weight=1, uniform="buttons")
     WindowFrame.columnconfigure(colrow, weight=1, uniform="buttons")
 WindowFrame.rowconfigure(6, weight=1)
+if BorderDisplay == True:
+    WindowFrame.rowconfigure(0, weight=0, uniform="")
 Outputframe = ttk.Frame(WindowFrame, borderwidth=1, relief="sunken")
 Output = ttk.Label(Outputframe, text="0")
 # Buttons
@@ -814,7 +848,13 @@ LdButton = ttk.Button(WindowFrame, text="ld", command=lambda: appendToCalculatio
 LnButton = ttk.Button(WindowFrame, text="ln", command=lambda: appendToCalculation("ln("))
 LgButton = ttk.Button(WindowFrame, text="lg", command=lambda: appendToCalculation("lg("))
 WindowFrame.grid(row=0, column=0, sticky="nesw")
-Outputframe.grid(row=0, column=0, columnspan=4, sticky="nesw")
+if not BorderDisplay == True:
+    Outputframe.grid(row=0, column=0, columnspan=4, sticky="nesw")
+    CopyButton.grid(row=0, column=4, sticky="nesw")
+    BackspaceButton.grid(row=0, column=5, sticky="nesw")
+    ExitButton.grid(row=6, column=0, sticky="nesw")
+else:
+    BackspaceButton.grid(row=6, column=0, sticky="nesw")
 Output.pack(pady=1)
 PlusButton.grid(row=1, column=5, sticky="nesw")
 MinusButton.grid(row=2, column=5, sticky="nesw")
@@ -836,13 +876,10 @@ InfoButton.grid(row=1, column=0, sticky="nesw")
 ZeroButton.grid(row=6, column=2, columnspan=2, sticky="nesw")
 HelpButton.grid(row=5, column=0, sticky="nesw")
 sqrtButton.grid(row=5, column=5, sticky="nesw")
-ExitButton.grid(row=6, column=0, sticky="nesw")
 SettingsButton.grid(row=2, column=0, sticky="nesw")
-BackspaceButton.grid(row=0, column=5, sticky="nesw")
 HistoryButton.grid(row=4, column=0, sticky="nesw")
 LeftParenButton.grid(row=2, column=2, sticky="nesw")
 RightParenButton.grid(row=2, column=3, sticky="nesw")
-CopyButton.grid(row=0, column=4, sticky="nesw")
 PowerButton.grid(row=1, column=4, sticky="nesw")
 SetMemoryButton.grid(row=1, column=2, sticky="nesw")
 GetMemoryButton.grid(row=1, column=3, sticky="nesw")
