@@ -179,8 +179,17 @@ def pageReload():
         Progress.grid(row=0, column=0, columnspan=2, sticky="esw")
         threading.Thread(target=actuallyInstall, daemon=True).start()
     elif WizardPage == 7:
-        messagebox.showinfo("PraktiCalc Installer", "PraktiCalc was installed!")
-        InstallWizardWindow.destroy()
+        MainFrame.config(text="Installation finished")
+        clearMainFrame()
+        FinishIcon = tk.Label(MainFrame, text="ü", font=("Wingdings", 32))
+        FinishText = ttk.Label(MainFrame, text="Installation successfull!\nPraktiCalc was installed")
+        FinishIcon.grid(row=0, column=0, padx=50, pady=10)
+        FinishText.grid(row=1, column=0, padx=20, pady=10)
+        for widgets in BottomFrame.winfo_children():
+            widgets.destroy()
+        FinishButton = ttk.Button(BottomFrame, text="Close", command=lambda: InstallWizardWindow.destroy())
+        FinishButton.grid(row=0, column=0, columnspan=2, sticky="esw")
+        InstallWizardWindow.geometry("170x170")
 def actuallyInstall():
     global Progress, InstallProgressText, WizardPage
     ProgressText = "checking system compatibility..."
