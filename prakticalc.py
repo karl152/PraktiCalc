@@ -316,7 +316,7 @@ def loadTheme():
 
 # toggled dark mode
 def ChangeDarkMode() :
-    global DarkMode, usedttktheme, SettingsWindow, style, HistoryX, MoreWindow
+    global DarkMode, usedttktheme, SettingsWindow, style, HistoryX, MoreWindow, HelpWindow, Content1
     if DarkMode == False :
         DarkMode = True
         usedttktheme = darkttktheme
@@ -326,6 +326,7 @@ def ChangeDarkMode() :
         changeTheme(MoreWindow)
         changeTheme(ErrorWindow)
         changeTheme(CustomInfox)
+        changeTheme(HelpWindow)
     elif DarkMode == True :
         DarkMode = False
         usedttktheme = thettktheme
@@ -335,6 +336,7 @@ def ChangeDarkMode() :
         changeTheme(MoreWindow)
         changeTheme(ErrorWindow)
         changeTheme(CustomInfox)
+        changeTheme(HelpWindow)
 
 # info window
 def CustomInfo() :
@@ -453,7 +455,29 @@ def closeError():
 
 # help GUI
 def helpGUI():
-    showError("Not implemented")
+    global HelpWindow, DarkMode
+    HelpWindow = tk.Toplevel(MainWindow)
+    HelpWindow.rowconfigure(0, weight=1)
+    HelpWindow.columnconfigure(0, weight=1)
+    HelpWindow.title("PraktiCalc Help")
+    if platform.system() == "Windows":
+        HelpWindow.focus_force()
+    changeTheme(HelpWindow)
+    HelpFrame = ttk.Frame(HelpWindow)
+    HelpFrame.rowconfigure(0, weight=1)
+    HelpFrame.columnconfigure(0, weight=1)
+    HelpFrame.grid(row=0, column=0, sticky="nesw")
+    HelpTabs = ttk.Notebook(HelpFrame)
+    Content1 = tk.Text(HelpTabs)
+    if DarkMode == True:
+        Content1.config(fg="white", bg="black")
+    Content1.pack(fill="both", expand=True)
+    HelpTabs.add(Content1, text="Placeholder")
+    HelpTabs.grid(row=0, column=0, sticky="nesw")
+    Content1.insert(tk.END, """This feature is currently not ready for use.
+
+If you need help, you can look at the GitHub README.""")
+    Content1.config(state="disabled")
 
 # backspace button
 def Backspace() :
