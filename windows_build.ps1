@@ -43,6 +43,7 @@ Remove-Item .\prakticalc-installer.spec
 Remove-Item .\PraktiCalcProgramContent.zip
 Remove-Item .\content\prakticalc.exe
 Remove-Item .\content\PraktiCalcUninstaller.exe
+Remove-Item .\content\_internal -Recurse -Force
 Write-Host "Done!"
 }
 else{Write-Host "No valid build mode selected. Available modes: portable, installer"}
