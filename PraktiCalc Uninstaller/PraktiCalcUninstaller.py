@@ -20,7 +20,7 @@ import subprocess
 import time
 import threading
 from pathlib import Path
-import os
+import getpass
 import ctypes
 try:
     ctypes.windll.shcore.SetProcessDpiAwareness(1)
@@ -28,7 +28,7 @@ except:
     pass
 
 def actuallyUninstall():
-    username = os.getlogin()
+    username = getpass.getuser()
     try:
         subprocess.getoutput(r'reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /f')
         subprocess.getoutput('rmdir /S /Q "C:\Program Files\PraktiCalc"')
