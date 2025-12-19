@@ -44,10 +44,12 @@ def actuallyUninstall():
 
 Window = tk.Tk()
 Window.title("Uninstalling...")
+Icon = tk.Label(Window, text="6", font=("Wingdings", 32))
 Desc = ttk.Label(Window, text="Please wait...")
 Progress = ttk.Progressbar(Window, mode="indeterminate", length=300)
 Progress.start()
-Desc.pack(padx=20, pady=10)
+Icon.pack(padx=50, pady=10)
+Desc.pack(padx=20, pady=5)
 Progress.pack(padx=20, pady=10)
 threading.Thread(target=actuallyUninstall, daemon=True).start()
 Window.mainloop()
