@@ -33,14 +33,23 @@ import subprocess
 import sys
 import shutil
 import math
+import getpass # for getting the username
+import time
 
 # variables
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
 PraktiCalcVersion = "1.4"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
+allowWindowsShutdownDialog = "--allowShutdownDialog" in sys.argv
 if platform.system() == "Windows":
-    MsgBoxStyles = ["Tkinter", "Alternative", "VBS"]
+    MsgBoxStyles = ["Tkinter", "Alternative"]
+    if shutil.which("wscript"):
+        MsgBoxStyles.append("VBScript")
+    if shutil.which("msg"):
+        MsgBoxStyles.append("Windows Messaging Service")
+    if allowWindowsShutdownDialog == True:
+        MsgBoxStyles.append("Windows Shutdown")
     if BypassWindowsDPIFix == False:
         import ctypes
         try:
@@ -62,6 +71,7 @@ CurrentMsgBoxStyle = 1
 if CLIHelp == True:
     if platform.system() == "Windows":
         messagebox.showinfo("PraktiCalc CLI Options", "PraktiCalc " + PraktiCalcVersion + """ CLI Options:
+--allowShutdownDialog: allow the use of the shutdown command to display messages
 --big: start with bigger main window
 --debug: add a test button for debugging
 --nodpiawareness: disable Windows DPI Awareness
@@ -358,9 +368,15 @@ def CustomInfo() :
         ExtInfoText1.grid(row=1, column=0)
     else:
         if platform.system() == "Windows":
-            if CurrentMsgBoxStyle == 2:
-                pyver = platform.python_version()
+            pyver = platform.python_version()
+            if MsgBoxStyles[CurrentMsgBoxStyle] == "VBScript":
                 subprocess.Popen(["wscript", VBSInfoPath, PraktiCalcVersion, pyver])
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "Windows Messaging Service":
+                subprocess.Popen(["msg", getpass.getuser(), infotext])
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "Windows Shutdown":
+                subprocess.Popen(["shutdown", "/s", "/t", "60", "/c", infotext])
+                time.sleep(20)
+                subprocess.Popen(["shutdown", "/a"])
             else:
                 print("ERROR: Unknown Message Box Style")
         else:
@@ -408,8 +424,14 @@ def showError(message):
         ErrorTextLabel.grid(row=0, column=0)
     else:
         if platform.system() == "Windows":
-            if CurrentMsgBoxStyle == 2:
+            if MsgBoxStyles[CurrentMsgBoxStyle] == "VBScript":
                 subprocess.Popen(["wscript", VBSErrorPath, message])
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "Windows Messaging Service":
+                subprocess.Popen(["msg", getpass.getuser(), message])
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "Windows Shutdown":
+                subprocess.Popen(["shutdown", "/s", "/t", "60", "/c", message])
+                time.sleep(10)
+                subprocess.Popen(["shutdown", "/a"])
             else:
                 print("ERROR: Unknown Message Box Style")
         else:
