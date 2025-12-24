@@ -83,14 +83,17 @@ if CLIHelp == True:
 --version: display version and exit""")
     else:
         print("PraktiCalc " + PraktiCalcVersion + " CLI Options")
-        print("--big           | start with bigger main window")
+        if platform.system() != "Darwin":
+            print("--big           | start with bigger main window")
         print("--borderdisplay | uses window title to show output")
         print("--debug         | add a test button for debugging")
-        print("--dark          | enable dark mode by default")
+        if platform.system() != "Darwin":
+            print("--dark          | enable dark mode by default")
         print("--console       | show console for debugging")
-        print("--breeze        | set the light theme to breeze")
-        print("--yaru          | set the light theme to yaru")
-        print("--equilux       | set the dark theme to equilux")
+        if platform.system() != "Darwin":
+            print("--breeze        | set the light theme to breeze")
+            print("--yaru          | set the light theme to yaru")
+            print("--equilux       | set the dark theme to equilux")
         print("--help          | display this help text and exit")
         print("--version       | display version and exit")
     sys.exit(0)
@@ -141,7 +144,10 @@ console = "--console" in sys.argv
 breeze = "--breeze" in sys.argv
 yaru = "--yaru" in sys.argv
 equilux = "--equilux" in sys.argv
-big = "--big" in sys.argv
+if platform.system() != "Darwin":
+    big = "--big" in sys.argv
+else:
+    big = False
 if breeze == True:
     thettktheme = "breeze"
 elif yaru == True:
@@ -154,7 +160,10 @@ else:
     darkttktheme = "black"
 usedttktheme = thettktheme
 M = "0"
-DarkMode = "--dark" in sys.argv
+if platform.system() != "Darwin":
+    DarkMode = "--dark" in sys.argv
+else:
+    DarkMode = False
 BorderDisplay = "--borderdisplay" in sys.argv
 debug = "--debug" in sys.argv
 historylist = []
@@ -169,7 +178,10 @@ lcc = "" # last console command
 # sets the theme for a given window
 def changeTheme(WindowName):
     global theming
-    if platform.system() == "Windows":
+    if platform.system() == "Darwin":
+        pass
+        return
+    elif platform.system() == "Windows":
         if DarkMode == True:
             style = ThemedStyle(WindowName)
             style.theme_use(usedttktheme)
@@ -309,7 +321,8 @@ def Settings() :
     MsgBoxStyleSelect.current(CurrentMsgBoxStyle)
     SettingsOKButton = ttk.Button(SettingsWindowFrame, text="OK", command=loadTheme)
     SettingsWindowFrame.grid(row=0, column=0, sticky="nesw")
-    DarkModeToggle.grid(row=2, column=0, sticky="w", padx=10)
+    if platform.system() != "Darwin":
+        DarkModeToggle.grid(row=2, column=0, sticky="w", padx=10)
     BorderDisplayToggle.grid(row=1, column=0, sticky="w", padx=10)
     MsgBoxStyleFrame.grid(row=3, column=0, sticky="ew", padx=10)
     MsgBoxStyleSelect.grid(row=0, column=0, sticky="ew")
@@ -896,7 +909,9 @@ MainWindow.bind("<Key>", KeyPress)
 More.grid(row=3, column=0, sticky="nesw")
 if debug == True:
     Checkb.grid(row=1, column=0, sticky="nesw")
-if big == False:
+if platform.system() == "Darwin":
+    pass
+elif big == False:
     MainWindow.geometry("250x250")
 else:
     MainWindow.geometry("400x400")
