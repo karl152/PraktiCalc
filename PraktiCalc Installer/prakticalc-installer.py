@@ -34,7 +34,7 @@ def speak(string):
     subprocess.Popen(["wscript", narrator, string])
 def speakAndWait(string):
     subprocess.run(["wscript", narrator, string])
-
+auto = "--auto" in sys.argv
 TTS = "--TTS" in sys.argv
 if Path("C:/Program Files/PraktiCalc").exists() == True:
     UninstallBaseString = "PraktiCalc is already installed on your system. If you want to reinstall or update it, please uninstall it first using "
@@ -46,7 +46,10 @@ if Path("C:/Program Files/PraktiCalc").exists() == True:
         messagebox.showerror("Not installing", UninstallBaseString + UninstallWinString)
     sys.exit(1)
 
-WizardPage = 0
+if auto == False:
+    WizardPage = 0
+else:
+    WizardPage = 6
 
 def testPyInstallerOneFile():
     try:
@@ -77,7 +80,10 @@ else:
         speakAndWait("WARNING: The PraktiCalc Installer will likely not work when not built to one file using PyInstaller! You should build it before execution using the provided script")
 
 if "--help" in sys.argv:
-    speak("PraktiCalc Windows Installer CLI Options: --TTS enables text to speech.")
+    print("""PraktiCalc Installer CLI Options:
+--auto: starts automatic installation
+--TTS: starts installer with text to speech
+--help: shows this help text""")
     sys.exit(0)
 
 ExtractTo = "C:/Program Files/PraktiCalc"
@@ -204,22 +210,25 @@ def pageReload():
         Progress.start(10)
         Progress.grid(row=0, column=0, columnspan=2, sticky="esw")
         threading.Thread(target=actuallyInstall, daemon=True).start()
-        if TTS == True:
+        if auto == False and TTS == True:
             speakAndWait("PraktiCalc is being installed. Please wait.\nThis process should take less than a minute.")
     elif WizardPage == 7:
-        MainFrame.config(text="Installation finished")
-        clearMainFrame()
-        FinishIcon = tk.Label(MainFrame, text="ü", font=("Wingdings", 32))
-        FinishText = ttk.Label(MainFrame, text="Installation successfull!\nPraktiCalc was installed")
-        FinishIcon.grid(row=0, column=0, padx=50, pady=10)
-        FinishText.grid(row=1, column=0, padx=20, pady=10)
-        for widgets in BottomFrame.winfo_children():
-            widgets.destroy()
-        FinishButton = ttk.Button(BottomFrame, text="Close", command=lambda: InstallWizardWindow.destroy())
-        FinishButton.grid(row=0, column=0, columnspan=2, sticky="esw")
-        InstallWizardWindow.geometry("170x170")
-        if TTS == True:
-            speak("PraktiCalc was installed, you can close this window now")
+        if auto == True:
+            InstallWizardWindow.destroy()
+        else:
+            MainFrame.config(text="Installation finished")
+            clearMainFrame()
+            FinishIcon = tk.Label(MainFrame, text="ü", font=("Wingdings", 32))
+            FinishText = ttk.Label(MainFrame, text="Installation successfull!\nPraktiCalc was installed")
+            FinishIcon.grid(row=0, column=0, padx=50, pady=10)
+            FinishText.grid(row=1, column=0, padx=20, pady=10)
+            for widgets in BottomFrame.winfo_children():
+                widgets.destroy()
+            FinishButton = ttk.Button(BottomFrame, text="Close", command=lambda: InstallWizardWindow.destroy())
+            FinishButton.grid(row=0, column=0, columnspan=2, sticky="esw")
+            InstallWizardWindow.geometry("170x170")
+            if TTS == True:
+                speak("PraktiCalc was installed, you can close this window now")
 def actuallyInstall():
     global Progress, InstallProgressText, WizardPage
     ProgressText = "checking system compatibility..."
