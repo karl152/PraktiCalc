@@ -128,12 +128,16 @@ if Path("./usr/share/tcltk/ttkthemes").exists():
     tcl_dir = Path("./usr/share/tcltk/ttkthemes").resolve()
 
 if RunningAsOneFileExe == True:
+    if platform.system() == "Darwin":
+        PraktiCalcMacIconPath = (sys._MEIPASS + "/PraktiCalc-MacOS.png")
     PraktiCalcIconPath = (sys._MEIPASS + "/PraktiCalculator_icon.png")
     PraktiCalcIconMonoPath = (sys._MEIPASS + "/PraktiCalculator_icon.xbm")
     PraktiCalcIconMonoInvertedPath = (sys._MEIPASS + "/PraktiCalculator_icon_inverted.xbm")
     VBSInfoPath = (sys._MEIPASS + "/info.vbs")
     VBSErrorPath = (sys._MEIPASS + "/error.vbs")
 else:
+    if platform.system() == "Darwin":
+        PraktiCalcMacIconPath = "PraktiCalc-MacOS.png"
     PraktiCalcIconPath = "PraktiCalculator_icon.png"
     PraktiCalcIconMonoPath = "PraktiCalculator_icon.xbm"
     PraktiCalcIconMonoInvertedPath = "PraktiCalculator_icon_inverted.xbm"
@@ -690,8 +694,12 @@ MainWindow = tk.Tk()
 MainWindow.title("PraktiCalc")
 MainWindow.icon_mono = tk.BitmapImage(file=PraktiCalcIconMonoPath)
 MainWindow.icon = tk.PhotoImage(file=PraktiCalcIconPath)
+if platform.system() == "Darwin":
+    MainWindow.macicon = tk.PhotoImage(file=PraktiCalcMacIconPath)
+    MainWindow.iconphoto(True, MainWindow.macicon)
+else:
+    MainWindow.iconphoto(True, MainWindow.icon)
 MainWindow.icon_mono_inverted = tk.BitmapImage(file=PraktiCalcIconMonoInvertedPath)
-MainWindow.iconphoto(True, MainWindow.icon)
 if WingWebDings == True:
     wingdingsfont = font.Font(family="Wingdings")
     webdingsfont = font.Font(family="Webdings")
