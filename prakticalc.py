@@ -42,8 +42,8 @@ CLIVersion = "--version" in sys.argv
 PraktiCalcVersion = "1.4test1"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 allowWindowsShutdownDialog = "--allowShutdownDialog" in sys.argv
+MsgBoxStyles = ["Tkinter", "Alternative"]
 if platform.system() == "Windows":
-    MsgBoxStyles = ["Tkinter", "Alternative"]
     if shutil.which("wscript"):
         MsgBoxStyles.append("VBScript")
     if shutil.which("msg"):
@@ -60,9 +60,11 @@ if platform.system() == "Windows":
         WingWebDings = True
     else:
         WingWebDings = False
+elif platform.system() == "Darwin":
+    WingWebDings = False
+    MsgBoxStyles.append("AppleScript")
 else:
     WingWebDings = False
-    MsgBoxStyles = ["Tkinter", "Alternative"]
     AdditionalLinuxMsgBoxStyles = ["xmessage", "yad", "kdialog", "zenity"]
     for MsgBoxStyle in AdditionalLinuxMsgBoxStyles:
         if shutil.which(MsgBoxStyle):
@@ -438,6 +440,9 @@ def CustomInfo() :
                 subprocess.Popen(["kdialog", "--title=About PraktiCalc", "--msgbox", infotext])
             elif MsgBoxStyles[CurrentMsgBoxStyle] == "zenity":
                 subprocess.Popen(["zenity", "--title=About PraktiCalc", "--info", "--icon=" + PraktiCalcIconPath, "--text=" + infotext])
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "AppleScript":
+                asc = f'display dialog "{infotext}" with icon POSIX file "{PraktiCalcIconPath}"'
+                subprocess.run(["osascript", "-e", asc])
             else:
                 print("ERROR: Unknown Message Box Style")
 
@@ -493,6 +498,9 @@ def showError(message):
                 subprocess.Popen(["kdialog", "--title=Error", "--error", message])
             elif MsgBoxStyles[CurrentMsgBoxStyle] == "zenity":
                 subprocess.Popen(["zenity", "--title=Error", "--error", "--text=" + message])
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "AppleScript":
+                asc = f'display dialog "{message}" with icon stop'
+                subprocess.run(["osascript", "-e", asc])
             else:
                 print("ERROR: Unknown Message Box Style")
 
