@@ -110,9 +110,9 @@ if CLIVersion == True:
 
 calculate = SimpleEval()
 calculate.functions["sqrt"] = math.sqrt
-calculate.functions["sin"] = math.sin
-calculate.functions["cos"] = math.cos
-calculate.functions["tan"] = math.tan
+calculate.functions["sin"] = lambda x: math.sin(math.radians(x))
+calculate.functions["cos"] = lambda x: math.cos(math.radians(x))
+calculate.functions["tan"] = lambda x: math.tan(math.radians(x))
 calculate.functions["ld"] = math.log2
 calculate.functions["ln"] = math.log
 calculate.functions["lg"] = math.log10
