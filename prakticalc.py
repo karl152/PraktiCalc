@@ -70,6 +70,7 @@ else:
         if shutil.which(MsgBoxStyle):
             MsgBoxStyles.append(MsgBoxStyle)
 CurrentMsgBoxStyle = 1
+ThemingDisabled = "--notheming" in sys.argv
 if CLIHelp == True:
     if platform.system() == "Windows":
         messagebox.showinfo("PraktiCalc CLI Options", "PraktiCalc " + PraktiCalcVersion + """ CLI Options:
@@ -92,6 +93,7 @@ if CLIHelp == True:
         if platform.system() != "Darwin":
             print("--dark          | enable dark mode by default")
         print("--console       | show console for debugging")
+        print("--notheming     | disables theming")
         if platform.system() != "Darwin":
             print("--breeze        | set the light theme to breeze")
             print("--yaru          | set the light theme to yaru")
@@ -166,7 +168,7 @@ else:
     darkttktheme = "black"
 usedttktheme = thettktheme
 M = "0"
-if platform.system() != "Darwin":
+if platform.system() != "Darwin" or ThemingDisabled == False:
     DarkMode = "--dark" in sys.argv
 else:
     DarkMode = False
@@ -184,7 +186,7 @@ lcc = "" # last console command
 # sets the theme for a given window
 def changeTheme(WindowName):
     global theming
-    if platform.system() == "Darwin":
+    if platform.system() == "Darwin" or ThemingDisabled == True:
         pass
         return
     elif platform.system() == "Windows":
@@ -307,7 +309,7 @@ def appendToCalculation(char):
 
 # settings window
 def Settings() :
-    global SettingsWindow, DarkMode, DarkModeToggle, MsgBoxStyles, CurrentMsgBoxStyle, MsgBoxStyleSelect, BorderDisplay
+    global SettingsWindow, DarkMode, DarkModeToggle, MsgBoxStyles, CurrentMsgBoxStyle, MsgBoxStyleSelect, BorderDisplay, ThemingDisabled
     SettingsWindow = tk.Toplevel(MainWindow)
     SettingsWindow.title("Settings")
     SettingsWindow.config(width=250, height=152)
@@ -328,7 +330,8 @@ def Settings() :
     SettingsOKButton = ttk.Button(SettingsWindowFrame, text="OK", command=loadTheme)
     SettingsWindowFrame.grid(row=0, column=0, sticky="nesw")
     if platform.system() != "Darwin":
-        DarkModeToggle.grid(row=2, column=0, sticky="w", padx=10)
+        if ThemingDisabled == False:
+            DarkModeToggle.grid(row=2, column=0, sticky="w", padx=10)
     BorderDisplayToggle.grid(row=1, column=0, sticky="w", padx=10)
     MsgBoxStyleFrame.grid(row=3, column=0, sticky="ew", padx=10)
     MsgBoxStyleSelect.grid(row=0, column=0, sticky="ew")
