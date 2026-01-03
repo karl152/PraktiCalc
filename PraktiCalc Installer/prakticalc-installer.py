@@ -22,7 +22,7 @@ import platform
 import ctypes
 import sys
 import zipfile
-import os
+import getpass
 import shutil
 from pathlib import Path
 try:
@@ -30,6 +30,12 @@ try:
 except:
     pass
 
+def speak(string):
+    subprocess.Popen(["wscript", narrator, string])
+def speakAndWait(string):
+    subprocess.run(["wscript", narrator, string])
+auto = "--auto" in sys.argv
+TTS = "--TTS" in sys.argv
 if Path("C:/Program Files/PraktiCalc").exists() == True:
     UninstallBaseString = "PraktiCalc is already installed on your system. If you want to reinstall or update it, please uninstall it first using "
     UninstallWinString = "Control Panel -> Programs -> Programs and Features -> PraktiCalc -> Uninstall/Change"
@@ -40,7 +46,10 @@ if Path("C:/Program Files/PraktiCalc").exists() == True:
         messagebox.showerror("Not installing", UninstallBaseString + UninstallWinString)
     sys.exit(1)
 
-WizardPage = 0
+if auto == False:
+    WizardPage = 0
+else:
+    WizardPage = 6
 
 def testPyInstallerOneFile():
     try:
@@ -54,20 +63,31 @@ if RunningAsOneFileExe == True:
     PraktiCalcBannerPath = (sys._MEIPASS + "/PraktiCalcBanner.png")
     PraktiCalcContentZIPPath = (sys._MEIPASS + "/PraktiCalcProgramContent.zip")
     licensefile = (sys._MEIPASS + "/LICENSE")
+    narrator = (sys._MEIPASS + "/narrator.vbs")
 else:
     PraktiCalcBannerPath = "PraktiCalcBanner.png"
     PraktiCalcContentZIPPath = "PraktiCalcProgramContent.zip"
     licensefile = "../LICENSE"
+    narrator = "narrator.vbs"
     print("""
 ----------------------------------------------------------
  WARNING: The PraktiCalc Installer will likely not work
  when not built to one file using PyInstaller! You should
- build it before execution using the provided scripts
+ build it before execution using the provided script
 ----------------------------------------------------------
 """)
+    if TTS == True:
+        speakAndWait("WARNING: The PraktiCalc Installer will likely not work when not built to one file using PyInstaller! You should build it before execution using the provided script")
+
+if "--help" in sys.argv:
+    print("""PraktiCalc Installer CLI Options:
+--auto: starts automatic installation
+--TTS: starts installer with text to speech
+--help: shows this help text""")
+    sys.exit(0)
 
 ExtractTo = "C:/Program Files/PraktiCalc"
-username = os.getlogin()
+username = getpass.getuser()
 
 def forward():
     global WizardPage
@@ -95,6 +115,8 @@ def pageReload():
         WelcomeText = ttk.Label(MainFrame, text="Welcome to the PraktiCalc Installer for Windows!\nThis Wizard will help you installing PraktiCalc.")
         WelcomeImage.grid(row=0, column=0)
         WelcomeText.grid(row=1, column=0, padx=10, pady=10)
+        if TTS == True:
+            speak("Welcome to the PraktiCalc Installer for Windows! This Wizard will help you installing PraktiCalc.")
     elif WizardPage == 1:
         MainFrame.config(text="License")
         MainFrame.columnconfigure(0, weight=1)
@@ -111,6 +133,8 @@ def pageReload():
         LicensePreText.grid(row=0, column=0, padx=10, pady=10)
         LicenseText.grid(row=1, column=0, padx=10, pady=10, sticky="nesw")
         LicenseTextScrollbar.grid(row=1, column=1, padx=10, pady=10, sticky="nes")
+        if TTS == True:
+            speak("This software is licensed under the GNU General Public License, Version 3. Continue if you accept that.")
     elif WizardPage == 2:
         MainFrame.config(text="Destination")
         MainFrame.columnconfigure(0, weight=0)
@@ -123,6 +147,8 @@ def pageReload():
         DestinationPathFrame.grid(row=1, column=0, padx=10, pady=10)
         DestinationPathLabel = ttk.Label(DestinationPathFrame, text="C:/Program Files/PraktiCalc")
         DestinationPathLabel.grid(row=0, column=0, padx=2, pady=2)
+        if TTS == True:
+            speak("PraktiCalc will be installed into the following directory: C:/Program Files/PraktiCalc")
     elif WizardPage == 3:
         MainFrame.config(text="Desktop Shortcut")
         clearMainFrame()
@@ -132,6 +158,8 @@ def pageReload():
         DesktopShortcutOptionYes.grid(row=1, column=0, padx=10)
         DesktopShortcutOptionNo = ttk.Radiobutton(MainFrame, text="No", value=False, variable=DesktopShortcut)
         DesktopShortcutOptionNo.grid(row=2, column=0, padx=10)
+        if TTS == True:
+            speak("Do you want to create a Desktop Shortcut for PraktiCalc?")
     elif WizardPage == 4:
         MainFrame.config(text="Start Menu Entry")
         clearMainFrame()
@@ -141,6 +169,8 @@ def pageReload():
         DesktopShortcutOptionYes.grid(row=1, column=0, padx=10)
         DesktopShortcutOptionNo = ttk.Radiobutton(MainFrame, text="No", value=False, variable=StartMenuEntry)
         DesktopShortcutOptionNo.grid(row=2, column=0, padx=10)
+        if TTS == True:
+            speak("Do you want to add PraktiCalc to the Start Menu?")
     elif WizardPage == 5:
         MainFrame.config(text="Ready for installation")
         clearMainFrame()
@@ -162,6 +192,8 @@ def pageReload():
         DesktopShortcutChoice.grid(row=2, column=0, padx=10, sticky="w")
         StartMenuEntryChoice.grid(row=3, column=0, padx=10, sticky="w")
         FinalAdvise.grid(row=4, column=0, padx=10, pady=10, sticky="w")
+        if TTS == True:
+            speak("PraktiCalc is now ready to be installed like you chose in the previous screens. Click continue to start the installation.")
     elif WizardPage == 6:
         global Progress, InstallProgressText
         MainFrame.config(text="Installing PraktiCalc...")
@@ -178,9 +210,25 @@ def pageReload():
         Progress.start(10)
         Progress.grid(row=0, column=0, columnspan=2, sticky="esw")
         threading.Thread(target=actuallyInstall, daemon=True).start()
+        if auto == False and TTS == True:
+            speakAndWait("PraktiCalc is being installed. Please wait.\nThis process should take less than a minute.")
     elif WizardPage == 7:
-        messagebox.showinfo("PraktiCalc Installer", "PraktiCalc was installed!")
-        InstallWizardWindow.destroy()
+        if auto == True:
+            InstallWizardWindow.destroy()
+        else:
+            MainFrame.config(text="Installation finished")
+            clearMainFrame()
+            FinishIcon = tk.Label(MainFrame, text="ü", font=("Wingdings", 32))
+            FinishText = ttk.Label(MainFrame, text="Installation successfull!\nPraktiCalc was installed")
+            FinishIcon.grid(row=0, column=0, padx=50, pady=10)
+            FinishText.grid(row=1, column=0, padx=20, pady=10)
+            for widgets in BottomFrame.winfo_children():
+                widgets.destroy()
+            FinishButton = ttk.Button(BottomFrame, text="Close", command=lambda: InstallWizardWindow.destroy())
+            FinishButton.grid(row=0, column=0, columnspan=2, sticky="esw")
+            InstallWizardWindow.geometry("170x170")
+            if TTS == True:
+                speak("PraktiCalc was installed, you can close this window now")
 def actuallyInstall():
     global Progress, InstallProgressText, WizardPage
     ProgressText = "checking system compatibility..."
@@ -209,9 +257,9 @@ def actuallyInstall():
             Progress.config(value=5)
             print(subprocess.getoutput(r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /v DisplayName /t REG_SZ /d "PraktiCalc" /f'))
             Progress.config(value=6)
-            print(subprocess.getoutput(r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /v DisplayVersion /t REG_SZ /d "1.3.1" /f'))
+            print(subprocess.getoutput(r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /v DisplayVersion /t REG_SZ /d "1.4test1" /f'))
             Progress.config(value=7)
-            print(subprocess.getoutput(r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /v UninstallString /t REG_SZ /d "C:\Program Files\PraktiCalc\PraktiCalcUninstaller.exe" /f'))
+            print(subprocess.getoutput(r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /v UninstallString /t REG_SZ /d "C:\Program Files\PraktiCalc\PraktiCalcUninstaller\PraktiCalcUninstaller.exe" /f'))
             Progress.config(value=8)
             print(subprocess.getoutput(r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /v Publisher /t REG_SZ /d "karl152" /f'))
             Progress.config(value=9)

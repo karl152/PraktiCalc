@@ -27,6 +27,6 @@ You can download PraktiCalc on the right at the Releases section. There should b
 If you want to contribute to PraktiCalc and help with development, there are some developer tools for you. Use the Check button to print the values of the calculation variables, or use the more advanced PraktiCalc Console to get values of all global variables and manually execute functions within PraktiCalc. Just start it with the ```--console``` argument and use the ```help``` command to get started.
 ##### Building PraktiCalc
 The build scripts will help you to build PraktiCalc into installable packages.
-For building on Windows, you need 7-Zip, Python 3.8 with tkinter on Windows 7 or newer (Vista might work too) together with the ```pyinstaller``` and ```ttkthemes``` modules.
-Buildung deb packages required the following dependencies installed via apt from the Debian package sources: ```python3-tk```, ```python3-ttkthemes```.
-AppImages require the same packages and additionally ```python3-pyinstaller```. ```appimagetool``` will be downloaded automatically by the build script.
+For building on Windows 10 or newer, you need Python with tkinter and the following modules installed via pip: ```ttkthemes```, ```pyinstaller```, ```pywin32```, ```simpleeval```
+For older versions of Windows, you need Python with the same modules and PowerShell 5 or 7-Zip installed. The lastest available Python version is recommended, that being Python 3.8.20 on Windows NT 6 (Windows 7/Vista). Windows Vista is unsupported by PraktiCalc, but should work in theory.
+Buildung deb packages required the following dependencies installed via apt from the Debian package sources: ```python3-tk```, ```python3-ttkthemes```, ```python3-simpleeval```. AppImages require the same packages and additionally ```python3-pyinstaller```. ```appimagetool``` will be downloaded automatically by the build script.

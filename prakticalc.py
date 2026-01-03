@@ -18,6 +18,8 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import font
+from simpleeval import SimpleEval
+from pathlib import Path
 try:
     from ttkthemes import ThemedStyle
     theming = 1
@@ -30,14 +32,24 @@ import platform
 import subprocess
 import sys
 import shutil
-import os
+import math
+import getpass # for getting the username
+import time
+
 # variables
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.3.1"
+PraktiCalcVersion = "1.4test1"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
+allowWindowsShutdownDialog = "--allowShutdownDialog" in sys.argv
+MsgBoxStyles = ["Tkinter", "Alternative"]
 if platform.system() == "Windows":
-    MsgBoxStyles = ["Tkinter", "Alternative", "VBS"]
+    if shutil.which("wscript"):
+        MsgBoxStyles.append("VBScript")
+    if shutil.which("msg"):
+        MsgBoxStyles.append("Windows Messaging Service")
+    if allowWindowsShutdownDialog == True:
+        MsgBoxStyles.append("Windows Shutdown")
     if BypassWindowsDPIFix == False:
         import ctypes
         try:
@@ -48,18 +60,23 @@ if platform.system() == "Windows":
         WingWebDings = True
     else:
         WingWebDings = False
+elif platform.system() == "Darwin":
+    WingWebDings = False
+    MsgBoxStyles.append("AppleScript")
 else:
     WingWebDings = False
-    MsgBoxStyles = ["Tkinter", "Alternative"]
     AdditionalLinuxMsgBoxStyles = ["xmessage", "yad", "kdialog", "zenity"]
     for MsgBoxStyle in AdditionalLinuxMsgBoxStyles:
         if shutil.which(MsgBoxStyle):
             MsgBoxStyles.append(MsgBoxStyle)
 CurrentMsgBoxStyle = 1
+ThemingDisabled = "--notheming" in sys.argv
 if CLIHelp == True:
     if platform.system() == "Windows":
         messagebox.showinfo("PraktiCalc CLI Options", "PraktiCalc " + PraktiCalcVersion + """ CLI Options:
+--allowShutdownDialog: allow the use of the shutdown command to display messages
 --big: start with bigger main window
+--borderdisplay: uses window title to show output
 --debug: add a test button for debugging
 --nodpiawareness: disable Windows DPI Awareness
 --dark: enable dark mode by default
@@ -69,15 +86,20 @@ if CLIHelp == True:
 --version: display version and exit""")
     else:
         print("PraktiCalc " + PraktiCalcVersion + " CLI Options")
-        print("--big     | start with bigger main window")
-        print("--debug   | add a test button for debugging")
-        print("--dark    | enable dark mode by default")
-        print("--console | show console for debugging")
-        print("--breeze  | set the light theme to breeze")
-        print("--yaru    | set the light theme to yaru")
-        print("--equilux | set the dark theme to equilux")
-        print("--help    | display this help text and exit")
-        print("--version | display version and exit")
+        if platform.system() != "Darwin":
+            print("--big           | start with bigger main window")
+        print("--borderdisplay | uses window title to show output")
+        print("--debug         | add a test button for debugging")
+        if platform.system() != "Darwin":
+            print("--dark          | enable dark mode by default")
+        print("--console       | show console for debugging")
+        print("--notheming     | disables theming")
+        if platform.system() != "Darwin":
+            print("--breeze        | set the light theme to breeze")
+            print("--yaru          | set the light theme to yaru")
+            print("--equilux       | set the dark theme to equilux")
+        print("--help          | display this help text and exit")
+        print("--version       | display version and exit")
     sys.exit(0)
 if CLIVersion == True:
     if platform.system() == "Windows":
@@ -85,6 +107,15 @@ if CLIVersion == True:
     else:
         print("PraktiCalc " + PraktiCalcVersion)
     sys.exit(0)
+
+calculate = SimpleEval()
+calculate.functions["sqrt"] = math.sqrt
+calculate.functions["sin"] = lambda x: math.sin(math.radians(x))
+calculate.functions["cos"] = lambda x: math.cos(math.radians(x))
+calculate.functions["tan"] = lambda x: math.tan(math.radians(x))
+calculate.functions["ld"] = math.log2
+calculate.functions["ln"] = math.log
+calculate.functions["lg"] = math.log10
 
 def testPyInstallerOneFile():
     try:
@@ -96,17 +127,21 @@ def testPyInstallerOneFile():
 RunningAsOneFileExe = testPyInstallerOneFile()
 
 # ttkthemes directory workaround for AppImage
-if os.path.exists("./usr/share/tcltk/ttkthemes"):
+if Path("./usr/share/tcltk/ttkthemes").exists():
     # If started as AppImage:
-    tcl_dir = os.path.abspath("./usr/share/tcltk/ttkthemes")
+    tcl_dir = Path("./usr/share/tcltk/ttkthemes").resolve()
 
 if RunningAsOneFileExe == True:
+    if platform.system() == "Darwin":
+        PraktiCalcMacIconPath = (sys._MEIPASS + "/PraktiCalc-MacOS.png")
     PraktiCalcIconPath = (sys._MEIPASS + "/PraktiCalculator_icon.png")
     PraktiCalcIconMonoPath = (sys._MEIPASS + "/PraktiCalculator_icon.xbm")
     PraktiCalcIconMonoInvertedPath = (sys._MEIPASS + "/PraktiCalculator_icon_inverted.xbm")
     VBSInfoPath = (sys._MEIPASS + "/info.vbs")
     VBSErrorPath = (sys._MEIPASS + "/error.vbs")
 else:
+    if platform.system() == "Darwin":
+        PraktiCalcMacIconPath = "PraktiCalc-MacOS.png"
     PraktiCalcIconPath = "PraktiCalculator_icon.png"
     PraktiCalcIconMonoPath = "PraktiCalculator_icon.xbm"
     PraktiCalcIconMonoInvertedPath = "PraktiCalculator_icon_inverted.xbm"
@@ -117,7 +152,10 @@ console = "--console" in sys.argv
 breeze = "--breeze" in sys.argv
 yaru = "--yaru" in sys.argv
 equilux = "--equilux" in sys.argv
-big = "--big" in sys.argv
+if platform.system() != "Darwin":
+    big = "--big" in sys.argv
+else:
+    big = False
 if breeze == True:
     thettktheme = "breeze"
 elif yaru == True:
@@ -129,27 +167,29 @@ if equilux == True:
 else:
     darkttktheme = "black"
 usedttktheme = thettktheme
-Input1 = "0"
-Input2 = "0"
-Stage = 0
-Operator = "op"
-StatusBar = False
-CustomMsgBox = True
-DarkMode = "--dark" in sys.argv
+M = "0"
+if platform.system() != "Darwin" or ThemingDisabled == False:
+    DarkMode = "--dark" in sys.argv
+else:
+    DarkMode = False
+BorderDisplay = "--borderdisplay" in sys.argv
 debug = "--debug" in sys.argv
 historylist = []
-FinalResult = 0
-aFinalResult = 0
 DecimalNumber = 0
 BinaryNumber = 0
 HexadecimalNumber = 0
+Calculation = "0"
+lcc = "" # last console command
 
 # functions
 
 # sets the theme for a given window
 def changeTheme(WindowName):
     global theming
-    if platform.system() == "Windows":
+    if platform.system() == "Darwin" or ThemingDisabled == True:
+        pass
+        return
+    elif platform.system() == "Windows":
         if DarkMode == True:
             style = ThemedStyle(WindowName)
             style.theme_use(usedttktheme)
@@ -161,21 +201,23 @@ def changeTheme(WindowName):
             style.configure("Wingdings.TButton", font=wingdingsfont)
         else:
             style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
+        style.configure("Treeview", rowheight=40)
     elif theming == 1 or theming == 2:
         try:
             style = ThemedStyle(WindowName)
             style.theme_use(usedttktheme)
             style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
+            style.configure("Treeview", rowheight=40)
         except:
             theming = 2
-            theme_base = os.path.join(sys._MEIPASS, "ttkthemes", "themes")
-            theme_path = os.path.join(theme_base, usedttktheme)
+            theme_base = Path(sys._MEIPASS).joinpath("ttkthemes", "themes")
+            theme_path = Path(theme_base).joinpath(usedttktheme)
             WindowName.tk.call("lappend", "auto_path", theme_base)
             try:
                 WindowName.tk.call("package", "require", f"ttk::theme::{usedttktheme}")
             except:
-                theme_tcl = os.path.join(theme_path, usedttktheme + ".tcl")
-                if os.path.exists(theme_tcl):
+                theme_tcl = Path(theme_path).joinpath(usedttktheme + ".tcl")
+                if Path(theme_tcl).exists():
                     WindowName.tk.call("source", theme_tcl)
                 else:
                     print(f"Couldn't find theme {theme_tcl}")
@@ -186,219 +228,89 @@ def changeTheme(WindowName):
                 print("Using default ttk theme")
         try:
             style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
+            style.configure("Treeview", rowheight=40)
         except:
-            print("Unable to increase font size of some buttons")
-
-# LEGACY: used to decide if custom messageboxes should be used for showing the info dialog
-def info() :
-    CustomInfo()
-
-# processes a number when a button is pressed
-def processNumber(number):
-    global Input1, Input2, Output, Stage
-    if Stage == 4 or Stage == 5:
-        Input2 = str(Input2) + number
-        Output.config(text=Input2)
-    if Stage == 3 :
-        Input2 = number
-        Output.config(text=Input2)
-        Stage = 4
-    if Stage == 1 or Stage == 2:
-        Input1 = str(Input1) + number
-        Output.config(text=Input1)
-    if Stage == 0 :
-        Input1 = number
-        Output.config(text=Input1)
-        Stage = 1
-
-# processes an operator for calculation
-def processOperator(TheOneAndOnlyOperatorThatShouldBeProcessed):
-    global Stage, Output, Operator, FinalResult, aFinalResult, Input1, Input2
-    if Stage != 0 and Stage != 3 and Stage != 4 and Stage != 5 and Stage != 6 :
-        Stage = 3
-        Operator = TheOneAndOnlyOperatorThatShouldBeProcessed
-        Output.config(text="0")
-    if Stage == 4 or Stage == 5 :
-        calc()
-        Input1 = FinalResult
-        Operator = TheOneAndOnlyOperatorThatShouldBeProcessed
-        Input2 = "0"
-        Stage = 3
-    if Stage == 6 :
-        Operator = TheOneAndOnlyOperatorThatShouldBeProcessed
-        Stage = 3
-        Output.config(text="0")
-        Input1 = FinalResult
+            print("Unable to increase font size of some buttons and row height in the history window")
 
 # processes the number zero, which is a special case and seperate
 def zero() :
-    global Input1, Input2, Output, Stage
-    if Stage == 4 or Stage == 5:
-        Input2 = str(Input2) + "0"
-        Output.config(text=Input2)
-    if Stage == 3 :
-        Input2 = "0"
-        Stage = 4
-    if Stage == 1 or Stage == 2:
-        Input1 = str(Input1) + "0"
-        Output.config(text=Input1)
-    if Stage == 0 :
-        pass
-    SizeReload()
+    global Calculation
+    if Calculation != "0":
+        Calculation += "0"
+    updateDisplay()
 
 # resets the calculator main window
 def clear() :
-    global Input1, Input2, Output, Stage, Status, StatusBar
-    Input1 = "0"
-    Input2 = "0"
-    Stage = 0
-    Output.config(text="0")
-    if StatusBar == True :
-        Status.config(text="Ready")
-    FinalResult = 0
-    aFinalResult = 0
-    SizeReload()
-
-# comma button
-def comma() :
-    global Input1, Input2, Output, Stage
-    if Stage == 5 :
-        Input2 = str(Input2) + "."
-        Output.config(text=Input2)
-    if Stage == 4 :
-        Input2 = str(Input2) + "."
-        Output.config(text=Input2)
-        Stage = 5
-    if Stage == 3 :
-        Input2 = "0."
-        Output.config(text=Input2)
-        Stage = 5
-    if Stage == 2 :
-        pass
-    if Stage == 1 :
-        Input1 = str(Input1) + "."
-        Output.config(text=Input1)
-        Stage = 2
-    if Stage == 0 :
-        Input1 = "0."
-        Output.config(text=Input1)
-        Stage = 2
-    SizeReload()
+    global Calculation
+    Calculation = "0"
+    updateDisplay()
 
 # does the actual calculation, used to include 171 if-statements
 def calc() :
-    global historylist, Input1, Stage, Input2, Output, Operator, FinalResult, aFinalResult
-    SimpleOperators = ["+", "-", "*", "/"]
-    SpecifiedStages = [0, 1, 2, 3, 6]
-    if len(historylist) >= 16:
-        historylist.pop(0)
-    if Stage == 6 :
-        aFinalResult = FinalResult
-        if str(aFinalResult).endswith(".0"):
-            aFinalResult = int(str(aFinalResult)[:-2])
-        if Operator in SimpleOperators:
-            if Operator == "+":
-                FinalResult = FinalResult + float(Input2)
-            elif Operator == "-":
-                FinalResult = FinalResult - float(Input2)
-            elif Operator == "*":
-                FinalResult = FinalResult * float(Input2)
-            elif Operator == "/":
-                if float(Input2) == 0.0:
-                    CustomDiv0()
-                    clear()
-                    return
-                else:
-                    FinalResult = FinalResult / float(Input2)
-            if str(FinalResult).endswith(".0"):
-                FinalResult = int(str(FinalResult)[:-2])
-            Output.config(text=str(FinalResult))
-            historylist.append(f"{aFinalResult} {Operator} {Input2} = {FinalResult}")
-        elif Operator == "sqrt" :
-            if aFinalResult < 0:
-                showError("Result is a complex number")
-                clear()
-            else:
-                FinalResult = FinalResult ** 0.5
-                if str(FinalResult).endswith(".0"):
-                    FinalResult = int(str(FinalResult)[:-2])
-                Output.config(text=str(FinalResult))
-                historylist.append(f"√{aFinalResult} = {FinalResult}")
-    if Stage not in SpecifiedStages:
-        Stage = 6
-        if Operator in SimpleOperators:
-            if Operator == "+":
-                FinalResult = (float(Input1) + float(Input2))
-            elif Operator == "-":
-                FinalResult = (float(Input1) - float(Input2))
-            elif Operator == "*":
-                FinalResult = (float(Input1) * float(Input2))
-            elif Operator == "/":
-                if float(Input2) == 0.0:
-                    CustomDiv0()
-                    clear()
-                    return
-                else:
-                    FinalResult = (float(Input1) / float(Input2))
-            if str(FinalResult).endswith(".0"):
-                FinalResult = int(str(FinalResult)[:-2])
-            Output.config(text=str(FinalResult))
-            historylist.append(f"{Input1} {Operator} {Input2} = {FinalResult}")
-        elif Operator == "sqrt" :
-            if float(Input1) < 0:
-                showError("Result is a complex number")
-                clear()
-            else:
-                Input2 = float(Input1) ** 0.5
-                if str(Input2).endswith(".0"):
-                    Input2 = int(str(Input2)[:-2])
-                Output.config(text=str(Input2))
-    if Operator == "sqrt" and Stage == 3:
-            if float(Input1) < 0:
-                showError("Result is a complex number")
-                clear()
-            else:
-                FinalResult = float(Input1) ** 0.5
-                if str(FinalResult).endswith(".0"):
-                    FinalResult = int(str(FinalResult)[:-2])
-                Output.config(text=str(FinalResult))
-                historylist.append(f"√{Input1} = {FinalResult}")
-                Stage = 6
+    global Calculation, historylist, BorderDisplay, MainWindow
+    TheCalc = Calculation.replace("\u221a", "sqrt")
+    TheCalc = TheCalc.replace("x", "*")
+    TheCalc = TheCalc.replace("^", "**")
+    try:
+        Result = calculate.eval(TheCalc)
+    except ZeroDivisionError:
+        showError("Division by zero")
+        return
+    except Exception:
+        showError("Error, please check your input for mistakes")
+        return
+    Result = str(round(float(Result), 12))
+    if str(Result).endswith(".0"):
+        Result = str(Result)[:-2]
+    else:
+        Result = str(Result)
+    historylist.append(f"{Calculation}={Result}")
+    if BorderDisplay == True:
+        MainWindow.title(Result)
+    else:
+        Output.config(text=Result)
 
 # processes keyboard input
 def KeyPress(event):
     Key = event.keysym
-    NumberKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-    if Key in NumberKeys:
-        processNumber(Key)
-    if Key == "0" :
+    # print(Key)
+    Keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "plus", "minus", "asterisk", "slash", "comma", "parenleft", "parenright"]
+    if Key in Keys:
+        appendToCalculation(Key)
+    elif Key == "0":
         zero()
-    if Key == "equal" or Key == "Return":
+    elif Key == "equal" or Key == "Return":
         calc()
-    if Key == "add" :
-        processOperator("+")
-    if Key == "subtract" :
-        processOperator("-")
-    if Key == "asterisk" :
-        processOperator("*")
-    if Key == "slash" :
-        processOperator("/")
-    if Key == "h" or Key == "H":
+    elif Key == "h" or Key == "H":
         History()
-    if Key == "c" or Key == "C":
+    elif Key == "c" or Key == "C":
         clear()
-    if Key == "i" :
-        info()
-    if Key == "s" or Key == "S":
+    elif Key == "i":
+        CustomInfo()
+    elif Key == "s" or Key == "S":
         Settings()
-    if Key == "comma" :
-        comma()
-    if Key == "BackSpace" :
+    elif Key == "BackSpace":
         Backspace()
+
+# append a character to the Calculation string
+def appendToCalculation(char):
+    global Calculation
+    char = char.replace("plus", "+")
+    char = char.replace("minus", "-")
+    char = char.replace("asterisk", "x")
+    char = char.replace("slash", "/")
+    char = char.replace("comma", ".")
+    char = char.replace("parenleft", "(")
+    char = char.replace("parenright", ")")
+    if Calculation == "0" and char != ".":
+        Calculation = char
+    else:
+        Calculation += char
+    updateDisplay()
 
 # settings window
 def Settings() :
-    global Status, SettingsWindow, StatusBar, StatusBarToggle, CustomMsgBox, CustomMsgBoxToggle, DarkMode, DarkModeToggle, MsgBoxStyles, CurrentMsgBoxStyle, MsgBoxStyleSelect
+    global SettingsWindow, DarkMode, DarkModeToggle, MsgBoxStyles, CurrentMsgBoxStyle, MsgBoxStyleSelect, BorderDisplay, ThemingDisabled
     SettingsWindow = tk.Toplevel(MainWindow)
     SettingsWindow.title("Settings")
     SettingsWindow.config(width=250, height=152)
@@ -410,22 +322,18 @@ def Settings() :
     changeTheme(SettingsWindow)
     SettingsWindowFrame = ttk.Frame(SettingsWindow)
     SettingsWindowFrame.columnconfigure(0, weight=1)
-    StatusBarToggle = ttk.Checkbutton(SettingsWindowFrame, text="Status Bar", command=ToggleStatusBar, variable=StatusBarTkVar)
-    CustomMsgBoxToggle = ttk.Checkbutton(SettingsWindowFrame, text="Alternative Messageboxes", command=ToggleCustomMsgBoxes)
-    if CustomMsgBox == False :
-        CustomMsgBoxToggle.state(["!selected"])
-    if CustomMsgBox == True :
-        CustomMsgBoxToggle.state(["selected"])
     DarkModeToggle = ttk.Checkbutton(SettingsWindowFrame, text="Dark Mode", command=ChangeDarkMode, variable=DarkModeTkVar)
+    BorderDisplayToggle = ttk.Checkbutton(SettingsWindowFrame, text="Border Display", command=toggleBorderDisplay, variable=BorderDisplayTkVar)
     MsgBoxStyleFrame = ttk.LabelFrame(SettingsWindowFrame, text="Messagebox Style")
     MsgBoxStyleFrame.columnconfigure(0, weight=1)
     MsgBoxStyleSelect = ttk.Combobox(MsgBoxStyleFrame, values=MsgBoxStyles)
     MsgBoxStyleSelect.current(CurrentMsgBoxStyle)
     SettingsOKButton = ttk.Button(SettingsWindowFrame, text="OK", command=loadTheme)
     SettingsWindowFrame.grid(row=0, column=0, sticky="nesw")
-    StatusBarToggle.grid(row=0, column=0, sticky="w", padx=10)
-    # CustomMsgBoxToggle.grid(row=1, column=0, sticky="w", padx=10)
-    DarkModeToggle.grid(row=2, column=0, sticky="w", padx=10)
+    if platform.system() != "Darwin":
+        if ThemingDisabled == False:
+            DarkModeToggle.grid(row=2, column=0, sticky="w", padx=10)
+    BorderDisplayToggle.grid(row=1, column=0, sticky="w", padx=10)
     MsgBoxStyleFrame.grid(row=3, column=0, sticky="ew", padx=10)
     MsgBoxStyleSelect.grid(row=0, column=0, sticky="ew")
     SettingsOKButton.grid(row=4, column=0, sticky="ew", padx=10, pady=10)
@@ -437,31 +345,9 @@ def loadTheme():
     # print(CurrentMsgBoxStyle)
     SettingsWindow.destroy()
 
-# LEGACY: used to toggle whether custom messageboxes should be used in general
-def ToggleCustomMsgBoxes():
-    global CustomMsgBox, CustomMsgBoxToggle
-    if CustomMsgBox == False:
-        CustomMsgBox = True
-    elif CustomMsgBox == True:
-        CustomMsgBox = False
-
-# LEGACY: toggles the status bar, which I would consider deprecated
-def ToggleStatusBar():
-    global Status, StatusBar, StatusBarToggle, StatusDecoration, MainWindow
-    if StatusBar == True:
-        Status.config(text="")
-        StatusBar = False
-        StatusDecoration.config(text="")
-        MainWindow.config(width=256, height=315)
-    elif StatusBar == False:
-        MainWindow.config(width=256, height=330)
-        Status.config(text="Ready")
-        StatusBar = True
-        StatusDecoration.config(text="__________________________________________________")
-
 # toggled dark mode
 def ChangeDarkMode() :
-    global DarkMode, usedttktheme, SettingsWindow, style, HistoryX, MoreWindow
+    global DarkMode, usedttktheme, SettingsWindow, style, HistoryX, MoreWindow, HelpWindow, Content1
     if DarkMode == False :
         DarkMode = True
         usedttktheme = darkttktheme
@@ -471,6 +357,7 @@ def ChangeDarkMode() :
         changeTheme(MoreWindow)
         changeTheme(ErrorWindow)
         changeTheme(CustomInfox)
+        changeTheme(HelpWindow)
     elif DarkMode == True :
         DarkMode = False
         usedttktheme = thettktheme
@@ -480,10 +367,30 @@ def ChangeDarkMode() :
         changeTheme(MoreWindow)
         changeTheme(ErrorWindow)
         changeTheme(CustomInfox)
+        changeTheme(HelpWindow)
 
-# LEGACY: used to show a custom error messagebox dialog for dividing by zero
-def CustomDiv0() :
-    showError("Division by 0")
+# toggles border display
+def toggleBorderDisplay():
+    global BorderDisplay, MainWindow
+    if BorderDisplay == True:
+        BorderDisplay = False
+        MainWindow.title("PraktiCalc")
+        Outputframe.grid(row=0, column=0, columnspan=4, sticky="nesw")
+        CopyButton.grid(row=0, column=4, sticky="nesw")
+        BackspaceButton.grid(row=0, column=5, sticky="nesw")
+        ExitButton.grid(row=6, column=0, sticky="nesw")
+        WindowFrame.rowconfigure(0, weight=1)
+        updateDisplay()
+    elif BorderDisplay == False:
+        BorderDisplay = True
+        MainWindow.title("Border Display")
+        Outputframe.grid_remove()
+        CopyButton.grid_remove()
+        BackspaceButton.grid_remove()
+        ExitButton.grid_remove()
+        BackspaceButton.grid(row=6, column=0, sticky="nesw")
+        WindowFrame.rowconfigure(0, weight=0, uniform="")
+        updateDisplay()
 
 # info window
 def CustomInfo() :
@@ -517,9 +424,15 @@ def CustomInfo() :
         ExtInfoText1.grid(row=1, column=0)
     else:
         if platform.system() == "Windows":
-            if CurrentMsgBoxStyle == 2:
-                pyver = platform.python_version()
+            pyver = platform.python_version()
+            if MsgBoxStyles[CurrentMsgBoxStyle] == "VBScript":
                 subprocess.Popen(["wscript", VBSInfoPath, PraktiCalcVersion, pyver])
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "Windows Messaging Service":
+                subprocess.Popen(["msg", getpass.getuser(), infotext])
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "Windows Shutdown":
+                subprocess.Popen(["shutdown", "/s", "/t", "60", "/c", infotext])
+                time.sleep(20)
+                subprocess.Popen(["shutdown", "/a"])
             else:
                 print("ERROR: Unknown Message Box Style")
         else:
@@ -531,6 +444,9 @@ def CustomInfo() :
                 subprocess.Popen(["kdialog", "--title=About PraktiCalc", "--msgbox", infotext])
             elif MsgBoxStyles[CurrentMsgBoxStyle] == "zenity":
                 subprocess.Popen(["zenity", "--title=About PraktiCalc", "--info", "--icon=" + PraktiCalcIconPath, "--text=" + infotext])
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "AppleScript":
+                asc = f'display dialog "{infotext}" with icon POSIX file "{PraktiCalcIconPath}"'
+                subprocess.run(["osascript", "-e", asc])
             else:
                 print("ERROR: Unknown Message Box Style")
 
@@ -538,11 +454,6 @@ def CustomInfo() :
 def closeCustomInfo() :
     global CustomInfox
     CustomInfox.destroy()
-
-# LEGACY: closes custom division by zero error dialog, which doesn't exist anymore
-def closeCustomDiv0() :
-    global Div0Error
-    Div0Error.destroy()
 
 # shows error dialogs
 def showError(message):
@@ -572,8 +483,14 @@ def showError(message):
         ErrorTextLabel.grid(row=0, column=0)
     else:
         if platform.system() == "Windows":
-            if CurrentMsgBoxStyle == 2:
+            if MsgBoxStyles[CurrentMsgBoxStyle] == "VBScript":
                 subprocess.Popen(["wscript", VBSErrorPath, message])
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "Windows Messaging Service":
+                subprocess.Popen(["msg", getpass.getuser(), message])
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "Windows Shutdown":
+                subprocess.Popen(["shutdown", "/s", "/t", "60", "/c", message])
+                time.sleep(10)
+                subprocess.Popen(["shutdown", "/a"])
             else:
                 print("ERROR: Unknown Message Box Style")
         else:
@@ -585,6 +502,9 @@ def showError(message):
                 subprocess.Popen(["kdialog", "--title=Error", "--error", message])
             elif MsgBoxStyles[CurrentMsgBoxStyle] == "zenity":
                 subprocess.Popen(["zenity", "--title=Error", "--error", "--text=" + message])
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "AppleScript":
+                asc = f'display dialog "{message}" with icon stop'
+                subprocess.run(["osascript", "-e", asc])
             else:
                 print("ERROR: Unknown Message Box Style")
 
@@ -593,54 +513,50 @@ def closeError():
     global ErrorWindow
     ErrorWindow.destroy()
 
-# LEGACY: used to change the font size of the calculator output dynamically
-def SizeReload() :
-    pass
+# help GUI
+def helpGUI():
+    global HelpWindow, DarkMode
+    HelpWindow = tk.Toplevel(MainWindow)
+    HelpWindow.rowconfigure(0, weight=1)
+    HelpWindow.columnconfigure(0, weight=1)
+    HelpWindow.title("PraktiCalc Help")
+    if platform.system() == "Windows":
+        HelpWindow.focus_force()
+    changeTheme(HelpWindow)
+    HelpFrame = ttk.Frame(HelpWindow)
+    HelpFrame.rowconfigure(0, weight=1)
+    HelpFrame.columnconfigure(0, weight=1)
+    HelpFrame.grid(row=0, column=0, sticky="nesw")
+    HelpTabs = ttk.Notebook(HelpFrame)
+    Content1 = tk.Text(HelpTabs)
+    if DarkMode == True:
+        Content1.config(fg="white", bg="black")
+    Content1.pack(fill="both", expand=True)
+    HelpTabs.add(Content1, text="Placeholder")
+    HelpTabs.grid(row=0, column=0, sticky="nesw")
+    Content1.insert(tk.END, """This feature is currently not ready for use.
 
-# LEGACY: informed the user about the former 15 character limit
-def CharacterStatus() :
-    global Status, StatusBar
-    if StatusBar == True :
-        Status.config(text="PraktiCalc only supports up to 15 characters!")
+If you need help, you can look at the GitHub README.""")
+    Content1.config(state="disabled")
 
 # backspace button
 def Backspace() :
-    global Input1, Input2
-    if Stage == 1 :
-        Input1 = Input1[:len(Input1) - 1]
-    if Stage == 2 :
-        Input1 = Input1[:len(Input1) - 1]
-    if Stage == 4 :
-        Input2 = Input2[:len(Input2) - 1]
-    if Stage == 5 :
-        Input2 = Input2[:len(Input2) - 1]
+    global Calculation
+    if Calculation == "0":
+        pass
+    elif len(Calculation) <= 1:
+        Calculation = "0"
+    else:
+        Calculation = Calculation[:-1]
     updateDisplay()
 
 # updates output
 def updateDisplay() :
-    global Input1, Output, Input2, Stage
-    if Stage == 5 :
-        Output.config(text=Input2)
-        if not "." in Input2 :
-            Stage = 4
-    if Stage == 4 :
-        Output.config(text=Input2)
-        if len(Input2) == 0 :
-            Stage = 3
-            Input2 = "0"
-    if Stage == 3 :
-        Output.config(text=Input2)
-    if Stage == 2 :
-        Output.config(text=Input1)
-        if not "." in Input1 :
-            Stage = 1
-    if Stage == 1 :
-        Output.config(text=Input1)
-        if len(Input1) == 0 :
-            Stage= 0
-    if Stage == 0 :
-        Output.config(text="0")
-    SizeReload()
+    global Calculation, BorderDisplay, MainWindow
+    if BorderDisplay == True:
+        MainWindow.title(Calculation)
+    else:
+        Output.config(text=Calculation)
 
 # history window
 def History() :
@@ -656,58 +572,15 @@ def History() :
     changeTheme(HistoryX)
     HistoryWindowFrame = ttk.Frame(HistoryX)
     HistoryWindowFrame.columnconfigure(0, weight=1)
-    for i in range(31):
-        HistoryWindowFrame.rowconfigure(i, weight=1)
+    HistoryWindowFrame.rowconfigure(0, weight=1)
     HistoryWindowFrame.grid(row=0, column=0, sticky="nesw")
-    labelrow = -2
-    separatorrow = -1
-    for widgetnumber in range(15):
-        labelrow += 2
-        separatorrow += 2
-        try:
-            ttk.Label(HistoryWindowFrame, text=historylist[widgetnumber]).grid(row=labelrow, column=0, sticky="nesw")
-            ttk.Separator(HistoryWindowFrame, orient="horizontal").grid(row=separatorrow, column=0, sticky="nesw")
-        except:
-            break
+    HistoryTreeview = ttk.Treeview(HistoryWindowFrame, height=15)
+    HistoryTreeview.heading("#0", text="History")
+    for entry in historylist:
+        HistoryTreeview.insert("", tk.END, text=entry)
     HistoryClearButton = ttk.Button(HistoryWindowFrame, text="Clear History", command=clearHistory)
-    HistoryClearButton.grid(row=30, column=0, sticky="nesw", padx=5, pady=5)
-
-# +/- button function
-def minus() :
-    global Input1, Input2, Output, Stage
-    if Stage == 4 or Stage == 5:
-        if Input2[0] != "-" :
-            Input2 = "-" + str(Input2)
-            Output.config(text=Input2)
-        else:
-            Input2 = Input2[1:]
-            Output.config(text=Input2)
-    if Stage == 3 :
-        if Input2[0] != "-" :
-            Input2 = "-"
-            Output.config(text=Input2)
-            Stage = 4
-    if Stage == 1 or Stage == 2:
-        if Input1[0] != "-" :
-            Input1 = "-" + str(Input1)
-            Output.config(text=Input1)
-        else:
-            Input1 = Input1[1:]
-            Output.config(text=Input1)
-    if Stage == 0 :
-        if Input1[0] != "-" :
-            Input1 = "-"
-            Output.config(text=Input1)
-            Stage = 1
-    SizeReload()
-
-# sqrt button
-def rooty() :
-    global Operator, Stage
-    Operator = "sqrt"
-    if Stage == 1 or Stage == 2:
-        Stage = 3
-    calc()
+    HistoryTreeview.grid(row=0, column=0, sticky="nesw")
+    HistoryClearButton.grid(row=1, column=0, sticky="nesw", padx=5, pady=5)
 
 # window for additional calculating stuff, cuttently only with a decimal number converter
 def More() :
@@ -788,6 +661,26 @@ def copyhex() :
     MainWindow.clipboard_append(HexadecimalNumber)
     MainWindow.update()
 
+# copies the result
+def copyResult():
+    global MainWindow
+    MainWindow.clipboard_clear()
+    MainWindow.clipboard_append(Output.cget("text"))
+    MainWindow.update()
+
+# sets the memory to the output
+def setMemory():
+    global M
+    M = Output.cget("text")
+
+def getMemory():
+    global M, Calculation
+    if Calculation == "0":
+        Calculation = M
+    else:
+        Calculation += M
+    updateDisplay()
+
 # clears the history
 def clearHistory() :
     global HistoryX
@@ -797,13 +690,10 @@ def clearHistory() :
 
 # debug function to print some variables
 def xcheck() :
-    print("Stage: " + str(Stage))
-    print("Input1: " + str(Input1))
-    print("Input2: " + str(Input2))
-    print("Operator: " + str(Operator))
-    print("FinalResult: " + str(FinalResult))
-    print("aFinalResult: " + str(aFinalResult))
-    print("____________________________")
+    print(f"""----------------------------------------------------
+Calculation: {Calculation}
+M: {M}
+----------------------------------------------------""")
 
 # quits the program
 def xquit() :
@@ -816,15 +706,19 @@ MainWindow = tk.Tk()
 MainWindow.title("PraktiCalc")
 MainWindow.icon_mono = tk.BitmapImage(file=PraktiCalcIconMonoPath)
 MainWindow.icon = tk.PhotoImage(file=PraktiCalcIconPath)
+if platform.system() == "Darwin":
+    MainWindow.macicon = tk.PhotoImage(file=PraktiCalcMacIconPath)
+    MainWindow.iconphoto(True, MainWindow.macicon)
+else:
+    MainWindow.iconphoto(True, MainWindow.icon)
 MainWindow.icon_mono_inverted = tk.BitmapImage(file=PraktiCalcIconMonoInvertedPath)
-MainWindow.iconphoto(True, MainWindow.icon)
 if WingWebDings == True:
     wingdingsfont = font.Font(family="Wingdings")
     webdingsfont = font.Font(family="Webdings")
 else:
     LargeUnicodeFont = font.Font(family="TkDefaultFont", size=14)
 DarkModeTkVar = tk.BooleanVar(value=DarkMode)
-StatusBarTkVar = tk.BooleanVar(value=StatusBar)
+BorderDisplayTkVar = tk.BooleanVar(value=BorderDisplay)
 MainWindow.config(width=256, height=315)
 if console == True:
 
@@ -852,6 +746,8 @@ if console == True:
 
     # interpretes and executed a given command in the console
     def executeTheCommand(cominput):
+        global lcc
+        lcc = cominput
         ConsoleInput.delete(0, tk.END)
         if cominput == "version":
             comoutput = "PraktiCalc Console on PraktiCalc " + PraktiCalcVersion
@@ -910,6 +806,9 @@ Useful Tips:
         ConsoleKey = event.keysym
         if ConsoleKey == "Return":
             executeTheCommand(ConsoleInput.get())
+        elif ConsoleKey == "Up":
+            ConsoleInput.delete(0, tk.END)
+            ConsoleInput.insert(0, lcc)
     ConsoleWindow = tk.Toplevel(MainWindow)
     ConsoleWindow.title("PraktiCalc Console")
     ConsoleWindow.config(bg="black")
@@ -931,82 +830,108 @@ MainWindow.rowconfigure(0, weight=1)
 MainWindow.columnconfigure(0, weight=1)
 changeTheme(MainWindow)
 WindowFrame = ttk.Frame(MainWindow)
-for colrow in range(5):
+for colrow in range(6):
     WindowFrame.rowconfigure(colrow, weight=1, uniform="buttons")
     WindowFrame.columnconfigure(colrow, weight=1, uniform="buttons")
-WindowFrame.rowconfigure(5, weight=1)
+WindowFrame.rowconfigure(6, weight=1)
+if BorderDisplay == True:
+    WindowFrame.rowconfigure(0, weight=0, uniform="")
 Outputframe = ttk.Frame(WindowFrame, borderwidth=1, relief="sunken")
 Output = ttk.Label(Outputframe, text="0")
 # Buttons
-PlusButton = ttk.Button(WindowFrame, text="+", command=lambda: processOperator("+"))
-MinusButton = ttk.Button(WindowFrame, text="-", command=lambda: processOperator("-"))
-MultiplyButton = ttk.Button(WindowFrame, text="x", command=lambda: processOperator("*"))
-DivideButton = ttk.Button(WindowFrame, text="÷", command=lambda: processOperator("/"))
-SevenButton = ttk.Button(WindowFrame, text="7", command=lambda: processNumber("7"))
-EightButton = ttk.Button(WindowFrame, text="8", command=lambda: processNumber("8"))
-NineButton = ttk.Button(WindowFrame, text="9", command=lambda: processNumber("9"))
+PlusButton = ttk.Button(WindowFrame, text="+", command=lambda: appendToCalculation("plus"))
+MinusButton = ttk.Button(WindowFrame, text="-", command=lambda: appendToCalculation("minus"))
+MultiplyButton = ttk.Button(WindowFrame, text="x", command=lambda: appendToCalculation("asterisk"))
+DivideButton = ttk.Button(WindowFrame, text="÷", command=lambda: appendToCalculation("slash"))
+SevenButton = ttk.Button(WindowFrame, text="7", command=lambda: appendToCalculation("7"))
+EightButton = ttk.Button(WindowFrame, text="8", command=lambda: appendToCalculation("8"))
+NineButton = ttk.Button(WindowFrame, text="9", command=lambda: appendToCalculation("9"))
 CEButton = ttk.Button(WindowFrame, text="CE", command=clear)
-FourButton = ttk.Button(WindowFrame, text="4", command=lambda: processNumber("4"))
-FiveButton = ttk.Button(WindowFrame, text="5", command=lambda: processNumber("5"))
-SixButton = ttk.Button(WindowFrame, text="6", command=lambda: processNumber("6"))
-CommaButton = ttk.Button(WindowFrame, text=",", command=comma)
-OneButton = ttk.Button(WindowFrame, text="1", command=lambda: processNumber("1"))
-TwoButton = ttk.Button(WindowFrame, text="2", command=lambda: processNumber("2"))
-ThreeButton = ttk.Button(WindowFrame, text="3", command=lambda: processNumber("3"))
+FourButton = ttk.Button(WindowFrame, text="4", command=lambda: appendToCalculation("4"))
+FiveButton = ttk.Button(WindowFrame, text="5", command=lambda: appendToCalculation("5"))
+SixButton = ttk.Button(WindowFrame, text="6", command=lambda: appendToCalculation("6"))
+CommaButton = ttk.Button(WindowFrame, text=",", command=lambda: appendToCalculation("comma"))
+OneButton = ttk.Button(WindowFrame, text="1", command=lambda: appendToCalculation("1"))
+TwoButton = ttk.Button(WindowFrame, text="2", command=lambda: appendToCalculation("2"))
+ThreeButton = ttk.Button(WindowFrame, text="3", command=lambda: appendToCalculation("3"))
 EqualButton = ttk.Button(WindowFrame, text="=", command=calc)
-InfoButton = ttk.Button(WindowFrame, text="i", command=info)
+InfoButton = ttk.Button(WindowFrame, text="i", command=CustomInfo)
 ZeroButton = ttk.Button(WindowFrame, text="0", command=zero)
 ExitButton = ttk.Button(WindowFrame, text="X", command=xquit)
-Status = ttk.Label(WindowFrame, text="")
-StatusDecoration = ttk.Label(WindowFrame, text="")
-NewStatusDecoration = ttk.Separator(WindowFrame, orient="horizontal")
+LeftParenButton = ttk.Button(WindowFrame, text="(", command=lambda: appendToCalculation("parenleft"))
+RightParenButton = ttk.Button(WindowFrame, text=")", command=lambda: appendToCalculation("parenright"))
 if WingWebDings == True:
     SettingsButton = ttk.Button(WindowFrame, text="@", command=Settings, style="Webdings.TButton")
     BackspaceButton = ttk.Button(WindowFrame, text="Õ", command=Backspace, style="Wingdings.TButton")
     HistoryButton = ttk.Button(WindowFrame, text="0", command=History, style="Wingdings.TButton")
+    CopyButton = ttk.Button(WindowFrame, text="4", command=copyResult, style="Wingdings.TButton")
 else:
     SettingsButton = ttk.Button(WindowFrame, text="\u26ed", command=Settings, style="LargeUnicode.TButton")
     BackspaceButton = ttk.Button(WindowFrame, text="\u232b", command=Backspace)
     HistoryButton = ttk.Button(WindowFrame, text="\u23f2", command=History, style="LargeUnicode.TButton")
-MButton = ttk.Button(WindowFrame, text="±", command=minus)
+    CopyButton = ttk.Button(WindowFrame, text="\u2398", command=copyResult, style="LargeUnicode.TButton")
+HelpButton = ttk.Button(WindowFrame, text="?", command=helpGUI)
 Checkb = ttk.Button(MainWindow, text="Check", command=xcheck) # some debug thing
-sqrtButton = ttk.Button(WindowFrame, text="√", command=rooty)
+sqrtButton = ttk.Button(WindowFrame, text="\u221a", command=lambda: appendToCalculation("\u221a" + "("))
 More = ttk.Button(WindowFrame, text="...", command=More)
+PowerButton = ttk.Button(WindowFrame, text="x^y", command=lambda: appendToCalculation("^"))
+SetMemoryButton = ttk.Button(WindowFrame, text="SM", command=setMemory)
+GetMemoryButton = ttk.Button(WindowFrame, text="GM", command=getMemory)
+SinButton = ttk.Button(WindowFrame, text="sin", command=lambda: appendToCalculation("sin("))
+CosButton = ttk.Button(WindowFrame, text="cos", command=lambda: appendToCalculation("cos("))
+TanButton = ttk.Button(WindowFrame, text="tan", command=lambda: appendToCalculation("tan("))
+LdButton = ttk.Button(WindowFrame, text="ld", command=lambda: appendToCalculation("ld("))
+LnButton = ttk.Button(WindowFrame, text="ln", command=lambda: appendToCalculation("ln("))
+LgButton = ttk.Button(WindowFrame, text="lg", command=lambda: appendToCalculation("lg("))
 WindowFrame.grid(row=0, column=0, sticky="nesw")
-Outputframe.grid(row=0, column=0, columnspan=4, sticky="nesw")
+if not BorderDisplay == True:
+    Outputframe.grid(row=0, column=0, columnspan=4, sticky="nesw")
+    CopyButton.grid(row=0, column=4, sticky="nesw")
+    BackspaceButton.grid(row=0, column=5, sticky="nesw")
+    ExitButton.grid(row=6, column=0, sticky="nesw")
+else:
+    BackspaceButton.grid(row=6, column=0, sticky="nesw")
 Output.pack(pady=1)
-PlusButton.grid(row=1, column=1, sticky="nesw")
-MinusButton.grid(row=1, column=2, sticky="nesw")
-MultiplyButton.grid(row=1, column=3, sticky="nesw")
-DivideButton.grid(row=1, column=4, sticky="nesw")
-SevenButton.grid(row=2, column=1, sticky="nesw")
-EightButton.grid(row=2, column=2, sticky="nesw")
-NineButton.grid(row=2, column=3, sticky="nesw")
+PlusButton.grid(row=1, column=5, sticky="nesw")
+MinusButton.grid(row=2, column=5, sticky="nesw")
+MultiplyButton.grid(row=3, column=5, sticky="nesw")
+DivideButton.grid(row=4, column=5, sticky="nesw")
+SevenButton.grid(row=3, column=2, sticky="nesw")
+EightButton.grid(row=3, column=3, sticky="nesw")
+NineButton.grid(row=3, column=4, sticky="nesw")
 CEButton.grid(row=2, column=4, sticky="nesw")
-FourButton.grid(row=3, column=1, sticky="nesw")
-FiveButton.grid(row=3, column=2, sticky="nesw")
-SixButton.grid(row=3, column=3, sticky="nesw")
-CommaButton.grid(row=5, column=3, sticky="nesw")
-OneButton.grid(row=4, column=1, sticky="nesw")
-TwoButton.grid(row=4, column=2, sticky="nesw")
-ThreeButton.grid(row=4, column=3, sticky="nesw")
-EqualButton.grid(row=5, column=4, sticky="nesw")
+FourButton.grid(row=4, column=2, sticky="nesw")
+FiveButton.grid(row=4, column=3, sticky="nesw")
+SixButton.grid(row=4, column=4, sticky="nesw")
+CommaButton.grid(row=6, column=4, sticky="nesw")
+OneButton.grid(row=5, column=2, sticky="nesw")
+TwoButton.grid(row=5, column=3, sticky="nesw")
+ThreeButton.grid(row=5, column=4, sticky="nesw")
+EqualButton.grid(row=6, column=5, sticky="nesw")
 InfoButton.grid(row=1, column=0, sticky="nesw")
-ZeroButton.grid(row=5, column=1, columnspan=2, sticky="nesw")
-MButton.grid(row=4, column=4, sticky="nesw")
-sqrtButton.grid(row=3, column=4, sticky="nesw")
-ExitButton.grid(row=5, column=0, sticky="nesw")
-Status.grid(row=7, column=0, columnspan=5, sticky="nesw")
-# StatusDecoration.grid(row=6, column=0, columnspan=5, sticky="nesw")
-NewStatusDecoration.grid(row=6, column=0, columnspan=5, sticky="nesw", pady=2)
+ZeroButton.grid(row=6, column=2, columnspan=2, sticky="nesw")
+HelpButton.grid(row=5, column=0, sticky="nesw")
+sqrtButton.grid(row=5, column=5, sticky="nesw")
 SettingsButton.grid(row=2, column=0, sticky="nesw")
-BackspaceButton.grid(row=0, column=4, sticky="nesw")
 HistoryButton.grid(row=4, column=0, sticky="nesw")
+LeftParenButton.grid(row=2, column=2, sticky="nesw")
+RightParenButton.grid(row=2, column=3, sticky="nesw")
+PowerButton.grid(row=1, column=4, sticky="nesw")
+SetMemoryButton.grid(row=1, column=2, sticky="nesw")
+GetMemoryButton.grid(row=1, column=3, sticky="nesw")
+SinButton.grid(row=1, column=1, sticky="nesw")
+CosButton.grid(row=2, column=1, sticky="nesw")
+TanButton.grid(row=3, column=1, sticky="nesw")
+LdButton.grid(row=4, column=1, sticky="nesw")
+LnButton.grid(row=5, column=1, sticky="nesw")
+LgButton.grid(row=6, column=1, sticky="nesw")
 MainWindow.bind("<Key>", KeyPress)
 More.grid(row=3, column=0, sticky="nesw")
 if debug == True:
     Checkb.grid(row=1, column=0, sticky="nesw")
-if big == False:
+if platform.system() == "Darwin":
+    pass
+elif big == False:
     MainWindow.geometry("250x250")
 else:
     MainWindow.geometry("400x400")
