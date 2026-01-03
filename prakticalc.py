@@ -302,7 +302,7 @@ def appendToCalculation(char):
     char = char.replace("comma", ".")
     char = char.replace("parenleft", "(")
     char = char.replace("parenright", ")")
-    if Calculation == "0":
+    if Calculation == "0" and char != ".":
         Calculation = char
     else:
         Calculation += char
