@@ -6,7 +6,7 @@ PraktiCalc is a simple calculator written in Python, compatible with Windows 7+ 
 There are not that many actually useful functions provided by PraktiCalc which don't exist in a modern calculator. But you have support and integration for Linux and Windows, especially for messagebox dialog tools like zenity, kdialog and xmessage on Linux and VBS MsgBoxes on Windows. 
 All that together with number conversion and great DPI scaling, it can be great and it will be even better in the future. Also make sure to use ```--big``` if the window is too small.
 I plan to continue development after this one-year-break, because it's great for learning. And why develop some testing thing to throw away to learn, when you can put that work to improve an existing project?
-Back to the features, you can also use your keyboard to type numbers into the calculator. You can also build it yourself using the build scripts. In theory, you can also even build on Windows Vista, because Python 3.8 is compatible with it, and I keep supporting Python 3.8 because I want Windows 7 compatibility. 
+Back to the features, you can also use your keyboard to type numbers into the calculator. You can also build it yourself using the build scripts. In theory, you can also even build on Windows Vista, because Python 3.7 is compatible with it, and I keep supporting Python 3.8 because I want Windows 7 compatibility. 
 Windows XP is basically confirmed to be incompatible, at least because of f-Strings. Building on there won't work.
 
 #### Get PraktiCalc
