@@ -259,6 +259,7 @@ def calc() :
     except Exception:
         showError("Error, please check your input for mistakes")
         return
+    Result = str(round(float(Result), 12))
     if str(Result).endswith(".0"):
         Result = str(Result)[:-2]
     else:
