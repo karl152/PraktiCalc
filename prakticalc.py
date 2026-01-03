@@ -34,7 +34,7 @@ import os
 # variables
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.3.1"
+PraktiCalcVersion = "1.3.2"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 if platform.system() == "Windows":
     MsgBoxStyles = ["Tkinter", "Alternative", "VBS"]
@@ -294,6 +294,7 @@ def calc() :
         historylist.pop(0)
     if Stage == 6 :
         aFinalResult = FinalResult
+        aFinalResult = round(float(aFinalResult), 12)
         if str(aFinalResult).endswith(".0"):
             aFinalResult = int(str(aFinalResult)[:-2])
         if Operator in SimpleOperators:
@@ -310,6 +311,7 @@ def calc() :
                     return
                 else:
                     FinalResult = FinalResult / float(Input2)
+            FinalResult = round(float(FinalResult), 12)
             if str(FinalResult).endswith(".0"):
                 FinalResult = int(str(FinalResult)[:-2])
             Output.config(text=str(FinalResult))
@@ -320,6 +322,7 @@ def calc() :
                 clear()
             else:
                 FinalResult = FinalResult ** 0.5
+                FinalResult = round(float(FinalResult), 12)
                 if str(FinalResult).endswith(".0"):
                     FinalResult = int(str(FinalResult)[:-2])
                 Output.config(text=str(FinalResult))
@@ -340,6 +343,7 @@ def calc() :
                     return
                 else:
                     FinalResult = (float(Input1) / float(Input2))
+            FinalResult = round(float(FinalResult), 12)
             if str(FinalResult).endswith(".0"):
                 FinalResult = int(str(FinalResult)[:-2])
             Output.config(text=str(FinalResult))
@@ -350,6 +354,7 @@ def calc() :
                 clear()
             else:
                 Input2 = float(Input1) ** 0.5
+                Input2 = round(float(Input2), 12)
                 if str(Input2).endswith(".0"):
                     Input2 = int(str(Input2)[:-2])
                 Output.config(text=str(Input2))
@@ -359,6 +364,7 @@ def calc() :
                 clear()
             else:
                 FinalResult = float(Input1) ** 0.5
+                FinalResult = round(float(FinalResult), 12)
                 if str(FinalResult).endswith(".0"):
                     FinalResult = int(str(FinalResult)[:-2])
                 Output.config(text=str(FinalResult))
