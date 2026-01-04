@@ -1,5 +1,5 @@
 # PraktiCalc - a practical calculator written in Python
-# Copyright (C) 2024-2025 Karl "karl152"
+# Copyright (C) 2024-2026 Karl "karl152"
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -97,6 +97,7 @@ if CLIHelp == True:
         if platform.system() != "Darwin":
             print("--breeze        | set the light theme to breeze")
             print("--yaru          | set the light theme to yaru")
+            print("--keramik       | set the light theme to keramik")
             print("--equilux       | set the dark theme to equilux")
         print("--help          | display this help text and exit")
         print("--version       | display version and exit")
@@ -151,6 +152,7 @@ else:
 console = "--console" in sys.argv
 breeze = "--breeze" in sys.argv
 yaru = "--yaru" in sys.argv
+keramik = "--keramik" in sys.argv
 equilux = "--equilux" in sys.argv
 if platform.system() != "Darwin":
     big = "--big" in sys.argv
@@ -160,6 +162,8 @@ if breeze == True:
     thettktheme = "breeze"
 elif yaru == True:
     thettktheme = "yaru"
+elif keramik == True:
+    thettktheme = "keramik"
 else:
     thettktheme = "plastik"
 if equilux == True:
