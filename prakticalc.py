@@ -517,7 +517,7 @@ def closeError():
     global ErrorWindow
     ErrorWindow.destroy()
 
-# help GUI
+# LEGACY: help GUI (kept for use in the distant future)
 def helpGUI():
     global HelpWindow, DarkMode
     HelpWindow = tk.Toplevel(MainWindow)
@@ -874,7 +874,7 @@ else:
     BackspaceButton = ttk.Button(WindowFrame, text="\u232b", command=Backspace)
     HistoryButton = ttk.Button(WindowFrame, text="\u23f2", command=History, style="LargeUnicode.TButton")
     CopyButton = ttk.Button(WindowFrame, text="\u2398", command=copyResult, style="LargeUnicode.TButton")
-HelpButton = ttk.Button(WindowFrame, text="?", command=helpGUI)
+ModuloButton = ttk.Button(WindowFrame, text="%", command=lambda: appendToCalculation("%"))
 Checkb = ttk.Button(MainWindow, text="Check", command=xcheck) # some debug thing
 sqrtButton = ttk.Button(WindowFrame, text="\u221a", command=lambda: appendToCalculation("\u221a" + "("))
 More = ttk.Button(WindowFrame, text="...", command=More)
@@ -914,7 +914,7 @@ ThreeButton.grid(row=5, column=4, sticky="nesw")
 EqualButton.grid(row=6, column=5, sticky="nesw")
 InfoButton.grid(row=1, column=0, sticky="nesw")
 ZeroButton.grid(row=6, column=2, columnspan=2, sticky="nesw")
-HelpButton.grid(row=5, column=0, sticky="nesw")
+ModuloButton.grid(row=5, column=0, sticky="nesw")
 sqrtButton.grid(row=5, column=5, sticky="nesw")
 SettingsButton.grid(row=2, column=0, sticky="nesw")
 HistoryButton.grid(row=4, column=0, sticky="nesw")
