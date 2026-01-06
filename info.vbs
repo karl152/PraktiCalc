@@ -6,4 +6,4 @@ Option Explicit
 Dim PraktiCalcVersion, pyver
 PraktiCalcVersion = WScript.Arguments(0)
 pyver = WScript.Arguments(1)
-MsgBox "PraktiCalc" & vbCrLf & "Version " & PraktiCalcVersion & vbCrLf & "running on Python " & pyver & vbCrLf & "Licensed under GPLv3" & vbCrLf & "read more at https://www.gnu.org/licenses/", 64, "About PraktiCalc"
+MsgBox "PraktiCalc" & vbCrLf & "Version " & PraktiCalcVersion & vbCrLf & "running on Python " & pyver & vbCrLf & "Licensed under GPLv3" & vbCrLf & "read more at https://www.gnu.org/licenses/" & vbCrLf & "themes provided by the ttkthemes library", 64, "About PraktiCalc"

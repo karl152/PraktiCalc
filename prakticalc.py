@@ -399,7 +399,7 @@ def toggleBorderDisplay():
 # info window
 def CustomInfo() :
     global CustomInfox
-    infotext = "PraktiCalc\nVersion " + PraktiCalcVersion + "\nrunning on Python "+ platform.python_version() + "\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/"
+    infotext = "PraktiCalc\nVersion " + PraktiCalcVersion + "\nrunning on Python "+ platform.python_version() + "\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/\nthemes provided by the ttkthemes library"
     if CurrentMsgBoxStyle == 0:
         messagebox.showinfo("About PraktiCalc", infotext)
     elif CurrentMsgBoxStyle == 1:
