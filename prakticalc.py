@@ -34,7 +34,7 @@ import os
 # variables
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.3.2"
+PraktiCalcVersion = "1.3.3"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 if platform.system() == "Windows":
     MsgBoxStyles = ["Tkinter", "Alternative", "VBS"]
@@ -71,11 +71,13 @@ if CLIHelp == True:
         print("PraktiCalc " + PraktiCalcVersion + " CLI Options")
         print("--big     | start with bigger main window")
         print("--debug   | add a test button for debugging")
-        print("--dark    | enable dark mode by default")
+        if theming != 0:
+            print("--dark    | enable dark mode by default")
         print("--console | show console for debugging")
-        print("--breeze  | set the light theme to breeze")
-        print("--yaru    | set the light theme to yaru")
-        print("--equilux | set the dark theme to equilux")
+        if theming != 0:
+            print("--breeze  | set the light theme to breeze")
+            print("--yaru    | set the light theme to yaru")
+            print("--equilux | set the dark theme to equilux")
         print("--help    | display this help text and exit")
         print("--version | display version and exit")
     sys.exit(0)
@@ -423,6 +425,8 @@ def Settings() :
     if CustomMsgBox == True :
         CustomMsgBoxToggle.state(["selected"])
     DarkModeToggle = ttk.Checkbutton(SettingsWindowFrame, text="Dark Mode", command=ChangeDarkMode, variable=DarkModeTkVar)
+    if theming == 0:
+        DarkModeToggle.configure(state="disabled")
     MsgBoxStyleFrame = ttk.LabelFrame(SettingsWindowFrame, text="Messagebox Style")
     MsgBoxStyleFrame.columnconfigure(0, weight=1)
     MsgBoxStyleSelect = ttk.Combobox(MsgBoxStyleFrame, values=MsgBoxStyles)
