@@ -71,6 +71,8 @@ else:
             MsgBoxStyles.append(MsgBoxStyle)
 CurrentMsgBoxStyle = 1
 ThemingDisabled = "--notheming" in sys.argv
+if ThemingDisabled == True:
+    theming = 0
 if CLIHelp == True:
     if platform.system() == "Windows":
         messagebox.showinfo("PraktiCalc CLI Options", "PraktiCalc " + PraktiCalcVersion + """ CLI Options:
@@ -190,7 +192,7 @@ lcc = "" # last console command
 # sets the theme for a given window
 def changeTheme(WindowName):
     global theming
-    if platform.system() == "Darwin" or ThemingDisabled == True:
+    if platform.system() == "Darwin":
         pass
         return
     elif platform.system() == "Windows":
