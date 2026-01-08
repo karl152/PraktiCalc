@@ -257,7 +257,7 @@ def actuallyInstall():
             Progress.config(value=5)
             print(subprocess.getoutput(r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /v DisplayName /t REG_SZ /d "PraktiCalc" /f'))
             Progress.config(value=6)
-            print(subprocess.getoutput(r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /v DisplayVersion /t REG_SZ /d "1.4test1" /f'))
+            print(subprocess.getoutput(r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /v DisplayVersion /t REG_SZ /d "1.4" /f'))
             Progress.config(value=7)
             print(subprocess.getoutput(r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /v UninstallString /t REG_SZ /d "C:\Program Files\PraktiCalc\PraktiCalcUninstaller\PraktiCalcUninstaller.exe" /f'))
             Progress.config(value=8)
