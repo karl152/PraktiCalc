@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# PraktiCalc © 2024-2025 Karl "karl152"
+# PraktiCalc © 2024-2026 Karl "karl152"
 # Licensed under the GNU General Public License v3.0.
 # See https://www.gnu.org/licenses/gpl-3.0.txt for details.
 
@@ -20,6 +20,11 @@ cp ./PraktiCalculator_icon.xbm linux-pkg-builds/debian/prakticalc/usr/share/prak
 gunzip linux-pkg-builds/debian/prakticalc/usr/share/doc/prakticalc/changelog.gz
 nano linux-pkg-builds/debian/prakticalc/usr/share/doc/prakticalc/changelog
 gzip -n -9 linux-pkg-builds/debian/prakticalc/usr/share/doc/prakticalc/changelog
+
+# edit manpage
+gunzip linux-pkg-builds/debian/prakticalc/usr/share/man/man1/prakticalc.1.gz
+nano linux-pkg-builds/debian/prakticalc/usr/share/man/man1/prakticalc.1
+gzip -n -9 linux-pkg-builds/debian/prakticalc/usr/share/man/man1/prakticalc.1
 
 # set permissions
 cd linux-pkg-builds/debian/prakticalc/
