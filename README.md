@@ -1,6 +1,6 @@
 # PraktiCalc
 A practical calculator with GUI featuring a calculating history, a decimal number converter & dark mode, as well as integration for many dialog tools.
-<img alt="PraktiCalc Screenshot" src="https://raw.githubusercontent.com/karl152/PraktiCalcScreenshots/refs/heads/main/PraktiCalc1.3.1.png"/>
+<img alt="PraktiCalc Screenshot" src="https://raw.githubusercontent.com/karl152/PraktiCalcScreenshots/refs/heads/main/PraktiCalc1.4.png"/>
 
 PraktiCalc is a simple calculator written in Python, compatible with Windows 7+ and Linux. MacOS support is planned but not possible at the moment, as I don't have any MacOS hardware yet.
 There are not that many actually useful functions provided by PraktiCalc which don't exist in a modern calculator. But you have support and integration for Linux and Windows, especially for messagebox dialog tools like zenity, kdialog and xmessage on Linux and VBS MsgBoxes on Windows. 
