@@ -52,5 +52,4 @@ Remove-Item .\content\PraktiCalcUninstaller -Recurse -Force
 Remove-Item .\content\_internal -Recurse -Force
 Write-Host "Done!"
 }
-
 else{Write-Host "No valid build mode selected. Available modes: portable, installer"}
