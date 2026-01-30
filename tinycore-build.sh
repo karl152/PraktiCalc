@@ -10,6 +10,9 @@ sed -i "s/bash/sh/g" linux-pkg-builds/tce/usr/bin/prakticalc
 sed -i "s|/usr/bin/python3|/usr/local/bin/python3.9|g" linux-pkg-builds/tce/usr/bin/prakticalc
 cp prakticalc.py linux-pkg-builds/tce/usr/share/prakticalc/
 cp *_icon* linux-pkg-builds/tce/usr/share/prakticalc/
+cp -r linux-pkg-builds/debian/prakticalc/usr/share/applications/ linux-pkg-builds/tce/usr/share/applications
+cp -r linux-pkg-builds/debian/prakticalc/usr/share/icons/ linux-pkg-builds/tce/usr/share/icons
+cp LICENSE linux-pkg-builds/tce/usr/share/prakticalc/
 chmod +x linux-pkg-builds/tce/usr/bin/prakticalc
 echo "creating prakticalc.tcz..."
 cd linux-pkg-builds
@@ -26,6 +29,7 @@ echo "Description:	A Practical Calculator written in Python" >> prakticalc.tcz.i
 echo "Version:	1.3" >> prakticalc.tcz.info
 echo 'Author:		Karl "karl152"' >> prakticalc.tcz.info
 echo "License:	GPL-3.0" >> prakticalc.tcz.info
+echo "Dependencies:	python3.9.tcz tk8.6.tcz" >> prakticalc.tcz.info
 echo "created info file"
 md5sum prakticalc.tcz > prakticalc.tcz.md5.txt
 echo "created md5 checksum file"
