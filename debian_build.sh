@@ -4,6 +4,13 @@
 # Licensed under the GNU General Public License v3.0.
 # See https://www.gnu.org/licenses/gpl-3.0.txt for details.
 
+# REQUIREMENTS
+# - Debian stable
+# - python3
+# - python3-tk
+# - python3-ttkthemes
+# - python3-simpleeval
+
 # clean up last build
 rm linux-pkg-builds/debian/prakticalc.deb
 
