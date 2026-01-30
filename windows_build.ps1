@@ -2,6 +2,12 @@
 # Licensed under the GNU General Public License v3.0.
 # See https://www.gnu.org/licenses/gpl-3.0.txt for details.
 
+# REQUIREMENTS
+# - Windows 7 or newer
+# - PowerShell 2+ with 7-Zip or PowerShell 5/7
+# - Python 3.8 or newer with tkinter and pip
+# - PIP Modules: ttkthemes, simpleeval, pyinstaller
+
 $mode = $args[0]
 
 if ($mode -eq "portable"){
@@ -46,4 +52,5 @@ Remove-Item .\content\PraktiCalcUninstaller -Recurse -Force
 Remove-Item .\content\_internal -Recurse -Force
 Write-Host "Done!"
 }
+
 else{Write-Host "No valid build mode selected. Available modes: portable, installer"}
