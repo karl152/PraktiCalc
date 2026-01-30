@@ -4,6 +4,13 @@
 # Licensed under the GNU General Public License v3.0.
 # See https://www.gnu.org/licenses/gpl-3.0.txt for details.
 
+# REQUIREMENTS FOR DEBIAN
+# - python3
+# - python3-tk
+# - python3-ttkthemes
+# - python3-simpleeval
+# - python3-pyinstaller
+
 echo "Cleaning"
 rm linux-pkg-builds/AppImage/PraktiCalc-$(uname -m).AppImage
 
