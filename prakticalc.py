@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
+# SPDX-License-Identifier: GPL-3.0
 
 # import modules
 import tkinter as tk
@@ -39,7 +40,7 @@ import time
 # variables
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.4"
+PraktiCalcVersion = "1.4.1"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 allowWindowsShutdownDialog = "--allowShutdownDialog" in sys.argv
 MsgBoxStyles = ["Tkinter", "Alternative"]
@@ -272,6 +273,8 @@ def calc() :
         Result = str(Result)[:-2]
     else:
         Result = str(Result)
+    if Result == "-0":
+        Result = "0"
     historylist.append(f"{Calculation}={Result}")
     if BorderDisplay == True:
         MainWindow.title(Result)
