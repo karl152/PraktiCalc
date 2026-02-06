@@ -1,5 +1,5 @@
 # PraktiCalc - a practical calculator written in Python
-# Copyright (C) 2024-2025 Karl "karl152"
+# Copyright (C) 2024-2026 Karl "karl152"
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import sys
 import zipfile
 import getpass
 import shutil
+import winreg
 from pathlib import Path
 try:
     ctypes.windll.shcore.SetProcessDpiAwareness(1)
@@ -254,20 +255,21 @@ def actuallyInstall():
             Progress.config(value=4)
             ProgressText += "\nregistering program..."
             InstallProgressText.config(text=ProgressText)
-            print(subprocess.getoutput(r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /f'))
-            Progress.config(value=5)
-            print(subprocess.getoutput(r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /v DisplayName /t REG_SZ /d "PraktiCalc" /f'))
-            Progress.config(value=6)
-            print(subprocess.getoutput(r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /v DisplayVersion /t REG_SZ /d "1.4" /f'))
-            Progress.config(value=7)
-            print(subprocess.getoutput(r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /v UninstallString /t REG_SZ /d "C:\Program Files\PraktiCalc\PraktiCalcUninstaller\PraktiCalcUninstaller.exe" /f'))
-            Progress.config(value=8)
-            print(subprocess.getoutput(r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /v Publisher /t REG_SZ /d "karl152" /f'))
-            Progress.config(value=9)
-            print(subprocess.getoutput(r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /v InstallLocation /t REG_SZ /d "C:\Program Files\PraktiCalc" /f'))
-            Progress.config(value=10)
-            print(subprocess.getoutput(r'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /v DisplayIcon /t REG_SZ /d "C:\Program Files\PraktiCalc\PraktiCalc.exe" /f'))
-            Progress.config(value=11)
+            with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", 0, winreg.KEY_WRITE) as UninstallKey:
+                with winreg.CreateKey(UninstallKey, "PraktiCalc") as PraktiKey:
+                    Progress.config(value=5)
+                    winreg.SetValueEx(PraktiKey, "DisplayName", 0, winreg.REG_SZ, "PraktiCalc")
+                    Progress.config(value=6)
+                    winreg.SetValueEx(PraktiKey, "DisplayVersion", 0, winreg.REG_SZ, "1.4.1")
+                    Progress.config(value=7)
+                    winreg.SetValueEx(PraktiKey, "UninstallString", 0, winreg.REG_SZ, r"C:\Program Files\PraktiCalc\PraktiCalcUninstaller\PraktiCalcUninstaller.exe")
+                    Progress.config(value=8)
+                    winreg.SetValueEx(PraktiKey, "Publisher", 0, winreg.REG_SZ, "karl152")
+                    Progress.config(value=9)
+                    winreg.SetValueEx(PraktiKey, "InstallLocation", 0, winreg.REG_SZ, r"C:\Program Files\PraktiCalc")
+                    Progress.config(value=10)
+                    winreg.SetValueEx(PraktiKey, "DisplayIcon", 0, winreg.REG_SZ, r"C:\Program Files\PraktiCalc\PraktiCalc.exe")
+                    Progress.config(value=11)
             if StartMenuEntry.get() == True:
                 ProgressText += "\ncreating start menu entry..."
                 InstallProgressText.config(text=ProgressText)
