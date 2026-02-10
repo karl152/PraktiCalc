@@ -280,6 +280,7 @@ def calc() :
         MainWindow.title(Result)
     else:
         Output.config(text=Result)
+    Calculation = Result
 
 # processes keyboard input
 def KeyPress(event):
