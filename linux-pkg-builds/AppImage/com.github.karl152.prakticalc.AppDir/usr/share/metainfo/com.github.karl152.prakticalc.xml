@@ -12,7 +12,7 @@
 	<url type="homepage">https://github.com/karl152/PraktiCalc</url>
 	<screenshots>
 		<screenshot type="default">
-			<image>https://raw.githubusercontent.com/karl152/PraktiCalcScreenshots/refs/heads/main/PraktiCalc1.3.2.png</image>
+			<image>https://raw.githubusercontent.com/karl152/PraktiCalcScreenshots/refs/heads/main/PraktiCalc1.3.3.png</image>
 		</screenshot>
 	</screenshots>
     <content_rating type="oars-1.1"/>
@@ -23,4 +23,5 @@
 		<id>com.github.karl152.prakticalc.desktop</id>
 	</provides>
 </component>
+
 
