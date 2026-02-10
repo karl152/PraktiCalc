@@ -2,11 +2,11 @@
 A practical calculator with GUI featuring a calculating history, a decimal number converter & dark mode, as well as integration for many dialog tools.
 <img alt="PraktiCalc Screenshot" src="https://raw.githubusercontent.com/karl152/PraktiCalcScreenshots/refs/heads/main/PraktiCalc1.3.2.png"/>
 
-PraktiCalc is a simple calculator written in Python, compatible with Windows 7+ and Linux. MacOS support is planned but not possible at the moment, as I don't have any MacOS hardware yet.
+PraktiCalc is a simple calculator written in Python, compatible with Windows 7+ and Linux. MacOS support is there in PraktiCalc 1.4+.
 There are not that many actually useful functions provided by PraktiCalc which don't exist in a modern calculator. But you have support and integration for Linux and Windows, especially for messagebox dialog tools like zenity, kdialog and xmessage on Linux and VBS MsgBoxes on Windows. 
 All that together with number conversion and great DPI scaling, it can be great and it will be even better in the future. Also make sure to use ```--big``` if the window is too small.
 I plan to continue development after this one-year-break, because it's great for learning. And why develop some testing thing to throw away to learn, when you can put that work to improve an existing project?
-Back to the features, you can also use your keyboard to type numbers into the calculator. You can also build it yourself using the build scripts. In theory, you can also even build on Windows Vista, because Python 3.7 is compatible with it, and I keep supporting Python 3.8 because I want Windows 7 compatibility. I recently confirmed PraktiCalc 1.3 working on Windows Vista 32-Bit without any additional python modules, but I didn't try to build anything.
+Back to the features, you can also use your keyboard to type numbers into the calculator. You can also build it yourself using the build scripts. In theory, you can also even build on Windows Vista, because Python 3.8 is compatible with it, and I keep supporting Python 3.8 because I want Windows 7 compatibility. I recently confirmed PraktiCalc 1.3 working on Windows Vista 32-Bit without any additional python modules, but I didn't try to build anything.
 Windows XP is basically confirmed to be incompatible, at least because of f-Strings. Building on there won't work.
 
 #### Get PraktiCalc
@@ -31,4 +31,4 @@ The build scripts will help you to build PraktiCalc into installable packages.
 For building on Windows, you need 7-Zip, Python 3.8 with tkinter on Windows 7 or newer (Vista might work too) together with the ```pyinstaller``` and ```ttkthemes``` modules.
 Buildung deb packages required the following dependencies installed via apt from the Debian package sources: ```python3-tk```, ```python3-ttkthemes```.
 AppImages require the same packages and additionally ```python3-pyinstaller```. ```appimagetool``` will be downloaded automatically by the build script.
-Building TinyCore extensions requires `python3.9`, `tk8.6`, `squashfs-tools`.
+Building TinyCore extensions requires `python3.14`, `tk8.6`, `squashfs-tools`.
