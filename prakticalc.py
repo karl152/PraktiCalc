@@ -652,7 +652,6 @@ def paste() :
         DecimalNumber = int(cp)
     except:
         showError("Please enter a real number!")
-    DecimalInput.config(text=str(DecimalNumber))
     BinaryNumber = bin(DecimalNumber)[2:]
     HexadecimalNumber = hex(DecimalNumber)
     BinaryLabel.config(text=str(BinaryNumber))
