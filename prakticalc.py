@@ -34,7 +34,7 @@ import os
 # variables
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.3.3"
+PraktiCalcVersion = "1.3.4"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 if platform.system() == "Windows":
     MsgBoxStyles = ["Tkinter", "Alternative", "VBS"]
@@ -968,6 +968,7 @@ ZeroButton = ttk.Button(WindowFrame, text="0", command=zero)
 ExitButton = ttk.Button(WindowFrame, text="X", command=xquit)
 Status = ttk.Label(WindowFrame, text="")
 StatusDecoration = ttk.Label(WindowFrame, text="")
+StatusSizegrip = ttk.Sizegrip(WindowFrame)
 NewStatusDecoration = ttk.Separator(WindowFrame, orient="horizontal")
 if WingWebDings == True:
     SettingsButton = ttk.Button(WindowFrame, text="@", command=Settings, style="Webdings.TButton")
@@ -1005,8 +1006,9 @@ ZeroButton.grid(row=5, column=1, columnspan=2, sticky="nesw")
 MButton.grid(row=4, column=4, sticky="nesw")
 sqrtButton.grid(row=3, column=4, sticky="nesw")
 ExitButton.grid(row=5, column=0, sticky="nesw")
-Status.grid(row=7, column=0, columnspan=5, sticky="nesw")
+Status.grid(row=7, column=0, columnspan=4, sticky="nesw")
 # StatusDecoration.grid(row=6, column=0, columnspan=5, sticky="nesw")
+StatusSizegrip.grid(row=7, column=4, sticky="se")
 NewStatusDecoration.grid(row=6, column=0, columnspan=5, sticky="nesw", pady=2)
 SettingsButton.grid(row=2, column=0, sticky="nesw")
 BackspaceButton.grid(row=0, column=4, sticky="nesw")
