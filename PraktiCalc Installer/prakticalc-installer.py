@@ -38,6 +38,7 @@ def speakAndWait(string):
     subprocess.run(["wscript", narrator, string])
 auto = "--auto" in sys.argv
 TTS = "--TTS" in sys.argv
+BulletPoint = "\u2022"
 if Path("C:/Program Files/PraktiCalc").exists() == True:
     UninstallBaseString = "PraktiCalc is already installed on your system. If you want to reinstall or update it, please uninstall it first using "
     UninstallWinString = "Control Panel -> Programs -> Programs and Features -> PraktiCalc -> Uninstall/Change"
@@ -177,17 +178,17 @@ def pageReload():
         MainFrame.config(text="Ready for installation")
         clearMainFrame()
         ReadyText = ttk.Label(MainFrame, text="PraktiCalc is now ready to be installed.\nYour choices:")
-        DestinationChoiceText = ttk.Label(MainFrame, text="- Install PraktiCalc to C:/Program Files/PraktiCalc")
+        DestinationChoiceText = ttk.Label(MainFrame, text=f"{BulletPoint} Install PraktiCalc to C:/Program Files/PraktiCalc")
         DesktopShortcutChoice = ttk.Label(MainFrame)
         StartMenuEntryChoice = ttk.Label(MainFrame)
         if DesktopShortcut.get() == True:
-            DesktopShortcutChoice.config(text="- add a shortcut to the Desktop")
+            DesktopShortcutChoice.config(text=f"{BulletPoint} add a shortcut to the Desktop")
         else:
-            DesktopShortcutChoice.config(text="- don't add a shortcut to the Desktop")
+            DesktopShortcutChoice.config(text=f"{BulletPoint} don't add a shortcut to the Desktop")
         if StartMenuEntry.get() == True:
-            StartMenuEntryChoice.config(text="- add an entry to the Start Menu")
+            StartMenuEntryChoice.config(text=f"{BulletPoint} add an entry to the Start Menu")
         else:
-            StartMenuEntryChoice.config(text="- don't add an entry to the Start Menu")
+            StartMenuEntryChoice.config(text=f"{BulletPoint} don't add an entry to the Start Menu")
         FinalAdvise = ttk.Label(MainFrame, text="Click continue to start the installation.")
         ReadyText.grid(row=0, column=0, padx=10, pady=10, sticky="w")
         DestinationChoiceText.grid(row=1, column=0, padx=10, sticky="w")
