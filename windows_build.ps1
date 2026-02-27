@@ -1,4 +1,4 @@
-﻿# PraktiCalc © 2024-2025 Karl "karl152"
+﻿# PraktiCalc © 2024-2026 Karl "karl152"
 # Licensed under the GNU General Public License v3.0.
 # See https://www.gnu.org/licenses/gpl-3.0.txt for details.
 # SPDX-License-Identifier: GPL-3.0
@@ -33,7 +33,7 @@ Remove-Item .\build -Recurse -Force
 Remove-Item .\prakticalc.spec
 Write-Host "[2/3] Building Uninstaller..."
 Set-Location '.\PraktiCalc Uninstaller'
-python.exe -m PyInstaller .\PraktiCalcUninstaller.py --onedir --clean --windowed --icon ..\PraktiCalculatorMono.ico
+python.exe -m PyInstaller .\PraktiCalcUninstaller.py --onedir --clean --windowed --uac-admin --icon ..\PraktiCalculatorMono.ico
 Copy-Item .\dist\PraktiCalcUninstaller '..\PraktiCalc Installer\content' -Recurse -Verbose
 Remove-Item .\dist -Recurse -Force
 Remove-Item .\build -Recurse -Force
