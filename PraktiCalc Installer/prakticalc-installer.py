@@ -83,8 +83,7 @@ else:
         speakAndWait("WARNING: The PraktiCalc Installer will likely not work when not built to one file using PyInstaller! You should build it before execution using the provided script")
 
 if "--help" in sys.argv:
-    print("""PraktiCalc Installer CLI Options:
---auto: starts automatic installation
+    messagebox.showinfo("PraktiCalc Installer CLI options", """--auto: starts automatic installation
 --TTS: starts installer with text to speech
 --help: shows this help text""")
     sys.exit(0)
