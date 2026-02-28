@@ -51,7 +51,7 @@ if platform.system() == "Windows":
 else:
     WingWebDings = False
     MsgBoxStyles = ["Tkinter", "Alternative"]
-    AdditionalLinuxMsgBoxStyles = ["xmessage", "yad", "kdialog", "zenity"]
+    AdditionalLinuxMsgBoxStyles = ["xmessage", "yad", "kdialog", "zenity", "Xdialog"]
     for MsgBoxStyle in AdditionalLinuxMsgBoxStyles:
         if shutil.which(MsgBoxStyle):
             MsgBoxStyles.append(MsgBoxStyle)
@@ -541,6 +541,8 @@ def CustomInfo() :
                 subprocess.Popen(["kdialog", "--title=About PraktiCalc", "--msgbox", infotext])
             elif MsgBoxStyles[CurrentMsgBoxStyle] == "zenity":
                 subprocess.Popen(["zenity", "--title=About PraktiCalc", "--info", "--icon=" + PraktiCalcIconPath, "--text=" + infotext])
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "Xdialog":
+                subprocess.Popen(["Xdialog", "--title=About PraktiCalc", "--msgbox", infotext, "10", "40"])
             else:
                 print("ERROR: Unknown Message Box Style")
 
@@ -595,6 +597,8 @@ def showError(message):
                 subprocess.Popen(["kdialog", "--title=Error", "--error", message])
             elif MsgBoxStyles[CurrentMsgBoxStyle] == "zenity":
                 subprocess.Popen(["zenity", "--title=Error", "--error", "--text=" + message])
+            elif MsgBoxStyles[CurrentMsgBoxStyle] == "Xdialog":
+                subprocess.Popen(["Xdialog", "--title=Error", "--msgbox", message, "10", "40"])
             else:
                 print("ERROR: Unknown Message Box Style")
 
