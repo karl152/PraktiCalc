@@ -16,9 +16,7 @@
 
 # import modules
 import tkinter as tk
-from tkinter import ttk
-from tkinter import messagebox
-from tkinter import font
+from tkinter import ttk, messagebox, font, scrolledtext
 from simpleeval import SimpleEval
 from pathlib import Path
 try:
@@ -810,6 +808,7 @@ Useful Tips:
         else:
             comoutput = "[X] Unknown command"
         ConsoleOutput.insert(tk.END, str(comoutput) + "\n")
+        ConsoleOutput.see("end")
 
     # processes the enter key in the console
     def ConsoleEnterKey(event):
@@ -828,7 +827,8 @@ Useful Tips:
     ConsoleWindow.columnconfigure(1, weight=1)
     ConsoleWindow.columnconfigure(2, weight=1)
     ConsoleWindow.bind("<Key>", ConsoleEnterKey)
-    ConsoleOutput = tk.Text(ConsoleWindow, bg="black", fg="white")
+    ConsoleOutput = scrolledtext.ScrolledText(ConsoleWindow, bg="black", fg="white")
+    ConsoleOutput.vbar.config(bg="black")
     ConsoleInputLabel = tk.Label(ConsoleWindow, text="INPUT: ", bg="black", fg="white")
     ConsoleInput = tk.Entry(ConsoleWindow, bg="black", fg="white")
     ConsoleExecuteButton = tk.Button(ConsoleWindow, text="--^", bg="black", fg="white", command=lambda: executeTheCommand(ConsoleInput.get()))
