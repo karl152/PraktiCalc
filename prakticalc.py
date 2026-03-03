@@ -336,7 +336,7 @@ def Settings() :
     SettingsWindowFrame.columnconfigure(0, weight=1)
     DarkModeToggle = ttk.Checkbutton(SettingsWindowFrame, text="Dark Mode", command=ChangeDarkMode, variable=DarkModeTkVar)
     BorderDisplayToggle = ttk.Checkbutton(SettingsWindowFrame, text="Border Display", command=toggleBorderDisplay, variable=BorderDisplayTkVar)
-    MsgBoxStyleFrame = ttk.LabelFrame(SettingsWindowFrame, text="Messagebox Style")
+    MsgBoxStyleFrame = ttk.LabelFrame(SettingsWindowFrame, text="Dialog Style")
     MsgBoxStyleFrame.columnconfigure(0, weight=1)
     MsgBoxStyleSelect = ttk.OptionMenu(MsgBoxStyleFrame, CurrentMsgBoxStyleTkVar, CurrentMsgBoxStyle, *MsgBoxStyles)
     SettingsOKButton = ttk.Button(SettingsWindowFrame, text="OK", command=loadTheme)
