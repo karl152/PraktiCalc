@@ -70,7 +70,7 @@ else:
     for MsgBoxStyle in AdditionalLinuxMsgBoxStyles:
         if shutil.which(MsgBoxStyle):
             MsgBoxStyles.append(MsgBoxStyle)
-CurrentMsgBoxStyle = 1
+CurrentMsgBoxStyle = "Alternative"
 ThemingDisabled = "--notheming" in sys.argv
 if ThemingDisabled == True:
     theming = 0
@@ -338,8 +338,7 @@ def Settings() :
     BorderDisplayToggle = ttk.Checkbutton(SettingsWindowFrame, text="Border Display", command=toggleBorderDisplay, variable=BorderDisplayTkVar)
     MsgBoxStyleFrame = ttk.LabelFrame(SettingsWindowFrame, text="Messagebox Style")
     MsgBoxStyleFrame.columnconfigure(0, weight=1)
-    MsgBoxStyleSelect = ttk.Combobox(MsgBoxStyleFrame, values=MsgBoxStyles)
-    MsgBoxStyleSelect.current(CurrentMsgBoxStyle)
+    MsgBoxStyleSelect = ttk.OptionMenu(MsgBoxStyleFrame, CurrentMsgBoxStyleTkVar, CurrentMsgBoxStyle, *MsgBoxStyles)
     SettingsOKButton = ttk.Button(SettingsWindowFrame, text="OK", command=loadTheme)
     SettingsWindowFrame.grid(row=0, column=0, sticky="nesw")
     DarkModeToggle.grid(row=2, column=0, sticky="w", padx=10)
@@ -353,7 +352,7 @@ def Settings() :
 # saves the selected theme choice in the settigns window
 def loadTheme():
     global SettingsWindow, CurrentMsgBoxStyle, MsgBoxStyleSelect
-    CurrentMsgBoxStyle = MsgBoxStyleSelect.current()
+    CurrentMsgBoxStyle = CurrentMsgBoxStyleTkVar.get()
     # print(CurrentMsgBoxStyle)
     SettingsWindow.destroy()
 
@@ -408,9 +407,9 @@ def toggleBorderDisplay():
 def CustomInfo() :
     global CustomInfox
     infotext = "PraktiCalc\nVersion " + PraktiCalcVersion + "\nrunning on Python "+ platform.python_version() + "\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/\nthemes provided by the ttkthemes library"
-    if CurrentMsgBoxStyle == 0:
+    if CurrentMsgBoxStyle == "Tkinter":
         messagebox.showinfo("About PraktiCalc", infotext)
-    elif CurrentMsgBoxStyle == 1:
+    elif CurrentMsgBoxStyle == "Alternative":
         CustomInfox = tk.Toplevel(MainWindow)
         CustomInfox.title("About PraktiCalc")
         CustomInfox.rowconfigure(0, weight=1)
@@ -437,26 +436,26 @@ def CustomInfo() :
     else:
         if platform.system() == "Windows":
             pyver = platform.python_version()
-            if MsgBoxStyles[CurrentMsgBoxStyle] == "VBScript":
+            if CurrentMsgBoxStyle == "VBScript":
                 subprocess.Popen(["wscript", VBSInfoPath, PraktiCalcVersion, pyver])
-            elif MsgBoxStyles[CurrentMsgBoxStyle] == "Windows Messaging Service":
+            elif CurrentMsgBoxStyle == "Windows Messaging Service":
                 subprocess.Popen(["msg", getpass.getuser(), infotext])
-            elif MsgBoxStyles[CurrentMsgBoxStyle] == "Windows Shutdown":
+            elif CurrentMsgBoxStyle == "Windows Shutdown":
                 subprocess.Popen(["shutdown", "/s", "/t", "60", "/c", infotext])
                 time.sleep(20)
                 subprocess.Popen(["shutdown", "/a"])
             else:
                 print("ERROR: Unknown Message Box Style")
         else:
-            if MsgBoxStyles[CurrentMsgBoxStyle] == "xmessage":
+            if CurrentMsgBoxStyle == "xmessage":
                 subprocess.Popen(["xmessage", "-title", "About PraktiCalc", infotext])
-            elif MsgBoxStyles[CurrentMsgBoxStyle] == "yad":
+            elif CurrentMsgBoxStyle == "yad":
                 subprocess.Popen(["yad", "--title=About PraktiCalc", "--info", "--image=" + PraktiCalcIconPath, "--button=OK", "--text=" + infotext])
-            elif MsgBoxStyles[CurrentMsgBoxStyle] == "kdialog":
+            elif CurrentMsgBoxStyle == "kdialog":
                 subprocess.Popen(["kdialog", "--title=About PraktiCalc", "--msgbox", infotext])
-            elif MsgBoxStyles[CurrentMsgBoxStyle] == "zenity":
+            elif CurrentMsgBoxStyle == "zenity":
                 subprocess.Popen(["zenity", "--title=About PraktiCalc", "--info", "--icon=" + PraktiCalcIconPath, "--text=" + infotext])
-            elif MsgBoxStyles[CurrentMsgBoxStyle] == "AppleScript":
+            elif CurrentMsgBoxStyle == "AppleScript":
                 asc = f'display dialog "{infotext}" with icon POSIX file "{PraktiCalcIconPath}"'
                 subprocess.run(["osascript", "-e", asc])
             else:
@@ -470,9 +469,9 @@ def closeCustomInfo() :
 # shows error dialogs
 def showError(message):
     global ErrorWindow
-    if CurrentMsgBoxStyle == 0:
+    if CurrentMsgBoxStyle == "Tkinter":
         messagebox.showerror("Error", message)
-    elif CurrentMsgBoxStyle == 1:
+    elif CurrentMsgBoxStyle == "Alternative":
         ErrorWindow = tk.Toplevel(MainWindow)
         ErrorWindow.title("Error")
         ErrorWindow.rowconfigure(0, weight=1)
@@ -495,26 +494,26 @@ def showError(message):
         ErrorTextLabel.grid(row=0, column=0)
     else:
         if platform.system() == "Windows":
-            if MsgBoxStyles[CurrentMsgBoxStyle] == "VBScript":
+            if CurrentMsgBoxStyle == "VBScript":
                 subprocess.Popen(["wscript", VBSErrorPath, message])
-            elif MsgBoxStyles[CurrentMsgBoxStyle] == "Windows Messaging Service":
+            elif CurrentMsgBoxStyle == "Windows Messaging Service":
                 subprocess.Popen(["msg", getpass.getuser(), message])
-            elif MsgBoxStyles[CurrentMsgBoxStyle] == "Windows Shutdown":
+            elif CurrentMsgBoxStyle == "Windows Shutdown":
                 subprocess.Popen(["shutdown", "/s", "/t", "60", "/c", message])
                 time.sleep(10)
                 subprocess.Popen(["shutdown", "/a"])
             else:
                 print("ERROR: Unknown Message Box Style")
         else:
-            if MsgBoxStyles[CurrentMsgBoxStyle] == "xmessage":
+            if CurrentMsgBoxStyle == "xmessage":
                 subprocess.Popen(["xmessage", "-title", "Error", "[X] " + message])
-            elif MsgBoxStyles[CurrentMsgBoxStyle] == "yad":
+            elif CurrentMsgBoxStyle == "yad":
                 subprocess.Popen(["yad", "--title=Error", "--error", "--image=dialog-error", "--button=OK", "--text=" + message])
-            elif MsgBoxStyles[CurrentMsgBoxStyle] == "kdialog":
+            elif CurrentMsgBoxStyle == "kdialog":
                 subprocess.Popen(["kdialog", "--title=Error", "--error", message])
-            elif MsgBoxStyles[CurrentMsgBoxStyle] == "zenity":
+            elif CurrentMsgBoxStyle == "zenity":
                 subprocess.Popen(["zenity", "--title=Error", "--error", "--text=" + message])
-            elif MsgBoxStyles[CurrentMsgBoxStyle] == "AppleScript":
+            elif CurrentMsgBoxStyle == "AppleScript":
                 asc = f'display dialog "{message}" with icon stop'
                 subprocess.run(["osascript", "-e", asc])
             else:
@@ -730,6 +729,7 @@ else:
     LargeUnicodeFont = font.Font(family="TkDefaultFont", size=14)
 DarkModeTkVar = tk.BooleanVar(value=DarkMode)
 BorderDisplayTkVar = tk.BooleanVar(value=BorderDisplay)
+CurrentMsgBoxStyleTkVar = tk.StringVar(value=CurrentMsgBoxStyle)
 MainWindow.config(width=256, height=315)
 if console == True:
 
