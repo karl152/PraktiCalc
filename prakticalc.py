@@ -38,7 +38,7 @@ import time
 # variables
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.4.1"
+PraktiCalcVersion = "1.5"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 allowWindowsShutdownDialog = "--allowShutdownDialog" in sys.argv
 MsgBoxStyles = ["Tkinter", "Alternative"]
@@ -320,7 +320,7 @@ def appendToCalculation(char):
 
 # settings window
 def Settings() :
-    global SettingsWindow, DarkMode, DarkModeToggle, MsgBoxStyles, CurrentMsgBoxStyle, MsgBoxStyleSelect, BorderDisplay, theming
+    global SettingsWindow, DarkMode, DarkModeToggle, MsgBoxStyles, CurrentMsgBoxStyle, MsgBoxStyleSelect, BorderDisplay, theming, ThemeSelector
     SettingsWindow = tk.Toplevel(MainWindow)
     SettingsWindow.title("Settings")
     SettingsWindow.config(width=250, height=152)
@@ -329,29 +329,79 @@ def Settings() :
     if platform.system() == "Windows":
         SettingsWindow.attributes("-toolwindow", True)
         SettingsWindow.focus_force()
-    changeTheme(SettingsWindow)
+    try:
+        changeTheme(SettingsWindow)
+    except:
+        pass
     SettingsWindowFrame = ttk.Frame(SettingsWindow)
     SettingsWindowFrame.columnconfigure(0, weight=1)
-    DarkModeToggle = ttk.Checkbutton(SettingsWindowFrame, text="Dark Mode", command=ChangeDarkMode, variable=DarkModeTkVar)
-    BorderDisplayToggle = ttk.Checkbutton(SettingsWindowFrame, text="Border Display", command=toggleBorderDisplay, variable=BorderDisplayTkVar)
+    AppearanceFrame = ttk.LabelFrame(SettingsWindowFrame, text="Appearance")
+    AppearanceFrame.columnconfigure(0, weight=1)
+    AppearanceFrame.grid(row=0, column=0, sticky="news", padx=10)
+    ThemeSelectChoice = ttk.Radiobutton(AppearanceFrame, text="Theme", value="select", variable=AppearanceTkVar, command=lambda: ThemeSelector.set(thettktheme))
+    ThemeSelector = ttk.Combobox(AppearanceFrame, values=["plastik", "keramik", "breeze", "yaru"])
+    ThemeSelector.set(usedttktheme)
+    ButtonBorderColorChoice = ttk.Radiobutton(AppearanceFrame, text="Button Border Color", value="border", variable=AppearanceTkVar)
+    DarkThemeChoice = ttk.Radiobutton(AppearanceFrame, text="Dark Mode", value="dark", variable=AppearanceTkVar, command=lambda: ChangeDarkMode() if DarkMode == False else None)
+    NoThemeChoice = ttk.Radiobutton(AppearanceFrame, text="no theme", value="off", variable=AppearanceTkVar)
+    ThemeSelectChoice.grid(row=0, column=0, sticky="w")
+    ThemeSelector.grid(row=1, column=0, sticky="ew", padx=5)
+    ButtonBorderColorChoice.grid(row=2, column=0, sticky="w")
+    BorderColorFrame = ttk.Frame(AppearanceFrame)
+    BorderColorFrame.grid(row=3, column=0, sticky="w", padx=10)
+    ttk.Scale(BorderColorFrame, orient="vertical", from_=1, to=7, variable=BorderColorTkVar).grid(row=0, column=0, rowspan=7, sticky="nws", pady=10)
+    colors = [["#8f8f8f", "grey"], ["#5a72c4", "blue"], ["#915ac4", "purple"], ["#c45aa7", "pink"], ["#5ac477", "green"], ["#8cc45a", "mint"], ["#c4ac5a", "sand"]]
+    for index, color in enumerate(colors):
+        tk.Label(BorderColorFrame, text="##", fg=color[0], bg=color[0]).grid(row=index, column=1, sticky="w")
+        ttk.Label(BorderColorFrame, text=color[1]).grid(row=index, column=2, sticky="w", padx=5)
+    DarkThemeChoice.grid(row=4, column=0, sticky="w")
+    NoThemeChoice.grid(row=5, column=0, sticky="w")
+    BorderDisplayToggle = ttk.Checkbutton(AppearanceFrame, text="Border Display", command=toggleBorderDisplay, variable=BorderDisplayTkVar)
     MsgBoxStyleFrame = ttk.LabelFrame(SettingsWindowFrame, text="Dialog Style")
     MsgBoxStyleFrame.columnconfigure(0, weight=1)
     MsgBoxStyleSelect = ttk.OptionMenu(MsgBoxStyleFrame, CurrentMsgBoxStyleTkVar, CurrentMsgBoxStyle, *MsgBoxStyles)
     SettingsOKButton = ttk.Button(SettingsWindowFrame, text="OK", command=loadTheme)
     SettingsWindowFrame.grid(row=0, column=0, sticky="nesw")
-    DarkModeToggle.grid(row=2, column=0, sticky="w", padx=10)
-    if platform.system() == "Darwin" or theming == 0:
+    if platform.system() == "Darwin" or platform.system() == "Windows" or theming == 0:
         DarkModeToggle.config(state="disabled")
-    BorderDisplayToggle.grid(row=1, column=0, sticky="w", padx=10)
+        for widget in AppearanceFrame.winfo_children():
+            try:
+                widget.config(state="disabled")
+            except:
+                pass
+        for widget in BorderColorFrame.winfo_children():
+            try:
+                widget.config(state="disabled")
+            except:
+                pass
+        NoThemeChoice.config(state="normal")
+        BorderDisplayToggle.config(state="normal")
+        if platform.system() == "Windows":
+            DarkThemeChoice.config(state="normal")
+    ttk.Separator(AppearanceFrame, orient="horizontal").grid(row=6, column=0, sticky="ew")
+    BorderDisplayToggle.grid(row=7, column=0, sticky="w", padx=10)
     MsgBoxStyleFrame.grid(row=3, column=0, sticky="ew", padx=10)
-    MsgBoxStyleSelect.grid(row=0, column=0, sticky="ew")
+    MsgBoxStyleSelect.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
     SettingsOKButton.grid(row=4, column=0, sticky="ew", padx=10, pady=10)
 
 # saves the selected theme choice in the settigns window
 def loadTheme():
-    global SettingsWindow, CurrentMsgBoxStyle, MsgBoxStyleSelect
+    global SettingsWindow, CurrentMsgBoxStyle, MsgBoxStyleSelect, ThemeSelector, usedttktheme, thettktheme, DarkMode
     CurrentMsgBoxStyle = CurrentMsgBoxStyleTkVar.get()
     # print(CurrentMsgBoxStyle)
+    thettktheme = usedttktheme = ThemeSelector.get()
+    if DarkMode == True and usedttktheme != "black":
+        DarkMode = True
+    try:
+        changeTheme(MainWindow)
+        changeTheme(SettingsWindow)
+        changeTheme(HistoryX)
+        changeTheme(MoreWindow)
+        changeTheme(ErrorWindow)
+        changeTheme(CustomInfox)
+        changeTheme(HelpWindow)
+    except:
+        pass
     SettingsWindow.destroy()
 
 # toggled dark mode
@@ -404,7 +454,7 @@ def toggleBorderDisplay():
 # info window
 def CustomInfo() :
     global CustomInfox
-    infotext = "PraktiCalc\nVersion " + PraktiCalcVersion + "\nrunning on Python "+ platform.python_version() + "\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/\nthemes provided by the ttkthemes library"
+    infotext = "PraktiCalc\nVersion " + PraktiCalcVersion + "\nrunning on Python " + platform.python_version() + "\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/\nthemes provided by the ttkthemes library"
     if CurrentMsgBoxStyle == "Tkinter":
         messagebox.showinfo("About PraktiCalc", infotext)
     elif CurrentMsgBoxStyle == "Alternative":
@@ -727,7 +777,17 @@ else:
     LargeUnicodeFont = font.Font(family="TkDefaultFont", size=14)
 DarkModeTkVar = tk.BooleanVar(value=DarkMode)
 BorderDisplayTkVar = tk.BooleanVar(value=BorderDisplay)
+BorderColorTkVar = tk.IntVar(value=3)
 CurrentMsgBoxStyleTkVar = tk.StringVar(value=CurrentMsgBoxStyle)
+AppearanceTkVar = tk.StringVar(value="off") # select, border, dark, off
+if theming == 0 or platform.system() == "Windows" or platform.system() == "Darwin":
+    AppearanceTkVar.set("off")
+else:
+    AppearanceTkVar.set("select")
+if platform.system() != "Darwin" and DarkMode == True:
+    AppearanceTkVar.set("dark")
+if platform.system() != "Windows" and platform.system() != "Darwin" and usedttktheme.startswith("scid"):
+    AppearanceTkVar.set("border")
 MainWindow.config(width=256, height=315)
 if console == True:
 
