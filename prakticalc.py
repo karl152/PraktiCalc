@@ -778,6 +778,7 @@ Available Commands:
 exit: exits the program
 clear: clears the output
 function(<function>: executes a function in the program
+eval(<command>: executed a Python command within the program
 system(<command>: executes a system command and prints the output
 varget(<variable>: shows the value of the given variable
 aboutwindow: opens console about window
@@ -807,6 +808,13 @@ Useful Tips:
                 comoutput = globals()[cominput]
             else:
                 comoutput = "[!] Unknown variable"
+        elif cominput.startswith("eval("):
+            cominput = cominput[5:]
+            try:
+                eval(cominput)
+                comoutput = "Command executed"
+            except:
+                comoutput = "[!] Failed to execute command"
         elif cominput == "clear":
             ConsoleOutput.delete("1.0", tk.END)
             comoutput = ""
