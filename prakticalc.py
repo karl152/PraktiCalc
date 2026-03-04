@@ -184,8 +184,11 @@ if ThemingDisabled == False:
     DarkMode = "--dark" in sys.argv
     if DarkMode == True:
         thettktheme = "black"
+        UseNativeTheme = False
 else:
     DarkMode = False
+if breeze == True or yaru == True or keramik == True or equilux == True:
+    UseNativeTheme = False
 BorderDisplay = "--borderdisplay" in sys.argv
 debug = "--debug" in sys.argv
 historylist = []
