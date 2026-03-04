@@ -38,11 +38,15 @@ import time
 # variables
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.4.1"
+PraktiCalcVersion = "1.5"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 allowWindowsShutdownDialog = "--allowShutdownDialog" in sys.argv
+UseNativeTheme = False
 MsgBoxStyles = ["Tkinter", "Alternative"]
 if platform.system() == "Windows":
+    UseNativeTheme = True
+    if theming != 0:
+        NativeTheme = "vista"
     if shutil.which("wscript"):
         MsgBoxStyles.append("VBScript")
     if shutil.which("msg"):
@@ -60,10 +64,15 @@ if platform.system() == "Windows":
     else:
         WingWebDings = False
 elif platform.system() == "Darwin":
+    UseNativeTheme = True
+    if theming != 0:
+        NativeTheme = "aqua"
     WingWebDings = False
     MsgBoxStyles.append("AppleScript")
 else:
     WingWebDings = False
+    if theming != 0:
+        NativeTheme = "default"
     AdditionalLinuxMsgBoxStyles = ["xmessage", "yad", "kdialog", "zenity"]
     for MsgBoxStyle in AdditionalLinuxMsgBoxStyles:
         if shutil.which(MsgBoxStyle):
@@ -95,13 +104,12 @@ if CLIHelp == True:
             if theming != 0:
                 print("--dark          | enable dark mode by default")
         print("--console       | show console for debugging")
-        if platform.system() != "Darwin":
-            if theming != 0:
-                print("--notheming     | disables theming")
-                print("--breeze        | set the light theme to breeze")
-                print("--yaru          | set the light theme to yaru")
-                print("--keramik       | set the light theme to keramik")
-                print("--equilux       | set the dark theme to equilux")
+        if theming != 0:
+            print("--notheming     | disables theming")
+            print("--breeze        | set the light theme to breeze")
+            print("--yaru          | set the light theme to yaru")
+            print("--keramik       | set the light theme to keramik")
+            print("--equilux       | set the dark theme to equilux")
         print("--help          | display this help text and exit")
         print("--version       | display version and exit")
     sys.exit(0)
@@ -170,13 +178,12 @@ elif keramik == True:
 else:
     thettktheme = "plastik"
 if equilux == True:
-    darkttktheme = "equilux"
-else:
-    darkttktheme = "black"
-usedttktheme = thettktheme
+    thettktheme = "equilux"
 M = "0"
-if platform.system() != "Darwin" or ThemingDisabled == False:
+if ThemingDisabled == False:
     DarkMode = "--dark" in sys.argv
+    if DarkMode == True:
+        thettktheme = "black"
 else:
     DarkMode = False
 BorderDisplay = "--borderdisplay" in sys.argv
@@ -194,15 +201,19 @@ lcc = "" # last console command
 def changeTheme(WindowName):
     global theming
     if platform.system() == "Darwin":
-        pass
-        return
-    elif platform.system() == "Windows":
-        if DarkMode == True:
+        if UseNativeTheme == False:
             style = ThemedStyle(WindowName)
-            style.theme_use(usedttktheme)
+            style.theme_use(thettktheme)
         else:
             style = ttk.Style(WindowName)
-            style.theme_use("vista")
+            style.theme_use(NativeTheme)
+    elif platform.system() == "Windows":
+        if UseNativeTheme == False:
+            style = ThemedStyle(WindowName)
+            style.theme_use(thettktheme)
+        else:
+            style = ttk.Style(WindowName)
+            style.theme_use(NativeTheme)
         if WingWebDings == True:
             style.configure("Webdings.TButton", font=webdingsfont)
             style.configure("Wingdings.TButton", font=wingdingsfont)
@@ -211,28 +222,36 @@ def changeTheme(WindowName):
         style.configure("Treeview", rowheight=40)
     elif theming == 1 or theming == 2:
         try:
-            style = ThemedStyle(WindowName)
-            style.theme_use(usedttktheme)
-            style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
-            style.configure("Treeview", rowheight=40)
+            if UseNativeTheme == False:
+                style = ThemedStyle(WindowName)
+                style.theme_use(thettktheme)
+            else:
+                style = ttk.Style(WindowName)
+                style.theme_use(NativeTheme)
+                style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
+                style.configure("Treeview", rowheight=40)
         except:
             theming = 2
-            theme_base = Path(sys._MEIPASS).joinpath("ttkthemes", "themes")
-            theme_path = Path(theme_base).joinpath(usedttktheme)
-            WindowName.tk.call("lappend", "auto_path", theme_base)
-            try:
-                WindowName.tk.call("package", "require", f"ttk::theme::{usedttktheme}")
-            except:
-                theme_tcl = Path(theme_path).joinpath(usedttktheme + ".tcl")
-                if Path(theme_tcl).exists():
-                    WindowName.tk.call("source", theme_tcl)
-                else:
-                    print(f"Couldn't find theme {theme_tcl}")
-            style = ttk.Style()
-            try:
-                style.theme_use(usedttktheme)
-            except:
-                print("Using default ttk theme")
+            if UseNativeTheme == True:
+                style = ttk.Style(WindowName)
+                style.theme_use(NativeTheme)
+            else:
+                theme_base = Path(sys._MEIPASS).joinpath("ttkthemes", "themes")
+                theme_path = Path(theme_base).joinpath(thettktheme)
+                WindowName.tk.call("lappend", "auto_path", theme_base)
+                try:
+                    WindowName.tk.call("package", "require", f"ttk::theme::{thettktheme}")
+                except:
+                    theme_tcl = Path(theme_path).joinpath(thettktheme + ".tcl")
+                    if Path(theme_tcl).exists():
+                        WindowName.tk.call("source", theme_tcl)
+                    else:
+                        print(f"Couldn't find theme {theme_tcl}")
+                style = ttk.Style()
+                try:
+                    style.theme_use(thettktheme)
+                except:
+                    print("Using default ttk theme")
         try:
             style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
             style.configure("Treeview", rowheight=40)
@@ -320,7 +339,7 @@ def appendToCalculation(char):
 
 # settings window
 def Settings() :
-    global SettingsWindow, DarkMode, DarkModeToggle, MsgBoxStyles, CurrentMsgBoxStyle, MsgBoxStyleSelect, BorderDisplay, theming
+    global SettingsWindow, MsgBoxStyles, CurrentMsgBoxStyle, MsgBoxStyleSelect, BorderDisplay, theming, ThemeSelector
     SettingsWindow = tk.Toplevel(MainWindow)
     SettingsWindow.title("Settings")
     SettingsWindow.config(width=250, height=152)
@@ -332,51 +351,44 @@ def Settings() :
     changeTheme(SettingsWindow)
     SettingsWindowFrame = ttk.Frame(SettingsWindow)
     SettingsWindowFrame.columnconfigure(0, weight=1)
-    DarkModeToggle = ttk.Checkbutton(SettingsWindowFrame, text="Dark Mode", command=ChangeDarkMode, variable=DarkModeTkVar)
+    ThemeFrame = ttk.LabelFrame(SettingsWindowFrame, text="Theme")
+    ThemeFrame.columnconfigure(0, weight=1)
+    ThemeSelector = ttk.Combobox(ThemeFrame, values=["plastik", "keramik", "breeze", "yaru", "black", "scidgrey", "scidblue", "scidpurple", "scidpink", "scidgreen", "scidmint", "scidsand", "classic"])
+    ThemeSelector.set(thettktheme)
+    NativeThemeToggle = ttk.Checkbutton(ThemeFrame, text="native theme", variable=UseNativeThemeTkVar)
+    ThemeFrame.grid(row=0, column=0, sticky="news", padx=10)
+    ThemeSelector.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
+    NativeThemeToggle.grid(row=1, column=0, sticky="w")
     BorderDisplayToggle = ttk.Checkbutton(SettingsWindowFrame, text="Border Display", command=toggleBorderDisplay, variable=BorderDisplayTkVar)
     MsgBoxStyleFrame = ttk.LabelFrame(SettingsWindowFrame, text="Dialog Style")
     MsgBoxStyleFrame.columnconfigure(0, weight=1)
     MsgBoxStyleSelect = ttk.OptionMenu(MsgBoxStyleFrame, CurrentMsgBoxStyleTkVar, CurrentMsgBoxStyle, *MsgBoxStyles)
     SettingsOKButton = ttk.Button(SettingsWindowFrame, text="OK", command=loadTheme)
     SettingsWindowFrame.grid(row=0, column=0, sticky="nesw")
-    DarkModeToggle.grid(row=2, column=0, sticky="w", padx=10)
-    if platform.system() == "Darwin" or theming == 0:
-        DarkModeToggle.config(state="disabled")
+    if theming == 0:
+        ThemeSelector.config(state="disabled")
+        NativeThemeToggle.config(state="disabled")
     BorderDisplayToggle.grid(row=1, column=0, sticky="w", padx=10)
     MsgBoxStyleFrame.grid(row=3, column=0, sticky="ew", padx=10)
-    MsgBoxStyleSelect.grid(row=0, column=0, sticky="ew")
+    MsgBoxStyleSelect.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
     SettingsOKButton.grid(row=4, column=0, sticky="ew", padx=10, pady=10)
 
 # saves the selected theme choice in the settigns window
 def loadTheme():
-    global SettingsWindow, CurrentMsgBoxStyle, MsgBoxStyleSelect
+    global SettingsWindow, CurrentMsgBoxStyle, MsgBoxStyleSelect, ThemeSelector, thettktheme, DarkMode, UseNativeTheme
+    thettktheme = ThemeSelector.get()
+    UseNativeTheme = UseNativeThemeTkVar.get()
+    if ThemeSelector.get() == "black" or ThemeSelector.get() == "equilux":
+        DarkMode = True
+    else:
+        DarkMode = False
     CurrentMsgBoxStyle = CurrentMsgBoxStyleTkVar.get()
     # print(CurrentMsgBoxStyle)
+    try:
+        changeTheme(MainWindow)
+    except:
+        pass
     SettingsWindow.destroy()
-
-# toggled dark mode
-def ChangeDarkMode() :
-    global DarkMode, usedttktheme, SettingsWindow, style, HistoryX, MoreWindow, HelpWindow, Content1
-    if DarkMode == False :
-        DarkMode = True
-        usedttktheme = darkttktheme
-        changeTheme(MainWindow)
-        changeTheme(SettingsWindow)
-        changeTheme(HistoryX)
-        changeTheme(MoreWindow)
-        changeTheme(ErrorWindow)
-        changeTheme(CustomInfox)
-        changeTheme(HelpWindow)
-    elif DarkMode == True :
-        DarkMode = False
-        usedttktheme = thettktheme
-        changeTheme(MainWindow)
-        changeTheme(SettingsWindow)
-        changeTheme(HistoryX)
-        changeTheme(MoreWindow)
-        changeTheme(ErrorWindow)
-        changeTheme(CustomInfox)
-        changeTheme(HelpWindow)
 
 # toggles border display
 def toggleBorderDisplay():
@@ -599,7 +611,7 @@ def More() :
         MoreWindowKey = event.keysym
         if MoreWindowKey == "Return":
             paste()
-    global DarkMode, MoreWindow, DecimalFrame, DecimalInput, DecimalNumber, BinaryLabel, HexLabel, usedttktheme
+    global MoreWindow, DecimalFrame, DecimalInput, DecimalNumber, BinaryLabel, HexLabel
     MoreWindow = tk.Toplevel(MainWindow)
     MoreWindow.title("Decimal Converter")
     MoreWindow.config(height=200, width=500)
@@ -706,8 +718,6 @@ M: {M}
 # quits the program
 def xquit() :
     MainWindow.destroy()
-if DarkMode == True :
-    usedttktheme = darkttktheme
 
 # main window
 MainWindow = tk.Tk()
@@ -725,7 +735,7 @@ if WingWebDings == True:
     webdingsfont = font.Font(family="Webdings")
 else:
     LargeUnicodeFont = font.Font(family="TkDefaultFont", size=14)
-DarkModeTkVar = tk.BooleanVar(value=DarkMode)
+UseNativeThemeTkVar = tk.BooleanVar(value=UseNativeTheme)
 BorderDisplayTkVar = tk.BooleanVar(value=BorderDisplay)
 CurrentMsgBoxStyleTkVar = tk.StringVar(value=CurrentMsgBoxStyle)
 MainWindow.config(width=256, height=315)
