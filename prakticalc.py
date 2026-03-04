@@ -14,7 +14,7 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 # SPDX-License-Identifier: GPL-3.0
 
-# import modules
+# MODULES
 import tkinter as tk
 from tkinter import ttk, messagebox, font, scrolledtext
 from simpleeval import SimpleEval
@@ -35,7 +35,7 @@ import math
 import getpass # for getting the username
 import time
 
-# variables
+# VARIABLES
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
 PraktiCalcVersion = "1.5"
@@ -198,7 +198,7 @@ HexadecimalNumber = 0
 Calculation = "0"
 lcc = "" # last console command
 
-# functions
+# FUNCTIONS
 
 # sets the theme for a given window
 def changeTheme(WindowName):
@@ -870,7 +870,7 @@ if BorderDisplay == True:
     WindowFrame.rowconfigure(0, weight=0, uniform="")
 Outputframe = ttk.Frame(WindowFrame, borderwidth=1, relief="sunken")
 Output = ttk.Label(Outputframe, text="0")
-# Buttons
+# BUTTONS
 PlusButton = ttk.Button(WindowFrame, text="+", command=lambda: appendToCalculation("plus"))
 MinusButton = ttk.Button(WindowFrame, text="-", command=lambda: appendToCalculation("minus"))
 MultiplyButton = ttk.Button(WindowFrame, text="x", command=lambda: appendToCalculation("asterisk"))
