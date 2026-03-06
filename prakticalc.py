@@ -34,6 +34,12 @@ import shutil
 import math
 import getpass # for getting the username
 import time
+if platform.system() == "Windows":
+    import winreg
+elif platform.system() == "Darwin":
+    import plistlib
+else:
+    import configparser
 
 # VARIABLES
 CLIHelp = "--help" in sys.argv
@@ -197,6 +203,52 @@ BinaryNumber = 0
 HexadecimalNumber = 0
 Calculation = "0"
 lcc = "" # last console command
+
+# CLASSES
+class Configuration:
+    def __init__(self):
+        if platform.system() == "Windows":
+            self.backend = WindowsConfig()
+        elif platform.system() == "Darwin":
+            self.backend = MacConfig()
+        else:
+            self.backend = XDGConfig()
+    def get(self, key):
+        return self.backend.get(key)
+    def set(self, key, value):
+        self.backend.set(key, value)
+    def create(self):
+        self.backend.create()
+    def reset(self):
+        self.backend.reset()
+        MainWindow.destroy()
+        sys.exit(0)
+
+class WindowsConfig:
+    def get(self, key):
+        with winreg.OpenKeyEx(winreg.HKEY_CURRENT_USER, r"Software\PraktiCalc") as PraktiKey:
+            value = winreg.QueryValueEx(PraktiKey, str(key))[0]
+            return value
+    def set(self, key, value):
+        with winreg.OpenKeyEx(winreg.HKEY_CURRENT_USER, r"Software\PraktiCalc", 0, winreg.KEY_SET_VALUE) as PraktiKey:
+            if isinstance(value, str):
+                winreg.SetValueEx(PraktiKey, str(key), 0, winreg.REG_SZ, value)
+            elif isinstance(value, int):
+                winreg.SetValueEx(PraktiKey, str(key), 0, winreg.REG_DWORD, value)
+            elif isinstance(value, bool):
+                if value == True:
+                    winreg.SetValueEx(PraktiKey, str(key), 0, winreg.REG_DWORD, 1)
+                elif value == False:
+                    winreg.SetValueEx(PraktiKey, str(key), 0, winreg.REG_DWORD, 0)
+            else:
+                try:
+                    showError("Error saving Configuration")
+                except:
+                    messagebox.showerror("Error writing configuration")
+    def create(self):
+        winreg.CreateKey(winreg.HKEY_CURRENT_USER, r"Software\PraktiCalc")
+    def reset(self):
+        print(subprocess.getoutput(r'reg delete "HKEY_CURRENT_USER\Software\PraktiCalc" /f'))
 
 # FUNCTIONS
 
