@@ -866,8 +866,7 @@ Useful Tips:
         elif cominput.startswith("eval("):
             cominput = cominput[5:]
             try:
-                eval(cominput)
-                comoutput = "Command executed"
+                comoutput = eval(cominput, globals())
             except:
                 comoutput = "[!] Failed to execute command"
         elif cominput == "clear":
