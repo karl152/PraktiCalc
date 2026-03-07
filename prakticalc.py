@@ -909,8 +909,8 @@ Useful Tips:
             cominput = cominput[5:]
             try:
                 comoutput = eval(cominput, globals())
-            except:
-                comoutput = "[!] Failed to execute command"
+            except Exception as error:
+                comoutput = f"[!] Failed to execute command:\n{error}"
         elif cominput == "clear":
             ConsoleOutput.delete("1.0", tk.END)
             comoutput = ""
