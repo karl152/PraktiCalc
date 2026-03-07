@@ -250,6 +250,48 @@ class WindowsConfig:
     def reset(self):
         print(subprocess.getoutput(r'reg delete "HKEY_CURRENT_USER\Software\PraktiCalc" /f'))
 
+class XDGConfig:
+    def __init__(self):
+        self.config = configparser.ConfigParser()
+        self.folder = Path.home() / ".config" / "PraktiCalc"
+        self.path = self.folder / "config.ini"
+    def get(self, key):
+        self.config.read(self.path)
+        value = self.config["General"][str(key)]
+        try:
+            return int(value)
+        except:
+            if value == "true":
+                return 1
+            elif value == "false":
+                return 0
+            else:
+                return value
+    def set(self, key, value):
+        if isinstance(value, str):
+            self.config["General"][str(key)] = value
+        elif isinstance(value, bool):
+            if value == True:
+                self.config["General"][str(key)] = "true"
+            elif value == False:
+                self.config["General"][str(key)] = "false"
+        elif isinstance(value, int):
+            self.config["General"][str(key)] = str(value)
+        else:
+            try:
+                showError("Error saving Configuration")
+            except:
+                messagebox.showerror("Error writing configuration")
+        with open(self.path, "w") as configfile:
+            self.config.write(configfile)
+    def create(self):
+        self.folder.mkdir(parents=True)
+        self.config["General"] = {}
+        with open(self.path, "w") as configfile:
+            self.config.write(configfile)
+    def reset(self):
+        shutil.rmtree(self.folder)
+
 # FUNCTIONS
 
 # sets the theme for a given window
