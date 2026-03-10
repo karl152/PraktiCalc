@@ -261,7 +261,13 @@ class MacConfig:
     def get(self, key):
         with open(self.filepath, "rb") as file:
             content = plistlib.load(file)
-            return content[str(key)]
+            if not isinstance(content[str(key)], bool):
+                return content[str(key)]
+            else:
+                if content[str(key)] == True:
+                    return 1
+                else:
+                    return 0
     def set(self, key, value):
         if isinstance(value, str) or isinstance(value, int) or isinstance(value, bool):
             with open(self.filepath, "rb") as file:
