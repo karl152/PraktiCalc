@@ -263,11 +263,17 @@ class MacConfig:
             content = plistlib.load(file)
             return content[str(key)]
     def set(self, key, value):
-        with open(self.filepath, "rb") as file:
-            data = plistlib.load(file)
-        data[str(key)] = value
-        with open(self.filepath, "wb") as file:
-            plistlib.dump(data, file)
+        if isinstance(value, str) or isinstance(value, int) or isinstance(value, bool):
+            with open(self.filepath, "rb") as file:
+                data = plistlib.load(file)
+            data[str(key)] = value
+            with open(self.filepath, "wb") as file:
+                plistlib.dump(data, file)
+        else:
+            try:
+                showError("Error saving Configuration")
+            except:
+                messagebox.showerror("Error writing configuration")
     def create(self):
         with open(self.filepath, "wb") as file:
             plistlib.dump({}, file)
