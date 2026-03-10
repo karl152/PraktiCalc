@@ -207,6 +207,10 @@ lcc = "" # last console command
 # CLASSES
 class Configuration:
     def __init__(self):
+        # Configuration TODO:
+        # - always return booleans as 0 and 1
+        # - make it possible to delete values
+        # - does overwriting work?
         if platform.system() == "Windows":
             self.backend = WindowsConfig()
         elif platform.system() == "Darwin":
@@ -249,6 +253,26 @@ class WindowsConfig:
         winreg.CreateKey(winreg.HKEY_CURRENT_USER, r"Software\PraktiCalc")
     def reset(self):
         print(subprocess.getoutput(r'reg delete "HKEY_CURRENT_USER\Software\PraktiCalc" /f'))
+
+class MacConfig:
+    def __init__(self):
+        self.folder = Path.home() / "Library" / "Preferences"
+        self.filepath = self.folder / "com.github.karl152.PraktiCalc.plist"
+    def get(self, key):
+        with open(self.filepath, "rb") as file:
+            content = plistlib.load(file)
+            return content[str(key)]
+    def set(self, key, value):
+        with open(self.filepath, "rb") as file:
+            data = plistlib.load(file)
+        data[str(key)] = value
+        with open(self.filepath, "wb") as file:
+            plistlib.dump(data, file)
+    def create(self):
+        with open(self.filepath, "wb") as file:
+            plistlib.dump({}, file)
+    def reset(self):
+        Path(self.filepath).unlink()
 
 class XDGConfig:
     def __init__(self):
