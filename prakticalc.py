@@ -36,6 +36,7 @@ import getpass # for getting the username
 import time
 if platform.system() == "Windows":
     import winreg
+    from ctypes import wintypes
 elif platform.system() == "Darwin":
     import plistlib
 else:
@@ -47,9 +48,11 @@ CLIVersion = "--version" in sys.argv
 PraktiCalcVersion = "1.5"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 allowWindowsShutdownDialog = "--allowShutdownDialog" in sys.argv
+WindowList = ["MainWindow", "SettingsWindow", "HistoryX", "MoreWindow", "CustomInfox", "ErrorWindow", "ConsoleWindow", "ConsoleAboutWindow", "HelpWindow"]
 UseNativeTheme = False
 MsgBoxStyles = ["Tkinter", "Alternative"]
 if platform.system() == "Windows":
+    import ctypes
     UseNativeTheme = True
     if theming != 0:
         NativeTheme = "vista"
@@ -60,7 +63,6 @@ if platform.system() == "Windows":
     if allowWindowsShutdownDialog == True:
         MsgBoxStyles.append("Windows Shutdown")
     if BypassWindowsDPIFix == False:
-        import ctypes
         try:
             ctypes.windll.shcore.SetProcessDpiAwareness(1)
         except:
@@ -69,6 +71,8 @@ if platform.system() == "Windows":
         WingWebDings = True
     else:
         WingWebDings = False
+        dwmapi = ctypes.WinDLL("dwmapi")
+        DWMWA_USE_IMMERSIVE_DARK_MODE = 20
 elif platform.system() == "Darwin":
     UseNativeTheme = True
     if theming != 0:
@@ -208,7 +212,6 @@ lcc = "" # last console command
 class Configuration:
     def __init__(self):
         # Configuration TODO:
-        # - always return booleans as 0 and 1
         # - make it possible to delete values
         # - does overwriting work?
         if platform.system() == "Windows":
@@ -341,6 +344,7 @@ def changeTheme(WindowName):
             style = ttk.Style(WindowName)
             style.theme_use(NativeTheme)
     elif platform.system() == "Windows":
+        ajustTitleBars()
         if UseNativeTheme == False:
             style = ThemedStyle(WindowName)
             style.theme_use(thettktheme)
@@ -511,10 +515,11 @@ def loadTheme():
     global SettingsWindow, CurrentMsgBoxStyle, MsgBoxStyleSelect, ThemeSelector, thettktheme, DarkMode, UseNativeTheme
     thettktheme = ThemeSelector.get()
     UseNativeTheme = UseNativeThemeTkVar.get()
-    if ThemeSelector.get() == "black" or ThemeSelector.get() == "equilux":
+    if UseNativeTheme == False and ThemeSelector.get() == "black" or ThemeSelector.get() == "equilux":
         DarkMode = True
     else:
         DarkMode = False
+    ajustTitleBars()
     CurrentMsgBoxStyle = CurrentMsgBoxStyleTkVar.get()
     # print(CurrentMsgBoxStyle)
     try:
@@ -522,6 +527,24 @@ def loadTheme():
     except:
         pass
     SettingsWindow.destroy()
+
+# changes the appearance of the Windows title bar
+def ajustTitleBar(hwnd):
+    if platform.system() == "Windows":
+        try:
+            value = wintypes.BOOL(DarkMode)
+            dwmapi.DwmSetWindowAttribute(wintypes.HWND(hwnd), wintypes.DWORD(DWMWA_USE_IMMERSIVE_DARK_MODE), ctypes.byref(value), ctypes.sizeof(value))
+        except:
+            pass
+
+# changes the appearance of all Windows title bars
+def ajustTitleBars():
+    for window in WindowList:
+        try:
+            exec(f"{window}.update_idletasks()")
+            exec(f"ajustTitleBar(ctypes.windll.user32.GetParent({window}.winfo_id()))")
+        except:
+            pass
 
 # toggles border display
 def toggleBorderDisplay():
@@ -876,6 +899,7 @@ if console == True:
 
     # shows console about window
     def ConsoleAbout():
+        global ConsoleAboutWindow
         ConsoleAboutWindow = tk.Toplevel(MainWindow)
         if platform.system() == "Windows":
             ConsoleAboutWindow.attributes("-toolwindow", True)
@@ -895,6 +919,7 @@ if console == True:
         ConsoleAboutIcon.grid(row=0, column=0, padx=152, pady=20)
         ConsoleAboutText.grid(row=2, column=0, sticky="nesw")
         ConsoleAboutSpacer2.grid(row=3, column=0, sticky="nesw")
+        ajustTitleBars()
 
     # interpretes and executed a given command in the console
     def executeTheCommand(cominput):
@@ -1096,4 +1121,8 @@ elif big == False:
     MainWindow.geometry("250x250")
 else:
     MainWindow.geometry("400x400")
+MainWindow.update_idletasks()
+hwnd = ctypes.windll.user32.GetParent(MainWindow.winfo_id())
+if DarkMode == True:
+    ajustTitleBar(hwnd)
 MainWindow.mainloop()
