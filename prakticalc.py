@@ -1122,7 +1122,8 @@ elif big == False:
 else:
     MainWindow.geometry("400x400")
 MainWindow.update_idletasks()
-hwnd = ctypes.windll.user32.GetParent(MainWindow.winfo_id())
-if DarkMode == True:
-    ajustTitleBar(hwnd)
+if platform.system() == "Windows":
+    hwnd = ctypes.windll.user32.GetParent(MainWindow.winfo_id())
+    if DarkMode == True:
+        ajustTitleBar(hwnd)
 MainWindow.mainloop()
