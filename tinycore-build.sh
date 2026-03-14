@@ -4,6 +4,9 @@
 # See https://www.gnu.org/licenses/gpl-3.0.txt for details.
 # SPDX-License-Identifier: GPL-3.0
 
+# required TinyCore extensions to build: squashfs-tools.tcz
+# required TinyCore extensions to run: python3.14, tk8.6
+
 echo "Cleaning up from last build..."
 rm prakticalc.tcz*
 echo "Creating directories..."
@@ -11,7 +14,7 @@ mkdir -p linux-pkg-builds/tce/usr/share/prakticalc
 mkdir -p linux-pkg-builds/tce/usr/bin
 echo "Copying files..."
 cp linux-pkg-builds/debian/prakticalc/usr/bin/prakticalc linux-pkg-builds/tce/usr/bin/
-sed -i "s/bash/sh/g" linux-pkg-builds/tce/usr/bin/prakticalc
+sed -i "s/dash/sh/g" linux-pkg-builds/tce/usr/bin/prakticalc
 sed -i "s|/usr/bin/python3|/usr/local/bin/python3.14|g" linux-pkg-builds/tce/usr/bin/prakticalc
 cp prakticalc.py linux-pkg-builds/tce/usr/share/prakticalc/
 cp *_icon* linux-pkg-builds/tce/usr/share/prakticalc/
