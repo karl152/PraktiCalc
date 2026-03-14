@@ -17,7 +17,6 @@
 # MODULES
 import tkinter as tk
 from tkinter import ttk, messagebox, font, scrolledtext
-from simpleeval import SimpleEval
 from pathlib import Path
 try:
     from ttkthemes import ThemedStyle
@@ -130,14 +129,14 @@ if CLIVersion == True:
         print("PraktiCalc " + PraktiCalcVersion)
     sys.exit(0)
 
-calculate = SimpleEval()
-calculate.functions["sqrt"] = math.sqrt
-calculate.functions["sin"] = lambda x: math.sin(math.radians(x))
-calculate.functions["cos"] = lambda x: math.cos(math.radians(x))
-calculate.functions["tan"] = lambda x: math.tan(math.radians(x))
-calculate.functions["ld"] = math.log2
-calculate.functions["ln"] = math.log
-calculate.functions["lg"] = math.log10
+calculate = {}
+calculate["sqrt"] = math.sqrt
+calculate["sin"] = lambda x: math.sin(math.radians(x))
+calculate["cos"] = lambda x: math.cos(math.radians(x))
+calculate["tan"] = lambda x: math.tan(math.radians(x))
+calculate["ld"] = math.log2
+calculate["ln"] = math.log
+calculate["lg"] = math.log10
 
 def testPyInstallerOneFile():
     try:
@@ -414,8 +413,11 @@ def calc() :
     TheCalc = Calculation.replace("\u221a", "sqrt")
     TheCalc = TheCalc.replace("x", "*")
     TheCalc = TheCalc.replace("^", "**")
+    if "__" in TheCalc:
+        showError("Invalid input!")
+        return
     try:
-        Result = calculate.eval(TheCalc)
+        Result = eval(TheCalc, {"__builtins__": None}, calculate)
     except ZeroDivisionError:
         showError("Division by zero")
         return
