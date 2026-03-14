@@ -82,7 +82,7 @@ else:
     WingWebDings = False
     if theming != 0:
         NativeTheme = "default"
-    AdditionalLinuxMsgBoxStyles = ["xmessage", "yad", "kdialog", "zenity"]
+    AdditionalLinuxMsgBoxStyles = ["xmessage", "yad", "kdialog", "zenity", "Xdialog"]
     for MsgBoxStyle in AdditionalLinuxMsgBoxStyles:
         if shutil.which(MsgBoxStyle):
             MsgBoxStyles.append(MsgBoxStyle)
@@ -626,6 +626,8 @@ def CustomInfo() :
             elif CurrentMsgBoxStyle == "AppleScript":
                 asc = f'display dialog "{infotext}" with icon POSIX file "{PraktiCalcIconPath}"'
                 subprocess.run(["osascript", "-e", asc])
+            elif CurrentMsgBoxStyle == "Xdialog":
+                subprocess.Popen(["Xdialog", "--title=About PraktiCalc", "--msgbox", infotext, "10", "40"])
             else:
                 print("ERROR: Unknown Message Box Style")
 
@@ -684,6 +686,8 @@ def showError(message):
             elif CurrentMsgBoxStyle == "AppleScript":
                 asc = f'display dialog "{message}" with icon stop'
                 subprocess.run(["osascript", "-e", asc])
+            elif CurrentMsgBoxStyle == "Xdialog":
+                subprocess.Popen(["Xdialog", "--title=Error", "--msgbox", message, "10", "40"])
             else:
                 print("ERROR: Unknown Message Box Style")
 
