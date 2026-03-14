@@ -475,21 +475,18 @@ def ChangeDarkMode() :
     if DarkMode == False :
         DarkMode = True
         usedttktheme = darkttktheme
-        changeTheme(MainWindow)
-        changeTheme(SettingsWindow)
-        changeTheme(HistoryX)
-        changeTheme(MoreWindow)
-        changeTheme(ErrorWindow)
-        changeTheme(CustomInfox)
     elif DarkMode == True :
         DarkMode = False
         usedttktheme = thettktheme
-        changeTheme(MainWindow)
-        changeTheme(SettingsWindow)
+    changeTheme(MainWindow)
+    changeTheme(SettingsWindow)
+    try:
         changeTheme(HistoryX)
         changeTheme(MoreWindow)
         changeTheme(ErrorWindow)
         changeTheme(CustomInfox)
+    except:
+        pass
 
 # LEGACY: used to show a custom error messagebox dialog for dividing by zero
 def CustomDiv0() :
