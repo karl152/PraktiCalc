@@ -803,6 +803,7 @@ Useful Tips:
             ConsoleAbout()
         elif cominput == "exit":
             MainWindow.destroy()
+            return
         else:
             comoutput = "[X] Unknown command"
         ConsoleOutput.insert(tk.END, str(comoutput) + "\n")
