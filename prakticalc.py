@@ -363,23 +363,19 @@ def ChangeDarkMode() :
     if DarkMode == False :
         DarkMode = True
         usedttktheme = darkttktheme
-        changeTheme(MainWindow)
-        changeTheme(SettingsWindow)
-        changeTheme(HistoryX)
-        changeTheme(MoreWindow)
-        changeTheme(ErrorWindow)
-        changeTheme(CustomInfox)
-        changeTheme(HelpWindow)
     elif DarkMode == True :
         DarkMode = False
         usedttktheme = thettktheme
-        changeTheme(MainWindow)
-        changeTheme(SettingsWindow)
+    changeTheme(MainWindow)
+    changeTheme(SettingsWindow)
+    try:
         changeTheme(HistoryX)
         changeTheme(MoreWindow)
         changeTheme(ErrorWindow)
         changeTheme(CustomInfox)
         changeTheme(HelpWindow)
+    except:
+        pass
 
 # toggles border display
 def toggleBorderDisplay():
