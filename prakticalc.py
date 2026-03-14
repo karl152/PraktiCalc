@@ -137,6 +137,7 @@ calculate["tan"] = lambda x: math.tan(math.radians(x))
 calculate["ld"] = math.log2
 calculate["ln"] = math.log
 calculate["lg"] = math.log10
+calculate["pi"] = math.pi
 
 def testPyInstallerOneFile():
     try:
@@ -411,6 +412,7 @@ def clear() :
 def calc() :
     global Calculation, historylist, BorderDisplay, MainWindow
     TheCalc = Calculation.replace("\u221a", "sqrt")
+    TheCalc = TheCalc.replace("\u03c0", "pi")
     TheCalc = TheCalc.replace("x", "*")
     TheCalc = TheCalc.replace("^", "**")
     if "__" in TheCalc:
