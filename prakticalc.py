@@ -189,7 +189,6 @@ if breeze == True or yaru == True or keramik == True or equilux == True:
     UseNativeTheme = False
 BorderDisplay = "--borderdisplay" in sys.argv
 debug = "--debug" in sys.argv
-lcc = "" # last console command
 
 # CLASSES
 class Configuration:
@@ -1012,13 +1011,14 @@ Useful Tips:
 class ConsoleWindow(tk.Toplevel):
     def __init__(self, parent, helper, console):
         super().__init__(parent)
+        self.lcc = ""
         self.title("PraktiCalc Console")
         self.config(bg="black")
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=1)
-        self.bind("<Return>", lambda event: self.run(parent, helper, console))
+        self.bind("<Key>", lambda event: self.run(parent, helper, console) if event.keysym == "Return" else self.ConsoleKey(event))
         self.ConsoleOutput = scrolledtext.ScrolledText(self, bg="black", fg="white")
         self.ConsoleOutput.vbar.config(bg="black")
         ConsoleInputLabel = tk.Label(self, text="INPUT: ", bg="black", fg="white")
@@ -1030,7 +1030,7 @@ class ConsoleWindow(tk.Toplevel):
         ConsoleExecuteButton.grid(row=1, column=2, sticky="ew", pady=2, padx=2)
         self.ConsoleInput.focus_set()
     def run(self, parent, helper, console):
-        command = self.ConsoleInput.get()
+        self.lcc = command = self.ConsoleInput.get()
         if command == "clear":
             self.ConsoleOutput.delete("1.0", tk.END)
         elif command == "aboutwindow":
@@ -1043,6 +1043,11 @@ class ConsoleWindow(tk.Toplevel):
             self.ConsoleOutput.insert(tk.END, str(comoutput) + "\n")
             self.ConsoleOutput.see("end")
         self.ConsoleInput.delete(0, tk.END)
+    def ConsoleKey(self, event):
+        key = event.keysym
+        if key == "Up":
+            self.ConsoleInput.delete(0, tk.END)
+            self.ConsoleInput.insert(0, self.lcc)
     def AboutWindow(self, parent, helper): # shows console about window
         ConsoleAboutWindow = tk.Toplevel(parent)
         if platform.system() == "Windows":
