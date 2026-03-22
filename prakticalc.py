@@ -734,6 +734,7 @@ class Dialog:
         elif CurrentMsgBoxStyle == "Alternative":
             CustomInfox = tk.Toplevel(parent)
             CustomInfox.title("About PraktiCalc")
+            CustomInfox.bind("<Return>", lambda event: CustomInfox.destroy())
             CustomInfox.rowconfigure(0, weight=1)
             CustomInfox.columnconfigure(0, weight=1)
             if platform.system() == "Windows":
@@ -790,6 +791,7 @@ class Dialog:
         elif CurrentMsgBoxStyle == "Alternative":
             ErrorWindow = tk.Toplevel(parent)
             ErrorWindow.title("Error")
+            ErrorWindow.bind("<Return>", lambda event: ErrorWindow.destroy())
             ErrorWindow.rowconfigure(0, weight=1)
             ErrorWindow.columnconfigure(0, weight=1)
             if platform.system() == "Windows":
