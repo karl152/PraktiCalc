@@ -189,9 +189,6 @@ if breeze == True or yaru == True or keramik == True or equilux == True:
     UseNativeTheme = False
 BorderDisplay = "--borderdisplay" in sys.argv
 debug = "--debug" in sys.argv
-DecimalNumber = 0
-BinaryNumber = 0
-HexadecimalNumber = 0
 lcc = "" # last console command
 
 # CLASSES
