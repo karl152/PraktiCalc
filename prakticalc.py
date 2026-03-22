@@ -404,7 +404,7 @@ class WindowHelper:
                 self.style = ttk.Style(WindowName)
                 self.style.theme_use(NativeTheme)
         elif platform.system() == "Windows":
-            ajustTitleBars()
+            self.ajustTitleBars()
             if UseNativeTheme == False:
                 self.style = ThemedStyle(WindowName)
                 self.style.theme_use(thettktheme)
