@@ -82,7 +82,7 @@ else:
     WingWebDings = False
     if theming != 0:
         NativeTheme = "default"
-    AdditionalLinuxMsgBoxStyles = ["xmessage", "yad", "kdialog", "zenity", "Xdialog"]
+    AdditionalLinuxMsgBoxStyles = ["xmessage", "gxmessage", "yad", "kdialog", "zenity", "Xdialog"]
     for MsgBoxStyle in AdditionalLinuxMsgBoxStyles:
         if shutil.which(MsgBoxStyle):
             MsgBoxStyles.append(MsgBoxStyle)
@@ -772,6 +772,8 @@ class Dialog:
             else:
                 if CurrentMsgBoxStyle == "xmessage":
                     subprocess.Popen(["xmessage", "-title", "About PraktiCalc", infotext])
+                elif CurrentMsgBoxStyle == "gxmessage":
+                    subprocess.Popen(["gxmessage", "-title", "About PraktiCalc", infotext])
                 elif CurrentMsgBoxStyle == "yad":
                     subprocess.Popen(["yad", "--title=About PraktiCalc", "--info", "--image=" + PraktiCalcIconPath, "--button=OK", "--text=" + infotext])
                 elif CurrentMsgBoxStyle == "kdialog":
@@ -825,6 +827,8 @@ class Dialog:
             else:
                 if CurrentMsgBoxStyle == "xmessage":
                     subprocess.Popen(["xmessage", "-title", "Error", "[X] " + message])
+                elif CurrentMsgBoxStyle == "gxmessage":
+                    subprocess.Popen(["gxmessage", "-title", "Error", "[X] " + message])
                 elif CurrentMsgBoxStyle == "yad":
                     subprocess.Popen(["yad", "--title=Error", "--error", "--image=dialog-error", "--button=OK", "--no-markup", "--text", message])
                 elif CurrentMsgBoxStyle == "kdialog":
