@@ -20,11 +20,12 @@ You can download PraktiCalc on the right at the Releases section. There should b
 | prakticalc-x.x-debian.deb               | installable PraktiCalc Debian Package                            |
 | prakticalc-x.x-linux-amd64.AppImage     | portable AppImage file for Linux on 64-Bit x86 Processors        |
 | prakticalc-x.x-linux-aarch64.AppImage   | portable AppImage file for Linux on 64-Bit ARM Processors        |
-| prakticalc-x.x-macos-aarch64.app        | portable unsigned App file for MacOS on Apple Silicon Processors |
+| prakticalc-x.x-macOS-aarch64.app        | portable unsigned App file for macOS on Apple Silicon Processors |
+| prakticalc-x.x-tinycore.tcz*            | PraktiCalc TinyCore Extension, can be loaded on TinyCore 17+     |
 | Source code (zip)                       | ZIP archive with the source code                                 |
 | Source code (tar.gz)                    | gzipped tar archive with the source code                         |
 
-Please note that the MacOS package is unsigned. Look up how to open unsigned Apps on MacOS to use it.
+Please note that the macOS package is unsigned. Look up how to open unsigned Apps on macOS to use it.
 
 #### Development tools
 If you want to contribute to PraktiCalc and help with development, there are some developer tools for you. Use the Check button to print the values of the calculation variables, or use the more advanced PraktiCalc Console to get values of all global variables and manually execute functions within PraktiCalc. Just start it with the ```--console``` argument and use the ```help``` command to get started.
