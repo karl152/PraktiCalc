@@ -1079,10 +1079,11 @@ class ConsoleWindow(tk.Toplevel):
         ConsoleAboutSpacer2.grid(row=3, column=0, sticky="nesw")
         helper.ajustTitleBars()
 
-Calculator = PraktiCalculator()
-WindowHelp = WindowHelper()
-Window = MainWindow(WindowHelp, Calculator)
-if "--console" in sys.argv:
-    cmd = Console()
-    CMDWindow = ConsoleWindow(Window, WindowHelp, cmd)
-Window.mainloop()
+if __name__ == "__main__":
+    Calculator = PraktiCalculator()
+    WindowHelp = WindowHelper()
+    Window = MainWindow(WindowHelp, Calculator)
+    if "--console" in sys.argv:
+        cmd = Console()
+        CMDWindow = ConsoleWindow(Window, WindowHelp, cmd)
+    Window.mainloop()
