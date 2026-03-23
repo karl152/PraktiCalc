@@ -47,7 +47,6 @@ CLIVersion = "--version" in sys.argv
 PraktiCalcVersion = "1.5"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 allowWindowsShutdownDialog = "--allowShutdownDialog" in sys.argv
-WindowList = ["MainWindow", "SettingsWindow", "HistoryX", "MoreWindow", "CustomInfox", "ErrorWindow", "ConsoleWindow", "ConsoleAboutWindow", "HelpWindow"]
 UseNativeTheme = False
 MsgBoxStyles = ["Tkinter", "Alternative"]
 if platform.system() == "Windows":
@@ -394,6 +393,8 @@ class PraktiCalculator:
 
 # provides settings, theming and ajustments for windows
 class WindowHelper:
+    def __init__(self):
+        self.WindowList = []
     def changeTheme(self, WindowName): # sets the theme for a given window
         global theming
         if platform.system() == "Darwin":
@@ -462,12 +463,14 @@ class WindowHelper:
             except:
                 pass
     def ajustTitleBars(self): # changes the appearance of all Windows title bars
-        for window in WindowList:
+        for window in self.WindowList:
             try:
-                exec(f"{window}.update_idletasks()")
-                exec(f"self.ajustTitleBar(ctypes.windll.user32.GetParent({window}.winfo_id()))")
+                self.ajustTitleBar(ctypes.windll.user32.GetParent(window.winfo_id()))
             except:
                 pass
+    def close(self, window):
+        window.destroy()
+        self.WindowList.remove(window)
 
 # main window
 class MainWindow(tk.Tk):
@@ -494,7 +497,6 @@ class MainWindow(tk.Tk):
         self.config(width=256, height=315)
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
-        helper.changeTheme(self)
         self.WindowFrame = ttk.Frame(self)
         for colrow in range(6):
             self.WindowFrame.rowconfigure(colrow, weight=1, uniform="buttons")
@@ -523,7 +525,7 @@ class MainWindow(tk.Tk):
         EqualButton = ttk.Button(self.WindowFrame, text="=", command=lambda: self.calculate(self, helper, calculator))
         InfoButton = ttk.Button(self.WindowFrame, text="i", command=lambda: Dialog().info(self, helper))
         ZeroButton = ttk.Button(self.WindowFrame, text="0", command=lambda: self.zero(calculator))
-        self.ExitButton = ttk.Button(self.WindowFrame, text="X", command=self.destroy)
+        self.ExitButton = ttk.Button(self.WindowFrame, text="X", command=lambda: helper.close(self))
         LeftParenButton = ttk.Button(self.WindowFrame, text="(", command=lambda: self.append("parenleft", calculator))
         RightParenButton = ttk.Button(self.WindowFrame, text=")", command=lambda: self.append("parenright", calculator))
         if WingWebDings == True:
@@ -601,11 +603,10 @@ class MainWindow(tk.Tk):
             self.geometry("250x250")
         else:
             self.geometry("400x400")
+        self.protocol("WM_DELETE_WINDOW", lambda: helper.close(self))
         self.update_idletasks()
-        if platform.system() == "Windows":
-            hwnd = ctypes.windll.user32.GetParent(self.winfo_id())
-            if DarkMode == True:
-                helper.ajustTitleBar(hwnd)
+        helper.WindowList.append(self)
+        helper.changeTheme(self)
     def KeyPress(self, event, calculator, helper): # processes keyboard input
         Key = event.keysym
         if Key in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "plus", "minus", "asterisk", "slash", "comma", "parenleft", "parenright"]:
@@ -686,7 +687,6 @@ class SettingsWindow(tk.Toplevel):
         if platform.system() == "Windows":
             self.attributes("-toolwindow", True)
             self.focus_force()
-        helper.changeTheme(self)
         SettingsWindowFrame = ttk.Frame(self)
         SettingsWindowFrame.columnconfigure(0, weight=1)
         ThemeFrame = ttk.LabelFrame(SettingsWindowFrame, text="Theme")
@@ -710,6 +710,10 @@ class SettingsWindow(tk.Toplevel):
         MsgBoxStyleFrame.grid(row=3, column=0, sticky="ew", padx=10)
         MsgBoxStyleSelect.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
         SettingsOKButton.grid(row=4, column=0, sticky="ew", padx=10, pady=10)
+        self.protocol("WM_DELETE_WINDOW", lambda: helper.close(self))
+        self.update_idletasks()
+        helper.WindowList.append(self)
+        helper.changeTheme(self)
     def loadTheme(self, parent, helper): # saves the selected theme choice in the settigns window
         global CurrentMsgBoxStyle, thettktheme, DarkMode, UseNativeTheme
         thettktheme = self.ThemeSelector.get()
@@ -724,7 +728,7 @@ class SettingsWindow(tk.Toplevel):
             helper.changeTheme(parent)
         except:
             pass
-        self.destroy()
+        helper.close(self)
 
 # info and error dialogs
 class Dialog:
@@ -735,17 +739,16 @@ class Dialog:
         elif CurrentMsgBoxStyle == "Alternative":
             CustomInfox = tk.Toplevel(parent)
             CustomInfox.title("About PraktiCalc")
-            CustomInfox.bind("<Return>", lambda event: CustomInfox.destroy())
+            CustomInfox.bind("<Return>", lambda event: self.close(helper, CustomInfox))
             CustomInfox.rowconfigure(0, weight=1)
             CustomInfox.columnconfigure(0, weight=1)
             if platform.system() == "Windows":
                 CustomInfox.attributes("-toolwindow", True)
                 CustomInfox.focus_force()
-            helper.changeTheme(CustomInfox)
             CustomInfoFrame = ttk.Frame(CustomInfox)
             CustomInfoFrame.rowconfigure(0, weight=1)
             CustomInfoFrame.columnconfigure(0, weight=1)
-            CustomInfoExit = ttk.Button(CustomInfoFrame, text="OK", command=CustomInfox.destroy)
+            CustomInfoExit = ttk.Button(CustomInfoFrame, text="OK", command=lambda: helper.close(CustomInfox))
             ExtendedInfoFrame = ttk.LabelFrame(CustomInfoFrame, relief="sunken", text="[i]")
             ExtendedInfoFrame.rowconfigure(0, weight=1)
             ExtendedInfoFrame.rowconfigure(1, weight=1)
@@ -757,6 +760,10 @@ class Dialog:
             ExtendedInfoFrame.grid(row=0, column=0, padx=20, pady=10, sticky="nesw")
             ExtInfoIcon.grid(row=0, column=0)
             ExtInfoText1.grid(row=1, column=0)
+            CustomInfox.protocol("WM_DELETE_WINDOW", lambda: helper.close(CustomInfox))
+            CustomInfox.update_idletasks()
+            helper.WindowList.append(CustomInfox)
+            helper.changeTheme(CustomInfox)
         else:
             if platform.system() == "Windows":
                 pyver = platform.python_version()
@@ -795,17 +802,16 @@ class Dialog:
         elif CurrentMsgBoxStyle == "Alternative":
             ErrorWindow = tk.Toplevel(parent)
             ErrorWindow.title("Error")
-            ErrorWindow.bind("<Return>", lambda event: ErrorWindow.destroy())
+            ErrorWindow.bind("<Return>", lambda event: helper.close(ErrorWindow))
             ErrorWindow.rowconfigure(0, weight=1)
             ErrorWindow.columnconfigure(0, weight=1)
             if platform.system() == "Windows":
                 ErrorWindow.attributes("-toolwindow", True)
                 ErrorWindow.focus_force()
-            helper.changeTheme(ErrorWindow)
             ErrorWindowFrame = ttk.Frame(ErrorWindow)
             ErrorWindowFrame.rowconfigure(0, weight=1)
             ErrorWindowFrame.columnconfigure(0, weight=1)
-            ErrorExitButton = ttk.Button(ErrorWindowFrame, text="OK", command=ErrorWindow.destroy)
+            ErrorExitButton = ttk.Button(ErrorWindowFrame, text="OK", command=helper.close(ErrorWindow))
             ExtendedErrorFrame = ttk.LabelFrame(ErrorWindowFrame, relief="sunken", text="[X]")
             ExtendedErrorFrame.rowconfigure(0, weight=1)
             ExtendedErrorFrame.columnconfigure(0, weight=1)
@@ -814,6 +820,10 @@ class Dialog:
             ErrorExitButton.grid(row=1, column=1, padx=10, pady=10)
             ExtendedErrorFrame.grid(row=0, column=0, padx=20, pady=10, sticky="nesw")
             ErrorTextLabel.grid(row=0, column=0)
+            ErrorWindow.protocol("WM_DELETE_WINDOW", lambda: self.close(helper, ErrorWindow))
+            ErrorWindow.update_idletasks()
+            helper.WindowList.append(ErrorWindow)
+            helper.changeTheme(ErrorWindow)
         else:
             if platform.system() == "Windows":
                 styles = {
@@ -856,7 +866,6 @@ class HelpWindow(tk.Toplevel):
         self.title("PraktiCalc Help")
         if platform.system() == "Windows":
             self.focus_force()
-        helper.changeTheme(self)
         HelpFrame = ttk.Frame(self)
         HelpFrame.rowconfigure(0, weight=1)
         HelpFrame.columnconfigure(0, weight=1)
@@ -870,6 +879,10 @@ class HelpWindow(tk.Toplevel):
         HelpTabs.grid(row=0, column=0, sticky="nesw")
         Content1.insert(tk.END, "Sorry, this feature has been aborted.\n\n>_<")
         Content1.config(state="disabled")
+        self.protocol("WM_DELETE_WINDOW", lambda: helper.close(self))
+        self.update_idletasks()
+        helper.WindowList.append(self)
+        helper.changeTheme(self)
 
 # history window
 class HistoryWindow(tk.Toplevel):
@@ -882,7 +895,6 @@ class HistoryWindow(tk.Toplevel):
         if platform.system() == "Windows":
             self.attributes("-toolwindow", True)
             self.focus_force()
-        helper.changeTheme(self)
         HistoryWindowFrame = ttk.Frame(self)
         HistoryWindowFrame.columnconfigure(0, weight=1)
         HistoryWindowFrame.rowconfigure(0, weight=1)
@@ -894,6 +906,10 @@ class HistoryWindow(tk.Toplevel):
         HistoryClearButton = ttk.Button(HistoryWindowFrame, text="Clear History", command=lambda: self.clear(calculator))
         self.HistoryTreeview.grid(row=0, column=0, sticky="nesw")
         HistoryClearButton.grid(row=1, column=0, sticky="nesw", padx=5, pady=5)
+        self.protocol("WM_DELETE_WINDOW", lambda: helper.close(self))
+        self.update_idletasks()
+        helper.WindowList.append(self)
+        helper.changeTheme(self)
     def clear(self, calculator):
         calculator.clearHistory()
         self.HistoryTreeview.delete(*self.HistoryTreeview.get_children())
@@ -910,7 +926,6 @@ class ExtensionWindow(tk.Toplevel):
         if platform.system() == "Windows":
             self.attributes("-toolwindow", True)
             self.focus_force()
-        helper.changeTheme(self)
         ConverterWindowFrame = ttk.Frame(self)
         DecimalFrame = ttk.LabelFrame(ConverterWindowFrame, text="Decimal")
         self.DecimalInput = ttk.Entry(DecimalFrame, width=70)
@@ -941,6 +956,10 @@ class ExtensionWindow(tk.Toplevel):
         HexCopyButton.grid(row=1, column=0)
         if platform.system() != "Windows":
             self.DecimalInput.focus_set()
+        self.protocol("WM_DELETE_WINDOW", lambda: helper.close(self))
+        self.update_idletasks()
+        helper.WindowList.append(self)
+        helper.changeTheme(self)
     def MoreWindowEnterKey(self, event, parent, helper): # processes the enter key inside the window
         MoreWindowKey = event.keysym
         if MoreWindowKey == "Return":
@@ -1038,6 +1057,10 @@ class ConsoleWindow(tk.Toplevel):
         self.ConsoleInput.grid(row=1, column=1, sticky="ew")
         ConsoleExecuteButton.grid(row=1, column=2, sticky="ew", pady=2, padx=2)
         self.ConsoleInput.focus_set()
+        self.protocol("WM_DELETE_WINDOW", lambda: helper.close(self))
+        self.update_idletasks()
+        helper.WindowList.append(self)
+        helper.ajustTitleBars()
     def run(self, parent, helper, console):
         self.lcc = command = self.ConsoleInput.get()
         if command == "clear":
@@ -1045,7 +1068,7 @@ class ConsoleWindow(tk.Toplevel):
         elif command == "aboutwindow":
             self.AboutWindow(parent, helper)
         elif command == "exit":
-            parent.destroy()
+            helper.close(parent)
             return
         else:
             comoutput = console.execute(self.ConsoleInput.get())
@@ -1075,6 +1098,9 @@ class ConsoleWindow(tk.Toplevel):
         ConsoleAboutIcon.grid(row=0, column=0, padx=152, pady=20)
         ConsoleAboutText.grid(row=2, column=0, sticky="nesw")
         ConsoleAboutSpacer2.grid(row=3, column=0, sticky="nesw")
+        ConsoleAboutWindow.protocol("WM_DELETE_WINDOW", lambda: helper.close(ConsoleAboutWindow))
+        ConsoleAboutWindow.update_idletasks()
+        helper.WindowList.append(ConsoleAboutWindow)
         helper.ajustTitleBars()
 
 if __name__ == "__main__":
