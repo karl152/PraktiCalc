@@ -608,23 +608,23 @@ class MainWindow(tk.Tk):
                 helper.ajustTitleBar(hwnd)
     def KeyPress(self, event, calculator, helper): # processes keyboard input
         Key = event.keysym
-        match Key:
-            case "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "plus" | "minus" | "asterisk" | "slash" | "comma" | "parenleft" | "parenright":
-                self.append(Key, calculator)
-            case "0":
-                self.zero(calculator)
-            case "equal" | "Return":
-                self.calculate(self, helper, calculator)
-            case "h" | "H":
-                HistoryWindow(self, calculator, helper)
-            case "c" | "C":
-                self.clear(calculator)
-            case "i":
-                Dialog().info(self, helper)
-            case "s" | "S":
-                SettingsWindow(self, helper, calculator)
-            case "BackSpace":
-                self.backspace(calculator)
+        if Key in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "plus", "minus", "asterisk", "slash", "comma", "parenleft", "parenright"]:
+            self.append(Key, calculator)
+        else:
+            Keys = {
+                "0": lambda: self.zero(calculator),
+                "equal": lambda: self.calculate(self, helper, calculator),
+                "Return": lambda: self.calculate(self, helper, calculator),
+                "h": lambda: HistoryWindow(self, calculator, helper),
+                "H": lambda: HistoryWindow(self, calculator, helper),
+                "i": lambda: Dialog().info(self, helper),
+                "s": lambda: SettingsWindow(self, helper, calculator),
+                "S": lambda: SettingsWindow(self, helper, calculator),
+                "BackSpace": lambda: self.backspace(calculator),
+                }
+            run = Keys.get(Key)
+            if run:
+                run()
     def toggleBorderDisplay(self, calculator): # toggles border display
         global BorderDisplay
         if BorderDisplay == True:
@@ -760,38 +760,35 @@ class Dialog:
         else:
             if platform.system() == "Windows":
                 pyver = platform.python_version()
-                match CurrentMsgBoxStyle:
-                    case "VBScript":
-                        subprocess.Popen(["wscript", VBSInfoPath, PraktiCalcVersion, pyver])
-                    case "Windows Messaging Service":
-                        subprocess.Popen(["msg", getpass.getuser(), infotext])
-                    case "Windows Shutdown":
-                        subprocess.Popen(["shutdown", "/s", "/t", "60", "/c", infotext])
-                        time.sleep(20)
-                        subprocess.Popen(["shutdown", "/a"])
-                    case _:
-                        print("ERROR: Unknown Message Box Style")
+                styles = {
+                    "VBScript": lambda: subprocess.Popen(["wscript", VBSInfoPath, PraktiCalcVersion, pyver]),
+                    "Windows Messaging Service": lambda: subprocess.Popen(["msg", getpass.getuser(), infotext]),
+                    }
+                opendialog = styles.get(CurrentMsgBoxStyle)
+                if opendialog:
+                    opendialog()
+                elif CurrentMsgBoxStyle == "Windows Shutdown":
+                    subprocess.Popen(["shutdown", "/s", "/t", "60", "/c", infotext])
+                    time.sleep(20)
+                    subprocess.Popen(["shutdown", "/a"])
+                else:
+                    print("ERROR: Unknown Message Box Style")
             else:
-                match CurrentMsgBoxStyle:
-                    case "xmessage":
-                        subprocess.Popen(["xmessage", "-title", "About PraktiCalc", infotext])
-                    case "gxmessage":
-                        subprocess.Popen(["gxmessage", "-title", "About PraktiCalc", infotext])
-                    case "yad":
-                        subprocess.Popen(["yad", "--title=About PraktiCalc", "--info", "--image=" + PraktiCalcIconPath, "--button=OK", "--text=" + infotext])
-                    case "kdialog":
-                        subprocess.Popen(["kdialog", "--title=About PraktiCalc", "--msgbox", infotext])
-                    case "zenity":
-                        subprocess.Popen(["zenity", "--title=About PraktiCalc", "--info", "--icon=" + PraktiCalcIconPath, "--text=" + infotext])
-                    case "AppleScript":
-                        asc = f'display dialog "{infotext}" with icon POSIX file "{PraktiCalcIconPath}"'
-                        subprocess.run(["osascript", "-e", asc])
-                    case "Xdialog":
-                        subprocess.Popen(["Xdialog", "--title=About PraktiCalc", "--msgbox", infotext, "10", "40"])
-                    case "notify-send":
-                        subprocess.Popen(["notify-send", "About PraktiCalc", infotext])
-                    case _:
-                        print("ERROR: Unknown Message Box Style")
+                styles = {
+                    "xmessage": lambda: subprocess.Popen(["xmessage", "-title", "About PraktiCalc", infotext]),
+                    "gxmessage": lambda: subprocess.Popen(["gxmessage", "-title", "About PraktiCalc", infotext]),
+                    "yad": lambda: subprocess.Popen(["yad", "--title=About PraktiCalc", "--info", "--image=" + PraktiCalcIconPath, "--button=OK", "--text=" + infotext]),
+                    "kdialog": lambda: subprocess.Popen(["kdialog", "--title=About PraktiCalc", "--msgbox", infotext]),
+                    "zenity": lambda: subprocess.Popen(["zenity", "--title=About PraktiCalc", "--info", "--icon=" + PraktiCalcIconPath, "--text=" + infotext]),
+                    "AppleScript": lambda: subprocess.run(["osascript", "-e", f'display dialog "{infotext}" with icon POSIX file "{PraktiCalcIconPath}"']),
+                    "Xdialog": lambda: subprocess.Popen(["Xdialog", "--title=About PraktiCalc", "--msgbox", infotext, "10", "40"]),
+                    "notify-send": lambda: subprocess.Popen(["notify-send", "About PraktiCalc", infotext]),
+                    }
+                opendialog = styles.get(CurrentMsgBoxStyle)
+                if opendialog:
+                    opendialog()
+                else:
+                    print("ERROR: Unknown Message Box Style")
     def error(self, message, parent, helper): # shows error dialogs
         if CurrentMsgBoxStyle == "Tkinter":
             messagebox.showerror("Error", message)
@@ -819,38 +816,35 @@ class Dialog:
             ErrorTextLabel.grid(row=0, column=0)
         else:
             if platform.system() == "Windows":
-                match CurrentMsgBoxStyle:
-                    case "VBScript":
-                        subprocess.Popen(["wscript", VBSErrorPath, message])
-                    case "Windows Messaging Service":
-                        subprocess.Popen(["msg", getpass.getuser(), message])
-                    case "Windows Shutdown":
-                        subprocess.Popen(["shutdown", "/s", "/t", "60", "/c", message])
-                        time.sleep(10)
-                        subprocess.Popen(["shutdown", "/a"])
-                    case _:
-                        print("ERROR: Unknown Message Box Style")
+                styles = {
+                    "VBScript": lambda: subprocess.Popen(["wscript", VBSErrorPath, message]),
+                    "Windows Messaging Service": lambda: subprocess.Popen(["msg", getpass.getuser(), message]),
+                    }
+                opendialog = styles.get(CurrentMsgBoxStyle)
+                if opendialog:
+                    opendialog()
+                elif CurrentMsgBoxStyle == "Windows Shutdown":
+                    subprocess.Popen(["shutdown", "/s", "/t", "60", "/c", message])
+                    time.sleep(10)
+                    subprocess.Popen(["shutdown", "/a"])
+                else:
+                    print("ERROR: Unknown Message Box Style")
             else:
-                match CurrentMsgBoxStyle:
-                    case "xmessage":
-                        subprocess.Popen(["xmessage", "-title", "Error", "[X] " + message])
-                    case "gxmessage":
-                        subprocess.Popen(["gxmessage", "-title", "Error", "[X] " + message])
-                    case "yad":
-                        subprocess.Popen(["yad", "--title=Error", "--error", "--image=dialog-error", "--button=OK", "--no-markup", "--text", message])
-                    case "kdialog":
-                        subprocess.Popen(["kdialog", "--title=Error", "--error", message])
-                    case "zenity":
-                        subprocess.Popen(["zenity", "--title=Error", "--error", "--no-markup", "--text", message])
-                    case "AppleScript":
-                        asc = f'display dialog "{message}" with icon stop'
-                        subprocess.run(["osascript", "-e", asc])
-                    case "Xdialog":
-                        subprocess.Popen(["Xdialog", "--title=Error", "--msgbox", message, "10", "40"])
-                    case "notify-send":
-                        subprocess.Popen(["notify-send", "Error", message])
-                    case _:
-                        print("ERROR: Unknown Message Box Style")
+                styles = {
+                    "xmessage": lambda: subprocess.Popen(["xmessage", "-title", "Error", "[X] " + message]),
+                    "gxmessage": lambda: subprocess.Popen(["gxmessage", "-title", "Error", "[X] " + message]),
+                    "yad": lambda: subprocess.Popen(["yad", "--title=Error", "--error", "--image=dialog-error", "--button=OK", "--no-markup", "--text", message]),
+                    "kdialog": lambda: subprocess.Popen(["kdialog", "--title=Error", "--error", message]),
+                    "zenity": lambda: subprocess.Popen(["zenity", "--title=Error", "--error", "--no-markup", "--text", message]),
+                    "AppleScript": lambda: subprocess.run(["osascript", "-e", f'display dialog "{message}" with icon stop']),
+                    "Xdialog": lambda: subprocess.Popen(["Xdialog", "--title=Error", "--msgbox", message, "10", "40"]),
+                    "notify-send": lambda: subprocess.Popen(["notify-send", "Error", message]),
+                    }
+                opendialog = styles.get(CurrentMsgBoxStyle)
+                if opendialog:
+                    opendialog()
+                else:
+                    print("ERROR: Unknown Message Box Style")
 
 # unused help GUI
 class HelpWindow(tk.Toplevel):
