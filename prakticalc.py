@@ -40,7 +40,7 @@ import time
 # variables
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.4.1"
+PraktiCalcVersion = "1.4.2"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 allowWindowsShutdownDialog = "--allowShutdownDialog" in sys.argv
 MsgBoxStyles = ["Tkinter", "Alternative"]
