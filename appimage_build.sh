@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: GPL-3.0
 
 # REQUIREMENTS FOR DEBIAN
+# - wget2
 # - python3
 # - python3-tk
 # - python3-ttkthemes
@@ -51,12 +52,12 @@ mv ./dist/prakticalc/* ./linux-pkg-builds/AppImage/com.github.karl152.prakticalc
 chmod +x ./linux-pkg-builds/AppImage/com.github.karl152.prakticalc.AppDir/AppRun
 chmod +x ./linux-pkg-builds/AppImage/com.github.karl152.prakticalc.AppDir/usr/bin/prakticalc
 echo ""
-echo "------------------------------------------"
+echo "------------------------------------------------------------------------------------"
 echo "The script will now download appimagetool from https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -m).AppImage. If you don't want that, press CTRL+C now."
-echo "------------------------------------------"
+echo "------------------------------------------------------------------------------------"
 sleep 10
 echo "Downloading appimagetool"
-wget https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -m).AppImage
+wget2 https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -m).AppImage
 chmod +x appimagetool-$(uname -m).AppImage
 mv ./appimagetool-$(uname -m).AppImage ./linux-pkg-builds/AppImage/
 
