@@ -176,13 +176,13 @@ elif keramik == True:
     thettktheme = "keramik"
 else:
     thettktheme = "plastik"
-if equilux == True:
-    thettktheme = "equilux"
 if ThemingDisabled == False:
     DarkMode = "--dark" in sys.argv
     if DarkMode == True:
         thettktheme = "black"
         UseNativeTheme = False
+    if equilux == True:
+        thettktheme = "equilux"
 else:
     DarkMode = False
 if breeze == True or yaru == True or keramik == True or equilux == True:
