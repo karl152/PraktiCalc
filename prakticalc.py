@@ -33,13 +33,14 @@ import shutil
 import math
 import getpass # for getting the username
 import time
+import configparser
+import importlib.util
+import webbrowser
 if platform.system() == "Windows":
     import winreg
     from ctypes import wintypes
 elif platform.system() == "Darwin":
     import plistlib
-else:
-    import configparser
 
 # VARIABLES
 CLIHelp = "--help" in sys.argv
@@ -918,53 +919,115 @@ class HistoryWindow(tk.Toplevel):
 class ExtensionWindow(tk.Toplevel):
     def __init__(self, parent, helper, calculator):
         super().__init__(parent)
-        self.title("Decimal Converter")
-        self.config(height=200, width=500)
-        self.bind("<Key>", lambda event: self.MoreWindowEnterKey(event, parent, helper))
+        self.title("Extensions")
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
         if platform.system() == "Windows":
             self.attributes("-toolwindow", True)
             self.focus_force()
-        ConverterWindowFrame = ttk.Frame(self)
-        DecimalFrame = ttk.LabelFrame(ConverterWindowFrame, text="Decimal")
+            self.FolderPath = Path.home() / "AppData" / "Roaming" / "PraktiXtensions"
+        elif platform.system() == "Darwin":
+            self.FolderPath = Path.home() / "Library" / "PraktiXtensions"
+        else:
+            self.FolderPath = Path.home() / ".config" / "PraktiXtensions"
+        self.Tabs = ttk.Notebook(self)
+        self.Tabs.grid(row=0, column=0, sticky="news")
+        self.protocol("WM_DELETE_WINDOW", lambda: helper.close(self))
+        self.update_idletasks()
+        helper.WindowList.append(self)
+        helper.changeTheme(self)
+        self.after(250, lambda: self.loadExtensions(parent, helper, calculator))
+    def loadExtensions(self, parent, helper, calculator):
+        if not self.FolderPath.exists():
+            self.FolderPath.mkdir(parents=True)
+            self.updateDecimalConverter()
+            self.updateExtensionManager()
+        if Path(self.FolderPath / "DecimalConverter.ini").exists():
+            DecimalConverterMeta = configparser.ConfigParser()
+            DecimalConverterMeta.read(self.FolderPath / "DecimalConverter.ini")
+            if DecimalConverterMeta["PraktiXtension"]["version"] != "1.0":
+                self.updateDecimalConverter()
+        if Path(self.FolderPath / "ExtensionManager.ini").exists():
+            ExtensionManagerMeta = configparser.ConfigParser()
+            ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini")
+            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.1":
+                self.updateExtensionManager()
+        for file in self.FolderPath.iterdir():
+            if file.suffix == ".py":
+                if Path(self.FolderPath / f"{file.stem}.ini").exists():
+                    meta = configparser.ConfigParser()
+                    meta.read(Path(self.FolderPath / f"{file.stem}.ini"))
+                    if meta["PraktiXtension"]["minpython"] == "default":
+                        if meta["PraktiXtension"]["maxpython"] == "default":
+                            canload = True
+                        elif float(meta["PraktiXtension"]["maxpython"]) >= float(f"{platform.python_version_tuple()[0]}.{platform.python_version_tuple()[1]}"):
+                            canload = True
+                        else: canload = False
+                    elif float(meta["PraktiXtension"]["minpython"]) <= float(f"{platform.python_version_tuple()[0]}.{platform.python_version_tuple()[1]}"):
+                        canload = True
+                    else:
+                        canload = False
+                    if canload == True:
+                        spec = importlib.util.spec_from_file_location(file.stem, file)
+                        module = importlib.util.module_from_spec(spec)
+                        spec.loader.exec_module(module)
+                        classs = getattr(module, file.stem)
+                        instance = classs(self.Tabs, self, parent, helper, calculator)
+                        self.Tabs.add(instance, text=meta["PraktiXtension"]["name"])
+                        print("loaded extension " + meta["PraktiXtension"]["name"])
+                    else:
+                        Dialog().error("incompatible Python version", parent, helper)
+                else:
+                    spec = importlib.util.spec_from_file_location(file.stem, file)
+                    module = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(module)
+                    classs = getattr(module, file.stem)
+                    instance = classs(self.Tabs, self, parent, helper, calculator)
+                    self.Tabs.add(instance, text=file.stem)
+                    print("loaded extension " + file.stem)
+    def updateDecimalConverter(self):
+        if Path(self.FolderPath / "DecimalConverter.py").exists():
+            Path(self.FolderPath / "DecimalConverter.py").unlink()
+            Path(self.FolderPath / "DecimalConverter.ini").unlink(missing_ok=True)
+            Path(self.FolderPath / "DecimalConverter.txt").unlink(missing_ok=True)
+        if not Path(self.FolderPath / "DecimalConverter.py").exists():
+            DecimalConverterCode = """import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
+import platform
+
+class DecimalConverter(ttk.Frame):
+    def __init__(self, tabs, parent, mainWin, helper, calculator):
+        super().__init__(tabs)
+        DecimalFrame = ttk.LabelFrame(self, text="Decimal")
         self.DecimalInput = ttk.Entry(DecimalFrame, width=70)
         DecimalFrame.columnconfigure(0, weight=1)
-        ConverterWindowFrame.columnconfigure(0, weight=1)
-        ConverterWindowFrame.columnconfigure(1, weight=1)
-        ConverterWindowFrame.rowconfigure(1, weight=1)
-        InsertButton = ttk.Button(DecimalFrame, text="OK", command=lambda: self.convert(parent, helper))
-        binFrame = ttk.LabelFrame(ConverterWindowFrame, text="Binary")
-        hexFrame = ttk.LabelFrame(ConverterWindowFrame, text="Hexadecimal")
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        self.rowconfigure(1, weight=1)
+        InsertButton = ttk.Button(DecimalFrame, text="OK", command=lambda: self.convert(mainWin, helper))
+        binFrame = ttk.LabelFrame(self, text="Binary")
+        hexFrame = ttk.LabelFrame(self, text="Hexadecimal")
         binFrame.rowconfigure(0, weight=1)
         binFrame.columnconfigure(0, weight=1)
         hexFrame.rowconfigure(0, weight=1)
         hexFrame.columnconfigure(0, weight=1)
         self.BinaryLabel = ttk.Label(binFrame, text="")
         self.HexLabel = ttk.Label(hexFrame, text="")
-        BinCopyButton = ttk.Button(binFrame, text="Copy", command=lambda: self.copybin(parent))
-        HexCopyButton = ttk.Button(hexFrame, text="Copy", command=lambda: self.copyhex(parent))
-        ConverterWindowFrame.grid(row=0, column=0, sticky="nesw")
+        BinCopyButton = ttk.Button(binFrame, text="Copy", command=lambda: self.copybin(mainWin))
+        HexCopyButton = ttk.Button(hexFrame, text="Copy", command=lambda: self.copyhex(mainWin))
         DecimalFrame.grid(row=0, column=0, columnspan=2, sticky="nesw", padx=5)
         self.DecimalInput.grid(row=0, column=0, pady=5, padx=5, sticky="nesw")
         InsertButton.grid(row=0, column=1, padx=5, pady=5)
-        binFrame.grid(row=1, column=0, sticky="nesw", padx=5)
-        hexFrame.grid(row=1, column=1, sticky="nesw", padx=5)
+        binFrame.grid(row=1, column=0, sticky="nesw", padx=5, pady=(0, 5))
+        hexFrame.grid(row=1, column=1, sticky="nesw", padx=5, pady=(0, 5))
         self.BinaryLabel.grid(row=0, column=0)
         self.HexLabel.grid(row=0, column=0)
-        BinCopyButton.grid(row=1, column=0)
-        HexCopyButton.grid(row=1, column=0)
+        BinCopyButton.grid(row=1, column=0, pady=(0, 5))
+        HexCopyButton.grid(row=1, column=0, pady=(0, 5))
         if platform.system() != "Windows":
             self.DecimalInput.focus_set()
-        self.protocol("WM_DELETE_WINDOW", lambda: helper.close(self))
-        self.update_idletasks()
-        helper.WindowList.append(self)
-        helper.changeTheme(self)
-    def MoreWindowEnterKey(self, event, parent, helper): # processes the enter key inside the window
-        MoreWindowKey = event.keysym
-        if MoreWindowKey == "Return":
-            self.convert(parent, helper)
-    def convert(self, parent, helper): # converts decimal numbers into binary and hexadecimal
+    def convert(self, mainWin, helper): # converts decimal numbers into binary and hexadecimal
         cp = str(self.DecimalInput.get())
         try:
             DecimalNumber = int(cp)
@@ -973,15 +1036,178 @@ class ExtensionWindow(tk.Toplevel):
             self.BinaryLabel.config(text=str(BinaryNumber))
             self.HexLabel.config(text=str(HexadecimalNumber))
         except:
-            Dialog().error("Please enter a real number!", parent, helper)
-    def copybin(self, parent): # copies the binary output
-        parent.clipboard_clear()
-        parent.clipboard_append(self.BinaryLabel.cget("text"))
-        parent.update()
-    def copyhex(self, parent): # copies the hexadecimal output
-        parent.clipboard_clear()
-        parent.clipboard_append(self.HexLabel.cget("text"))
-        parent.update()
+            messagebox.showerror("Error", "Please enter a real number!")
+    def copybin(self, mainWin): # copies the binary output
+        mainWin.clipboard_clear()
+        mainWin.clipboard_append(self.BinaryLabel.cget("text"))
+        mainWin.update()
+    def copyhex(self, mainWin): # copies the hexadecimal output
+        mainWin.clipboard_clear()
+        mainWin.clipboard_append(self.HexLabel.cget("text"))
+        mainWin.update()"""
+            DecimalConverterMetadata = configparser.ConfigParser()
+            DecimalConverterMetadata["PraktiXtension"] = {"name": "Decimal Converter",
+                                                          "version": "1.0",
+                                                          "filename": "DecimalConverter.py",
+                                                          "description": "The PraktiCalc Decimal Converter",
+                                                          "website": "",
+                                                          "minpython": "default",
+                                                          "maxpython": "default",
+                                                          "sha256": "",
+                                                          "requiresinternet": "false",
+                                                          "pxtxlink": ""}
+            DecimalConverterDescription = "This is the known decimal converter that PraktiCalc includes by default, now as an extension."
+            with open(self.FolderPath / "DecimalConverter.py", "w") as dcfile:
+                dcfile.write(DecimalConverterCode)
+            with open(self.FolderPath / "DecimalConverter.ini", "w") as dcmeta:
+                DecimalConverterMetadata.write(dcmeta)
+            with open(self.FolderPath / "DecimalConverter.txt", "w") as dcdesc:
+                dcdesc.write(DecimalConverterDescription)
+    def updateExtensionManager(self):
+        if Path(self.FolderPath / "ExtensionManager.py").exists():
+            Path(self.FolderPath / "ExtensionManager.py").unlink()
+            Path(self.FolderPath / "ExtensionManager.ini").unlink(missing_ok=True)
+            Path(self.FolderPath / "ExtensionManager.txt").unlink(missing_ok=True)
+        if not Path(self.FolderPath / "ExtensionManager.py").exists():
+            ExtensionManagerCode = """import tkinter as tk
+from tkinter import ttk, font
+from pathlib import Path
+import webbrowser, configparser
+
+class ExtensionManager(ttk.Frame):
+    def __init__(self, tabs, parent, mainWin, helper, calculator):
+        super().__init__(tabs)
+        self.style = ttk.Style()
+        self.style.configure("ExtensionTitle.TLabel", font=font.Font(family="TkDefaultFont", size=15))
+        self.rowconfigure(1, weight=1)
+        self.columnconfigure(0, weight=1)
+        ttk.Label(self, text="The Extension Manager allows you to easily manage your installed extensions and even install new ones in the PraktiXtension (.pxt) format.").grid(row=0, column=0, sticky="w")
+        self.Splitter = ttk.PanedWindow(self, orient="horizontal")
+        self.LeftFrame = ttk.Frame(self.Splitter)
+        self.RightFrame = ttk.LabelFrame(self.Splitter, text="Metadata")
+        self.ExtensionTree = ttk.Treeview(self.LeftFrame, selectmode="browse")
+        self.ExtensionTree.bind("<<TreeviewSelect>>", lambda event: self.updateMetadataDisplay(parent))
+        self.ExtensionTree.heading("#0", text="Extensions")
+        for file in parent.FolderPath.iterdir():
+            if file.suffix == ".py":
+                self.ExtensionTree.insert("", tk.END, text=file.stem)
+        ttk.Label(self.RightFrame).grid(row=0, column=0)
+        self.ExtensionTree.grid(row=0, column=0, columnspan=2, sticky="news")
+        ttk.Button(self.LeftFrame, text="Add", state="disabled").grid(row=1, column=0, padx=10, pady=10, sticky="w")
+        ttk.Button(self.LeftFrame, text="Remove", state="disabled").grid(row=1, column=1, padx=10, pady=10, sticky="w")
+        self.LeftFrame.columnconfigure(1, weight=1)
+        self.RightFrame.columnconfigure(0, weight=1)
+        self.TitleLabel = ttk.Label(self.RightFrame, text="", style="ExtensionTitle.TLabel")
+        self.DescriptionLabel = ttk.Label(self.RightFrame, text="")
+        self.InternetLabel = ttk.Label(self.RightFrame, text="requires internet connection")
+        self.WebsiteButton = ttk.Button(self.RightFrame, text="Website")
+        self.VersionDisplay = ttk.Entry(self.RightFrame, state="readonly")
+        self.minPyVerDisplay = ttk.Entry(self.RightFrame, state="readonly")
+        self.maxPyVerDisplay = ttk.Entry(self.RightFrame, state="readonly")
+        self.FileNameDisplay = ttk.Entry(self.RightFrame, state="readonly")
+        self.WebLinkDisplay = ttk.Entry(self.RightFrame, state="readonly")
+        self.ChecksumDisplay = ttk.Entry(self.RightFrame, state="readonly")
+        self.TitleLabel.grid(row=0, column=0, columnspan=2, sticky="new")
+        self.DescriptionLabel.grid(row=1, column=0, columnspan=2, sticky="ew")
+        ttk.Separator(self.RightFrame, orient="horizontal").grid(row=3, column=0, columnspan=2, sticky="ew")
+        Labels = ["Version", "File name", "Website", "Minimal Python version", "Maximal Python version", "SHA256 checksum"]
+        Entrys = [self.VersionDisplay, self.FileNameDisplay, self.WebLinkDisplay, self.minPyVerDisplay, self.maxPyVerDisplay, self.ChecksumDisplay]
+        for i in range(6):
+            ttk.Label(self.RightFrame, text=Labels[i]).grid(row=i+4, column=0, sticky="ew", padx=10)
+            Entrys[i].grid(row=i+4, column=1, sticky="we", padx=10, pady=5)
+        self.DescriptionFrame = ttk.LabelFrame(self.RightFrame, text="Description")
+        self.DescriptionFrame.rowconfigure(0, weight=1)
+        self.DescriptionFrame.columnconfigure(0, weight=1)
+        self.DescriptionFrame.grid(row=10, column=0, columnspan=2, sticky="news", padx=5, pady=5)
+        self.DescriptionText = ttk.Label(self.DescriptionFrame, text="")
+        self.DescriptionText.grid(row=0, column=0, sticky="news", padx=5, pady=5)
+        self.LeftFrame.rowconfigure(0, weight=1)
+        self.RightFrame.columnconfigure(1, weight=1)
+        self.RightFrame.rowconfigure(10, weight=1)
+        self.Splitter.add(self.LeftFrame)
+        self.Splitter.add(self.RightFrame)
+        self.Splitter.grid(row=1, column=0, sticky="news")
+    def updateMetadataDisplay(self, parent):
+        ext = self.ExtensionTree.item(self.ExtensionTree.selection(), "text")
+        labels = [self.TitleLabel, self.DescriptionLabel]
+        displays = [self.VersionDisplay, self.FileNameDisplay, self.WebLinkDisplay, self.minPyVerDisplay, self.maxPyVerDisplay, self.ChecksumDisplay]
+        if Path(parent.FolderPath / f"{ext}.ini").exists():
+            metadata = configparser.ConfigParser()
+            metadata.read(Path(parent.FolderPath / f"{ext}.ini"))
+            self.TitleLabel.config(text=metadata["PraktiXtension"]["name"])
+            self.DescriptionLabel.config(text=metadata["PraktiXtension"]["description"])
+            if metadata["PraktiXtension"]["website"] != "":
+                try:
+                    self.WebsiteButton.config(command=lambda: webbrowser.open_new(metadata["PraktiXtension"]["website"]))
+                    self.WebsiteButton.grid(row=2, column=1, sticky="e", padx=5, pady=5)
+                except:
+                    pass
+            else:
+                try:
+                    self.WebsiteButton.config(command=None)
+                    self.WebsiteButton.grid_remove()
+                except:
+                    pass
+            if metadata["PraktiXtension"]["requiresinternet"] == "true":
+                try:
+                    self.InternetLabel.grid(row=2, column=0, sticky="ew")
+                except:
+                    pass
+            else:
+                try:
+                    self.InternetLabel.grid_remove()
+                except:
+                    pass
+            for display in displays:
+                display.config(state="normal")
+                display.delete(0, tk.END)
+            self.VersionDisplay.insert(0, metadata["PraktiXtension"]["version"])
+            self.FileNameDisplay.insert(0, metadata["PraktiXtension"]["filename"])
+            self.WebLinkDisplay.insert(0, metadata["PraktiXtension"]["website"])
+            self.minPyVerDisplay.insert(0, metadata["PraktiXtension"]["minpython"])
+            self.maxPyVerDisplay.insert(0, metadata["PraktiXtension"]["maxpython"])
+            self.ChecksumDisplay.insert(0, metadata["PraktiXtension"]["sha256"])
+            for display in displays:
+                display.config(state="readonly")
+        else:
+            for label in labels:
+                label.config(text="")
+            for display in displays:
+                display.config(state="normal")
+                display.delete(0, tk.END)
+                display.config(state="readonly")
+            try:
+                self.WebsiteButton.config(command=None)
+                self.WebsiteButton.grid_remove()
+            except:
+                pass
+            try:
+                self.InternetLabel.grid_remove()
+            except:
+                pass
+        if Path(parent.FolderPath / f"{ext}.txt").exists():
+            with open(Path(parent.FolderPath / f"{ext}.txt")) as txt:
+                self.DescriptionText.config(text=txt.read())
+        else:
+            self.DescriptionText.config(text="")"""
+            ExtensionManagerMetadata = configparser.ConfigParser()
+            ExtensionManagerMetadata["PraktiXtension"] = {"name": "Extension Manager",
+                                                          "version": "1.1",
+                                                          "filename": "ExtensionManager.py",
+                                                          "description": "The PraktiCalc Extension Manager",
+                                                          "website": "",
+                                                          "minpython": "default",
+                                                          "maxpython": "default",
+                                                          "sha256": "",
+                                                          "requiresinternet": "false",
+                                                          "pxtxlink": ""}
+            ExtensionManagerDescription = "A graphical user interface to easily manage extensions in PraktiCalc."
+            with open(self.FolderPath / "ExtensionManager.py", "w") as emfile:
+                emfile.write(ExtensionManagerCode)
+            with open(self.FolderPath / "ExtensionManager.ini", "w") as emmeta:
+                ExtensionManagerMetadata.write(emmeta)
+            with open(self.FolderPath / "ExtensionManager.txt", "w") as emdesc:
+                emdesc.write(ExtensionManagerDescription)
 
 # console
 class Console:
