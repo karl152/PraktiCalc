@@ -35,6 +35,7 @@ import getpass # for getting the username
 import time
 import configparser
 import importlib.util
+import webbrowser
 if platform.system() == "Windows":
     import winreg
     from ctypes import wintypes
@@ -949,17 +950,41 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "ExtensionManager.ini").exists():
             ExtensionManagerMeta = configparser.ConfigParser()
             ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini")
-            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.0":
+            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.1":
                 self.updateExtensionManager()
         for file in self.FolderPath.iterdir():
             if file.suffix == ".py":
-                print("loaded extension " + file.stem)
-                spec = importlib.util.spec_from_file_location(file.stem, file)
-                module = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(module)
-                classs = getattr(module, file.stem)
-                instance = classs(self.Tabs, self, parent, helper, calculator)
-                self.Tabs.add(instance, text=file.stem)
+                if Path(self.FolderPath / f"{file.stem}.ini").exists():
+                    meta = configparser.ConfigParser()
+                    meta.read(Path(self.FolderPath / f"{file.stem}.ini"))
+                    if meta["PraktiXtension"]["minpython"] == "default":
+                        if meta["PraktiXtension"]["maxpython"] == "default":
+                            canload = True
+                        elif float(meta["PraktiXtension"]["maxpython"]) >= float(f"{platform.python_version_tuple()[0]}.{platform.python_version_tuple()[1]}"):
+                            canload = True
+                        else: canload = False
+                    elif float(meta["PraktiXtension"]["minpython"]) <= float(f"{platform.python_version_tuple()[0]}.{platform.python_version_tuple()[1]}"):
+                        canload = True
+                    else:
+                        canload = False
+                    if canload == True:
+                        spec = importlib.util.spec_from_file_location(file.stem, file)
+                        module = importlib.util.module_from_spec(spec)
+                        spec.loader.exec_module(module)
+                        classs = getattr(module, file.stem)
+                        instance = classs(self.Tabs, self, parent, helper, calculator)
+                        self.Tabs.add(instance, text=meta["PraktiXtension"]["name"])
+                        print("loaded extension " + meta["PraktiXtension"]["name"])
+                    else:
+                        Dialog().error("incompatible Python version", parent, helper)
+                else:
+                    spec = importlib.util.spec_from_file_location(file.stem, file)
+                    module = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(module)
+                    classs = getattr(module, file.stem)
+                    instance = classs(self.Tabs, self, parent, helper, calculator)
+                    self.Tabs.add(instance, text=file.stem)
+                    print("loaded extension " + file.stem)
     def updateDecimalConverter(self):
         if Path(self.FolderPath / "DecimalConverter.py").exists():
             Path(self.FolderPath / "DecimalConverter.py").unlink()
@@ -1045,18 +1070,23 @@ class DecimalConverter(ttk.Frame):
             Path(self.FolderPath / "ExtensionManager.txt").unlink(missing_ok=True)
         if not Path(self.FolderPath / "ExtensionManager.py").exists():
             ExtensionManagerCode = """import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, font
+from pathlib import Path
+import webbrowser, configparser
 
 class ExtensionManager(ttk.Frame):
     def __init__(self, tabs, parent, mainWin, helper, calculator):
         super().__init__(tabs)
+        self.style = ttk.Style()
+        self.style.configure("ExtensionTitle.TLabel", font=font.Font(family="TkDefaultFont", size=15))
         self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
         ttk.Label(self, text="The Extension Manager allows you to easily manage your installed extensions and even install new ones in the PraktiXtension (.pxt) format.").grid(row=0, column=0, sticky="w")
         self.Splitter = ttk.PanedWindow(self, orient="horizontal")
         self.LeftFrame = ttk.Frame(self.Splitter)
         self.RightFrame = ttk.LabelFrame(self.Splitter, text="Metadata")
-        self.ExtensionTree = ttk.Treeview(self.LeftFrame)
+        self.ExtensionTree = ttk.Treeview(self.LeftFrame, selectmode="browse")
+        self.ExtensionTree.bind("<<TreeviewSelect>>", lambda event: self.updateMetadataDisplay(parent))
         self.ExtensionTree.heading("#0", text="Extensions")
         for file in parent.FolderPath.iterdir():
             if file.suffix == ".py":
@@ -1067,13 +1097,102 @@ class ExtensionManager(ttk.Frame):
         ttk.Button(self.LeftFrame, text="Remove", state="disabled").grid(row=1, column=1, padx=10, pady=10, sticky="w")
         self.LeftFrame.columnconfigure(1, weight=1)
         self.RightFrame.columnconfigure(0, weight=1)
-        for frame in [self.LeftFrame, self.RightFrame]:
-            frame.rowconfigure(0, weight=1)
-            self.Splitter.add(frame)
-        self.Splitter.grid(row=1, column=0, sticky="news")"""
+        self.TitleLabel = ttk.Label(self.RightFrame, text="", style="ExtensionTitle.TLabel")
+        self.DescriptionLabel = ttk.Label(self.RightFrame, text="")
+        self.InternetLabel = ttk.Label(self.RightFrame, text="requires internet connection")
+        self.WebsiteButton = ttk.Button(self.RightFrame, text="Website")
+        self.VersionDisplay = ttk.Entry(self.RightFrame, state="readonly")
+        self.minPyVerDisplay = ttk.Entry(self.RightFrame, state="readonly")
+        self.maxPyVerDisplay = ttk.Entry(self.RightFrame, state="readonly")
+        self.FileNameDisplay = ttk.Entry(self.RightFrame, state="readonly")
+        self.WebLinkDisplay = ttk.Entry(self.RightFrame, state="readonly")
+        self.ChecksumDisplay = ttk.Entry(self.RightFrame, state="readonly")
+        self.TitleLabel.grid(row=0, column=0, columnspan=2, sticky="new")
+        self.DescriptionLabel.grid(row=1, column=0, columnspan=2, sticky="ew")
+        ttk.Separator(self.RightFrame, orient="horizontal").grid(row=3, column=0, columnspan=2, sticky="ew")
+        Labels = ["Version", "File name", "Website", "Minimal Python version", "Maximal Python version", "SHA256 checksum"]
+        Entrys = [self.VersionDisplay, self.FileNameDisplay, self.WebLinkDisplay, self.minPyVerDisplay, self.maxPyVerDisplay, self.ChecksumDisplay]
+        for i in range(6):
+            ttk.Label(self.RightFrame, text=Labels[i]).grid(row=i+4, column=0, sticky="ew", padx=10)
+            Entrys[i].grid(row=i+4, column=1, sticky="we", padx=10, pady=5)
+        self.DescriptionFrame = ttk.LabelFrame(self.RightFrame, text="Description")
+        self.DescriptionFrame.rowconfigure(0, weight=1)
+        self.DescriptionFrame.columnconfigure(0, weight=1)
+        self.DescriptionFrame.grid(row=10, column=0, columnspan=2, sticky="news", padx=5, pady=5)
+        self.DescriptionText = ttk.Label(self.DescriptionFrame, text="")
+        self.DescriptionText.grid(row=0, column=0, sticky="news", padx=5, pady=5)
+        self.LeftFrame.rowconfigure(0, weight=1)
+        self.RightFrame.columnconfigure(1, weight=1)
+        self.RightFrame.rowconfigure(10, weight=1)
+        self.Splitter.add(self.LeftFrame)
+        self.Splitter.add(self.RightFrame)
+        self.Splitter.grid(row=1, column=0, sticky="news")
+    def updateMetadataDisplay(self, parent):
+        ext = self.ExtensionTree.item(self.ExtensionTree.selection(), "text")
+        labels = [self.TitleLabel, self.DescriptionLabel]
+        displays = [self.VersionDisplay, self.FileNameDisplay, self.WebLinkDisplay, self.minPyVerDisplay, self.maxPyVerDisplay, self.ChecksumDisplay]
+        if Path(parent.FolderPath / f"{ext}.ini").exists():
+            metadata = configparser.ConfigParser()
+            metadata.read(Path(parent.FolderPath / f"{ext}.ini"))
+            self.TitleLabel.config(text=metadata["PraktiXtension"]["name"])
+            self.DescriptionLabel.config(text=metadata["PraktiXtension"]["description"])
+            if metadata["PraktiXtension"]["website"] != "":
+                try:
+                    self.WebsiteButton.config(command=lambda: webbrowser.open_new(metadata["PraktiXtension"]["website"]))
+                    self.WebsiteButton.grid(row=2, column=1, sticky="e", padx=5, pady=5)
+                except:
+                    pass
+            else:
+                try:
+                    self.WebsiteButton.config(command=None)
+                    self.WebsiteButton.grid_remove()
+                except:
+                    pass
+            if metadata["PraktiXtension"]["requiresinternet"] == "true":
+                try:
+                    self.InternetLabel.grid(row=2, column=0, sticky="ew")
+                except:
+                    pass
+            else:
+                try:
+                    self.InternetLabel.grid_remove()
+                except:
+                    pass
+            for display in displays:
+                display.config(state="normal")
+                display.delete(0, tk.END)
+            self.VersionDisplay.insert(0, metadata["PraktiXtension"]["version"])
+            self.FileNameDisplay.insert(0, metadata["PraktiXtension"]["filename"])
+            self.WebLinkDisplay.insert(0, metadata["PraktiXtension"]["website"])
+            self.minPyVerDisplay.insert(0, metadata["PraktiXtension"]["minpython"])
+            self.maxPyVerDisplay.insert(0, metadata["PraktiXtension"]["maxpython"])
+            self.ChecksumDisplay.insert(0, metadata["PraktiXtension"]["sha256"])
+            for display in displays:
+                display.config(state="readonly")
+        else:
+            for label in labels:
+                label.config(text="")
+            for display in displays:
+                display.config(state="normal")
+                display.delete(0, tk.END)
+                display.config(state="readonly")
+            try:
+                self.WebsiteButton.config(command=None)
+                self.WebsiteButton.grid_remove()
+            except:
+                pass
+            try:
+                self.InternetLabel.grid_remove()
+            except:
+                pass
+        if Path(parent.FolderPath / f"{ext}.txt").exists():
+            with open(Path(parent.FolderPath / f"{ext}.txt")) as txt:
+                self.DescriptionText.config(text=txt.read())
+        else:
+            self.DescriptionText.config(text="")"""
             ExtensionManagerMetadata = configparser.ConfigParser()
             ExtensionManagerMetadata["PraktiXtension"] = {"name": "Extension Manager",
-                                                          "version": "1.0",
+                                                          "version": "1.1",
                                                           "filename": "ExtensionManager.py",
                                                           "description": "The PraktiCalc Extension Manager",
                                                           "website": "",
