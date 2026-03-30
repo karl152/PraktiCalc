@@ -950,7 +950,7 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "ExtensionManager.ini").exists():
             ExtensionManagerMeta = configparser.ConfigParser()
             ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini")
-            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.1":
+            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.2":
                 self.updateExtensionManager()
         for file in self.FolderPath.iterdir():
             if file.suffix == ".py":
@@ -1093,8 +1093,10 @@ class ExtensionManager(ttk.Frame):
                 self.ExtensionTree.insert("", tk.END, text=file.stem)
         ttk.Label(self.RightFrame).grid(row=0, column=0)
         self.ExtensionTree.grid(row=0, column=0, columnspan=2, sticky="news")
-        ttk.Button(self.LeftFrame, text="Add", state="disabled").grid(row=1, column=0, padx=10, pady=10, sticky="w")
-        ttk.Button(self.LeftFrame, text="Remove", state="disabled").grid(row=1, column=1, padx=10, pady=10, sticky="w")
+        self.AddButton = ttk.Button(self.LeftFrame, text="Add", state="disabled")
+        self.AddButton.grid(row=1, column=0, padx=10, pady=10, sticky="w")
+        self.RemoveButton = ttk.Button(self.LeftFrame, text="Remove", state="disabled", command=lambda: self.removeExtension(parent))
+        self.RemoveButton.grid(row=1, column=1, padx=10, pady=10, sticky="w")
         self.LeftFrame.columnconfigure(1, weight=1)
         self.RightFrame.columnconfigure(0, weight=1)
         self.TitleLabel = ttk.Label(self.RightFrame, text="", style="ExtensionTitle.TLabel")
@@ -1128,6 +1130,7 @@ class ExtensionManager(ttk.Frame):
         self.Splitter.add(self.RightFrame)
         self.Splitter.grid(row=1, column=0, sticky="news")
     def updateMetadataDisplay(self, parent):
+        self.RemoveButton.config(state="normal")
         ext = self.ExtensionTree.item(self.ExtensionTree.selection(), "text")
         labels = [self.TitleLabel, self.DescriptionLabel]
         displays = [self.VersionDisplay, self.FileNameDisplay, self.WebLinkDisplay, self.minPyVerDisplay, self.maxPyVerDisplay, self.ChecksumDisplay]
@@ -1185,14 +1188,22 @@ class ExtensionManager(ttk.Frame):
                 self.InternetLabel.grid_remove()
             except:
                 pass
+            if ext == "":
+                self.RemoveButton.config(state="disabled")
         if Path(parent.FolderPath / f"{ext}.txt").exists():
             with open(Path(parent.FolderPath / f"{ext}.txt")) as txt:
                 self.DescriptionText.config(text=txt.read())
         else:
-            self.DescriptionText.config(text="")"""
+            self.DescriptionText.config(text="")
+    def removeExtension(self, parent):
+        ext = self.ExtensionTree.item(self.ExtensionTree.selection(), "text")
+        Path(parent.FolderPath / f"{ext}.py").unlink()
+        Path(parent.FolderPath / f"{ext}.ini").unlink(missing_ok=True)
+        Path(parent.FolderPath / f"{ext}.txt").unlink(missing_ok=True)
+        self.ExtensionTree.delete(self.ExtensionTree.selection()[0])"""
             ExtensionManagerMetadata = configparser.ConfigParser()
             ExtensionManagerMetadata["PraktiXtension"] = {"name": "Extension Manager",
-                                                          "version": "1.1",
+                                                          "version": "1.2",
                                                           "filename": "ExtensionManager.py",
                                                           "description": "The PraktiCalc Extension Manager",
                                                           "website": "",
