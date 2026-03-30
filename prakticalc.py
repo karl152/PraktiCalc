@@ -16,7 +16,7 @@
 
 # MODULES
 import tkinter as tk
-from tkinter import ttk, messagebox, font, scrolledtext
+from tkinter import ttk, messagebox, font, scrolledtext, filedialog
 from pathlib import Path
 try:
     from ttkthemes import ThemedStyle
@@ -26,7 +26,7 @@ except:
 # 0 = no theming
 # 1 = theming from ttkthemes
 # 2 = manual theming
-import platform, subprocess, sys, shutil, math, getpass, time, configparser, importlib.util, webbrowser
+import platform, subprocess, sys, shutil, math, getpass, time, configparser, importlib.util, webbrowser, zipfile, tempfile, hashlib
 if platform.system() == "Windows":
     import winreg
     from ctypes import wintypes
@@ -941,7 +941,7 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "ExtensionManager.ini").exists():
             ExtensionManagerMeta = configparser.ConfigParser()
             ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini")
-            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.2":
+            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.3":
                 self.updateExtensionManager()
         for file in self.FolderPath.iterdir():
             if file.suffix == ".py":
@@ -1061,9 +1061,9 @@ class DecimalConverter(ttk.Frame):
             Path(self.FolderPath / "ExtensionManager.txt").unlink(missing_ok=True)
         if not Path(self.FolderPath / "ExtensionManager.py").exists():
             ExtensionManagerCode = """import tkinter as tk
-from tkinter import ttk, font
+from tkinter import ttk, font, messagebox, filedialog
 from pathlib import Path
-import webbrowser, configparser
+import webbrowser, configparser, zipfile, tempfile, hashlib, shutil
 
 class ExtensionManager(ttk.Frame):
     def __init__(self, tabs, parent, mainWin, helper, calculator):
@@ -1084,7 +1084,7 @@ class ExtensionManager(ttk.Frame):
                 self.ExtensionTree.insert("", tk.END, text=file.stem)
         ttk.Label(self.RightFrame).grid(row=0, column=0)
         self.ExtensionTree.grid(row=0, column=0, columnspan=2, sticky="news")
-        self.AddButton = ttk.Button(self.LeftFrame, text="Add", state="disabled")
+        self.AddButton = ttk.Button(self.LeftFrame, text="Add", command=lambda: self.addExtension(parent))
         self.AddButton.grid(row=1, column=0, padx=10, pady=10, sticky="w")
         self.RemoveButton = ttk.Button(self.LeftFrame, text="Remove", state="disabled", command=lambda: self.removeExtension(parent))
         self.RemoveButton.grid(row=1, column=1, padx=10, pady=10, sticky="w")
@@ -1191,10 +1191,68 @@ class ExtensionManager(ttk.Frame):
         Path(parent.FolderPath / f"{ext}.py").unlink()
         Path(parent.FolderPath / f"{ext}.ini").unlink(missing_ok=True)
         Path(parent.FolderPath / f"{ext}.txt").unlink(missing_ok=True)
-        self.ExtensionTree.delete(self.ExtensionTree.selection()[0])"""
+        self.ExtensionTree.delete(self.ExtensionTree.selection()[0])
+    def addExtension(self, parent):
+        file = filedialog.askopenfilename(filetypes=[("PraktiXtension", "*.pxt")])
+        if file == () or file == "":
+            return
+        with tempfile.TemporaryDirectory() as tempdir:
+            with zipfile.ZipFile(file, "r") as Extension:
+                for filename in Extension.namelist():
+                    if ".." in filename or filename.startswith("/"):
+                        messagebox.showerror("Security alert", "Installing this extension would creates files outside of the usual extension directories, thus it's installation is aborted.")
+                        return
+                if not "info.ini" in Extension.namelist():
+                    abort = True
+                elif not "description.txt" in Extension.namelist():
+                    abort = True
+                else:
+                    abort = False
+                if abort == False:
+                    Extension.extractall(tempdir)
+                else:
+                    messagebox.showwarning("Warning", "Extension couldn't be installed")
+                    return
+                try:
+                    metadata = configparser.ConfigParser()
+                    metadata.read(Path(tempdir) / "info.ini")
+                    ExtensionName = metadata["PraktiXtension"]["filename"]
+                    if not ExtensionName in [file.name for file in Path(tempdir).iterdir() if file.is_file()]:
+                        raise FileNotFoundError
+                    with open(Path(tempdir) / ExtensionName, "rb") as ExtensionFile:
+                        if not metadata["PraktiXtension"]["sha256"] == "" or hashlib.sha256(ExtensionFile.read()).hexdigest() == metadata["PraktiXtension"]["sha256"]:
+                            raise ResourceWarning
+                    if metadata["PraktiXtension"]["minpython"] == "default":
+                        if metadata["PraktiXtension"]["maxpython"] == "default":
+                            canload = True
+                        elif tuple(metadata["PraktiXtension"]["maxpython"].split(".")) >= platform.python_version_tuple()[:-1]:
+                            canload = True
+                        else: canload = False
+                    elif tuple(metadata["PraktiXtension"]["minpython"].split(".")) <= platform.python_version_tuple()[:-1]:
+                        canload = True
+                    else:
+                        canload = False
+                    if canload == False:
+                        raise ImportWarning
+                    shutil.move(Path(tempdir) / "info.ini", parent.FolderPath / f"{ExtensionName[:-3]}.ini")
+                    shutil.move(Path(tempdir) / "description.txt", parent.FolderPath / f"{ExtensionName[:-3]}.txt")
+                    shutil.move(Path(tempdir) / ExtensionName, parent.FolderPath / ExtensionName)
+                    self.ExtensionTree.insert("", tk.END, text=ExtensionName[:-3])
+                except FileNotFoundError:
+                    messagebox.showerror("Error", "Extension not found in file")
+                    return
+                except ResourceWarning:
+                    messagebox.showerror("Cryptographic verification of extension failed")
+                    return
+                except ImportWarning:
+                    messagebox.showerror("Incompatible Python version")
+                    return
+                except Exception as e:
+                    messagebox.showerror("Error", str(e))
+                    return"""
             ExtensionManagerMetadata = configparser.ConfigParser()
             ExtensionManagerMetadata["PraktiXtension"] = {"name": "Extension Manager",
-                                                          "version": "1.2",
+                                                          "version": "1.3",
                                                           "filename": "ExtensionManager.py",
                                                           "description": "The PraktiCalc Extension Manager",
                                                           "website": "",
