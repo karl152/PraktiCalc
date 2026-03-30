@@ -323,7 +323,6 @@ class PraktiCalculator:
     def calculate(self): # does the actual calculation, used to include 171 if-statements
         TheCalc = self.CalculationString.replace("\u221a", "sqrt")
         TheCalc = TheCalc.replace("\u03c0", "pi")
-        TheCalc = TheCalc.replace("x", "*")
         TheCalc = TheCalc.replace("^", "**")
         if "__" in TheCalc:
             raise ValueError
@@ -350,7 +349,7 @@ class PraktiCalculator:
     def append(self, char): # append a character to the calculation string
         char = char.replace("plus", "+")
         char = char.replace("minus", "-")
-        char = char.replace("asterisk", "x")
+        char = char.replace("asterisk", "*")
         char = char.replace("slash", "/")
         char = char.replace("comma", ".")
         char = char.replace("parenleft", "(")
