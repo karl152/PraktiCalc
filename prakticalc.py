@@ -26,16 +26,7 @@ except:
 # 0 = no theming
 # 1 = theming from ttkthemes
 # 2 = manual theming
-import platform
-import subprocess
-import sys
-import shutil
-import math
-import getpass # for getting the username
-import time
-import configparser
-import importlib.util
-import webbrowser
+import platform, subprocess, sys, shutil, math, getpass, time, configparser, importlib.util, webbrowser
 if platform.system() == "Windows":
     import winreg
     from ctypes import wintypes
