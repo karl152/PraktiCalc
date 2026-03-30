@@ -145,10 +145,10 @@ def pageReload():
         InstallWizardWindow.geometry("408x420")
         DestinationText = ttk.Label(MainFrame, text="PraktiCalc will be installed into the following directory:")
         DestinationText.grid(row=0, column=0, padx=10, pady=10)
-        DestinationPathFrame = ttk.Frame(MainFrame, borderwidth=1, relief="sunken")
-        DestinationPathFrame.grid(row=1, column=0, padx=10, pady=10)
-        DestinationPathLabel = ttk.Label(DestinationPathFrame, text="C:/Program Files/PraktiCalc")
-        DestinationPathLabel.grid(row=0, column=0, padx=2, pady=2)
+        DestinationPathDisplay = ttk.Entry(MainFrame)
+        DestinationPathDisplay.insert(0, ExtractTo)
+        DestinationPathDisplay.config(state="readonly", width=28)
+        DestinationPathDisplay.grid(row=1, column=0, padx=10, pady=10)
         if TTS == True:
             speak("PraktiCalc will be installed into the following directory: C:/Program Files/PraktiCalc")
     elif WizardPage == 3:
