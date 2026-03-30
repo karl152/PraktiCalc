@@ -17,15 +17,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-import threading
-import subprocess
-import platform
-import ctypes
-import sys
-import zipfile
-import getpass
-import shutil
-import winreg
+import threading, subprocess, platform, ctypes, sys, zipfile, shutil, winreg
 from pathlib import Path
 try:
     ctypes.windll.shcore.SetProcessDpiAwareness(1)
@@ -89,7 +81,7 @@ if "--help" in sys.argv:
     sys.exit(0)
 
 ExtractTo = "C:/Program Files/PraktiCalc"
-username = getpass.getuser()
+username = Path.home().stem
 
 def forward():
     global WizardPage
