@@ -960,10 +960,10 @@ class ExtensionWindow(tk.Toplevel):
                     if meta["PraktiXtension"]["minpython"] == "default":
                         if meta["PraktiXtension"]["maxpython"] == "default":
                             canload = True
-                        elif float(meta["PraktiXtension"]["maxpython"]) >= float(f"{platform.python_version_tuple()[0]}.{platform.python_version_tuple()[1]}"):
+                        elif tuple(meta["PraktiXtension"]["maxpython"].split(".")) >= platform.python_version_tuple()[:-1]:
                             canload = True
                         else: canload = False
-                    elif float(meta["PraktiXtension"]["minpython"]) <= float(f"{platform.python_version_tuple()[0]}.{platform.python_version_tuple()[1]}"):
+                    elif tuple(meta["PraktiXtension"]["minpython"].split(".")) <= platform.python_version_tuple()[:-1]:
                         canload = True
                     else:
                         canload = False
