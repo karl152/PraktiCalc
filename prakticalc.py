@@ -950,7 +950,7 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "PraktiGraph.ini").exists():
             PraktiGraphMeta = configparser.ConfigParser()
             PraktiGraphMeta.read(self.FolderPath / "PraktiGraph.ini")
-            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.0":
+            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.1":
                 self.updatePraktiGraph()
         for file in self.FolderPath.iterdir():
             if file.suffix == ".py":
@@ -1342,34 +1342,40 @@ class PraktiGraph(ttk.Frame):
             self.Canvas.create_line(0, height/2-i*self.Scale.get(), width, height/2-i*self.Scale.get(), fill="grey")
             self.Canvas.create_text(width/2+self.TextOffset, height/2-i*self.Scale.get(), text=str(i)) if i != 0 and self.Numbers.get() == True else self.doNothing()
         if self.fxEntry.get() != "":
-            try:
-                values = []
-                for col in self.cols:
+            values = []
+            for col in self.cols:
+                try:
                     values.append(calculator.quickCalc(self.fxEntry.get().replace("x", f"({col})")))
-                self.Table.item(self.FirstTableRow, values=values)
-                values = []
-                for i in range(-1000, 1000):
-                    realI = i*0.1 # because range doesn't support floats
+                except:
+                    values.append("")
+            self.Table.item(self.FirstTableRow, values=values)
+            values = []
+            for i in range(-1000, 1000):
+                realI = i*0.1 # because range doesn't support floats
+                try:
                     values.append((realI, calculator.quickCalc(self.fxEntry.get().replace("x", f"({realI})"))))
-                for f in range(len(values)-1):
-                    self.Canvas.create_line(self.XtoX(values[f][0]), self.YtoY(values[f][1]), self.XtoX(values[f+1][0]), self.YtoY(values[f+1][1]), fill=self.fxColor)
-            except Exception as e:
-                messagebox.showwarning("Warning", "Couldn't perform calculation for f(x):" + str(e))
+                except:
+                    pass
+            for f in range(len(values)-1):
+                self.Canvas.create_line(self.XtoX(values[f][0]), self.YtoY(values[f][1]), self.XtoX(values[f+1][0]), self.YtoY(values[f+1][1]), fill=self.fxColor)
         if self.gxEntry.get() != "":
-            try:
-                values = []
-                for col in self.cols:
+            values = []
+            for col in self.cols:
+                try:
                     values.append(calculator.quickCalc(self.gxEntry.get().replace("x", f"({col})")))
-                self.Table.item(self.SecondTableRow, values=values)
-                values = []
-                for i in range(-1000, 1000):
-                    realI = i*0.1 # because range doesn't support floats
+                except:
+                    values.append("")
+            self.Table.item(self.SecondTableRow, values=values)
+            values = []
+            for i in range(-1000, 1000):
+                realI = i*0.1 # because range doesn't support floats
+                try:
                     values.append((realI, calculator.quickCalc(self.gxEntry.get().replace("x", f"({realI})"))))
-                for f in range(len(values)-1):
-                    self.Canvas.create_line(self.XtoX(values[f][0]), self.YtoY(values[f][1]), self.XtoX(values[f+1][0]), self.YtoY(values[f+1][1]), fill=self.gxColor)
-            except Exception as e:
-                messagebox.showwarning("Warning", "Couldn't perform calculation for g(x):" + str(e))
-        
+                except:
+                    pass
+            for f in range(len(values)-1):
+                self.Canvas.create_line(self.XtoX(values[f][0]), self.YtoY(values[f][1]), self.XtoX(values[f+1][0]), self.YtoY(values[f+1][1]), fill=self.gxColor)
+
     def clear(self):
         self.Canvas.delete("all")
         emptyness = []
@@ -1396,7 +1402,7 @@ class PraktiGraph(ttk.Frame):
         pass"""
             PraktiGraphMetadata = configparser.ConfigParser()
             PraktiGraphMetadata["PraktiXtension"] = {"name": "PraktiGraph",
-                                                          "version": "1.0",
+                                                          "version": "1.1",
                                                           "filename": "PraktiGraph.py",
                                                           "description": "The PraktiCalc Graph Thing",
                                                           "website": "",
