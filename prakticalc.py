@@ -16,7 +16,7 @@
 
 # MODULES
 import tkinter as tk
-from tkinter import ttk, messagebox, font, scrolledtext, filedialog
+from tkinter import ttk, messagebox, font, scrolledtext, filedialog, colorchooser
 from pathlib import Path
 try:
     from ttkthemes import ThemedStyle
@@ -26,7 +26,7 @@ except:
 # 0 = no theming
 # 1 = theming from ttkthemes
 # 2 = manual theming
-import platform, subprocess, sys, shutil, math, getpass, time, configparser, importlib.util, webbrowser, zipfile, tempfile, hashlib
+import platform, subprocess, sys, shutil, math, getpass, time, configparser, importlib.util, webbrowser, zipfile, tempfile, hashlib, re
 if platform.system() == "Windows":
     import winreg
     from ctypes import wintypes
@@ -932,6 +932,7 @@ class ExtensionWindow(tk.Toplevel):
             self.FolderPath.mkdir(parents=True)
             self.updateDecimalConverter()
             self.updateExtensionManager()
+            self.updatePraktiGraph()
         if Path(self.FolderPath / "DecimalConverter.ini").exists():
             DecimalConverterMeta = configparser.ConfigParser()
             DecimalConverterMeta.read(self.FolderPath / "DecimalConverter.ini")
@@ -942,6 +943,11 @@ class ExtensionWindow(tk.Toplevel):
             ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini")
             if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.3":
                 self.updateExtensionManager()
+        if Path(self.FolderPath / "PraktiGraph.ini").exists():
+            PraktiGraphMeta = configparser.ConfigParser()
+            PraktiGraphMeta.read(self.FolderPath / "PraktiGraph.ini")
+            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.0":
+                self.updatePraktiGraph()
         for file in self.FolderPath.iterdir():
             if file.suffix == ".py":
                 if Path(self.FolderPath / f"{file.stem}.ini").exists():
@@ -1267,6 +1273,142 @@ class ExtensionManager(ttk.Frame):
                 ExtensionManagerMetadata.write(emmeta)
             with open(self.FolderPath / "ExtensionManager.txt", "w") as emdesc:
                 emdesc.write(ExtensionManagerDescription)
+    def updatePraktiGraph(self):
+        if Path(self.FolderPath / "PraktiGraph.py").exists():
+            Path(self.FolderPath / "PraktiGraph.py").unlink()
+            Path(self.FolderPath / "PraktiGraph.ini").unlink(missing_ok=True)
+            Path(self.FolderPath / "PraktiGraph.txt").unlink(missing_ok=True)
+        if not Path(self.FolderPath / "PraktiGraph.py").exists():
+            PraktiGraphCode = """import tkinter as tk
+from tkinter import ttk, messagebox, colorchooser
+
+class PraktiGraph(ttk.Frame):
+    def __init__(self, tabs, parent, mainWin, helper, calculator):
+        super().__init__(tabs)
+        self.fxColor = "#000000"
+        self.gxColor = "#340098"
+        self.Scale = tk.IntVar(value=100)
+        self.ClearStatus = True
+        self.TextOffset = 15
+        self.Numbers = tk.BooleanVar(value=True)
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        self.columnconfigure(2, weight=1)
+        self.Canvas = tk.Canvas(self)
+        self.Canvas.grid(row=0, column=0, columnspan=4, sticky="news")
+        ttk.Separator(self, orient="horizontal").grid(row=1, column=0, columnspan=4, sticky="ew")
+        ttk.Label(self, text="f(x) = ").grid(row=2, column=0, sticky="e")
+        ttk.Label(self, text="g(x) = ").grid(row=3, column=0, sticky="e")
+        self.fxEntry = ttk.Entry(self)
+        self.gxEntry = ttk.Entry(self)
+        self.fxEntry.grid(row=2, column=1, columnspan=2, sticky="ew")
+        self.gxEntry.grid(row=3, column=1, columnspan=2, sticky="ew")
+        self.fxColorButton = tk.Button(self, text="color", fg=self.fxColor, bg=self.fxColor, command=lambda: self.setFxColor(parent, calculator))
+        self.gxColorButton = tk.Button(self, text="color", fg=self.gxColor, bg=self.gxColor, command=lambda: self.setGxColor(parent, calculator))
+        self.fxColorButton.grid(row=2, column=3, padx=10)
+        self.gxColorButton.grid(row=3, column=3, padx=10)
+        self.cols = ("-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5")
+        self.Table = ttk.Treeview(self, columns=self.cols, height=2)
+        self.Table.heading("#0", text="x")
+        for col in self.cols:
+            self.Table.heading(col, text=col)
+        self.FirstTableRow = self.Table.insert("", tk.END, text="f(x)")
+        self.SecondTableRow = self.Table.insert("", tk.END, text="g(x)")
+        self.Table.grid(row=4, column=0, columnspan=4, sticky="news")
+        ttk.Button(self, text="Clear", command=self.clear).grid(row=5, column=1, pady=10, padx=20, sticky="e")
+        ttk.Button(self, text="Draw", command=lambda: self.redraw(calculator)).grid(row=5, column=2, pady=10, padx=20, sticky="w")
+        ttk.Checkbutton(self, text="Draw numbers", variable=self.Numbers, command=lambda: self.redraw(calculator) if self.ClearStatus == False else self.doNothing()).grid(row=5, column=0, padx=(10, 0), sticky="w")
+        self.ScaleSlider = ttk.Scale(self, from_=50, to=500, orient="horizontal", variable=self.Scale, command=lambda _: self.redraw(calculator) if self.ClearStatus == False else self.doNothing())
+        self.ScaleSlider.grid(row=5, column=3, padx=(0, 10), sticky="e")
+        self.bind("<Configure>", lambda event: self.after(200, lambda: self.redraw(calculator)) if self.ClearStatus == False else self.clear())
+    def redraw(self, calculator):
+        self.clear()
+        self.ClearStatus = False
+        height = self.Canvas.winfo_height()
+        width = self.Canvas.winfo_width()
+        self.Canvas.create_line(0, height/2, width, height/2, fill="grey", width=2)
+        self.Canvas.create_line(width/2, 0, width/2, height, fill="grey", width=2)
+        for i in range(100):
+            self.Canvas.create_line(width/2+i*self.Scale.get(), 0, width/2+i*self.Scale.get(), height, fill="grey")
+            self.Canvas.create_text(width/2+i*self.Scale.get(), height/2+self.TextOffset, text=str(i)) if i != 0 and self.Numbers.get() == True else self.doNothing()
+            self.Canvas.create_line(width/2-i*self.Scale.get(), 0, width/2-i*self.Scale.get(), height, fill="grey")
+            self.Canvas.create_text(width/2-i*self.Scale.get(), height/2+self.TextOffset, text=f"-{i}") if i != 0 and self.Numbers.get() == True else self.doNothing()
+            self.Canvas.create_line(0, height/2+i*self.Scale.get(), width, height/2+i*self.Scale.get(), fill="grey")
+            self.Canvas.create_text(width/2+self.TextOffset, height/2+i*self.Scale.get(), text=f"-{i}") if i != 0 and self.Numbers.get() == True else self.doNothing()
+            self.Canvas.create_line(0, height/2-i*self.Scale.get(), width, height/2-i*self.Scale.get(), fill="grey")
+            self.Canvas.create_text(width/2+self.TextOffset, height/2-i*self.Scale.get(), text=str(i)) if i != 0 and self.Numbers.get() == True else self.doNothing()
+        if self.fxEntry.get() != "":
+            try:
+                values = []
+                for col in self.cols:
+                    values.append(calculator.quickCalc(self.fxEntry.get().replace("x", f"({col})")))
+                self.Table.item(self.FirstTableRow, values=values)
+                values = []
+                for i in range(-1000, 1000):
+                    realI = i*0.1 # because range doesn't support floats
+                    values.append((realI, calculator.quickCalc(self.fxEntry.get().replace("x", f"({realI})"))))
+                for f in range(len(values)-1):
+                    self.Canvas.create_line(self.XtoX(values[f][0]), self.YtoY(values[f][1]), self.XtoX(values[f+1][0]), self.YtoY(values[f+1][1]), fill=self.fxColor)
+            except Exception as e:
+                messagebox.showwarning("Warning", "Couldn't perform calculation for f(x):" + str(e))
+        if self.gxEntry.get() != "":
+            try:
+                values = []
+                for col in self.cols:
+                    values.append(calculator.quickCalc(self.gxEntry.get().replace("x", f"({col})")))
+                self.Table.item(self.SecondTableRow, values=values)
+                values = []
+                for i in range(-1000, 1000):
+                    realI = i*0.1 # because range doesn't support floats
+                    values.append((realI, calculator.quickCalc(self.gxEntry.get().replace("x", f"({realI})"))))
+                for f in range(len(values)-1):
+                    self.Canvas.create_line(self.XtoX(values[f][0]), self.YtoY(values[f][1]), self.XtoX(values[f+1][0]), self.YtoY(values[f+1][1]), fill=self.gxColor)
+            except Exception as e:
+                messagebox.showwarning("Warning", "Couldn't perform calculation for g(x):" + str(e))
+        
+    def clear(self):
+        self.Canvas.delete("all")
+        emptyness = []
+        for col in self.cols:
+            emptyness.append("")
+            self.Table.item(self.FirstTableRow, values=emptyness)
+            self.Table.item(self.SecondTableRow, values=emptyness)
+        self.ClearStatus = True
+    def setFxColor(self, parent, calculator):
+        self.fxColor = colorchooser.askcolor(parent=parent, color=self.fxColor)[1]
+        self.fxColorButton.config(fg=self.fxColor, bg=self.fxColor)
+        if self.ClearStatus == False:
+            self.redraw(calculator)
+    def setGxColor(self, parent, calculator):
+        self.gxColor = colorchooser.askcolor(parent=parent, color=self.gxColor)[1]
+        self.gxColorButton.config(fg=self.gxColor, bg=self.gxColor)
+        if self.ClearStatus == False:
+            self.redraw(calculator)
+    def YtoY(self, y):
+        return float(self.Canvas.winfo_height())/2.0-float(y) * self.Scale.get()
+    def XtoX(self, x):
+        return float(self.Canvas.winfo_width())/2.0+float(x) * self.Scale.get()
+    def doNothing(self):
+        pass"""
+            PraktiGraphMetadata = configparser.ConfigParser()
+            PraktiGraphMetadata["PraktiXtension"] = {"name": "PraktiGraph",
+                                                          "version": "1.0",
+                                                          "filename": "PraktiGraph.py",
+                                                          "description": "The PraktiCalc Graph Thing",
+                                                          "website": "",
+                                                          "minpython": "default",
+                                                          "maxpython": "default",
+                                                          "sha256": "",
+                                                          "requiresinternet": "false",
+                                                          "pxtxlink": ""}
+            PraktiGraphDescription = """This extension allows to draw simple graphs from mathematical functions.
+Please note that you have to write all multiplication operators."""
+            with open(self.FolderPath / "PraktiGraph.py", "w") as pgfile:
+                pgfile.write(PraktiGraphCode)
+            with open(self.FolderPath / "PraktiGraph.ini", "w") as pgmeta:
+                PraktiGraphMetadata.write(pgmeta)
+            with open(self.FolderPath / "PraktiGraph.txt", "w") as pgdesc:
+                pgdesc.write(PraktiGraphDescription)
 
 # console
 class Console:
