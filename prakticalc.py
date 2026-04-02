@@ -366,7 +366,7 @@ class PraktiCalculator:
         else:
             self.CalculationString = self.CalculationString[:-1]
     def setMemory(self): # sets the memory to the output
-        self.Memory = self.LastResult
+        self.Memory = self.CalculationString
     def getMemory(self): # adds the memory value to the calculation string
         if self.CalculationString == "0":
             self.CalculationString = self.Memory
@@ -538,8 +538,8 @@ class MainWindow(tk.Tk):
         sqrtButton = ttk.Button(self.WindowFrame, text="\u221a", command=lambda: self.append("\u221a" + "(", calculator))
         More = ttk.Button(self.WindowFrame, text="...", command=lambda: ExtensionWindow(self, helper, calculator))
         PowerButton = ttk.Button(self.WindowFrame, text="x^y", command=lambda: self.append("^", calculator))
-        SetMemoryButton = ttk.Button(self.WindowFrame, text="SM", command=calculator.setMemory)
-        GetMemoryButton = ttk.Button(self.WindowFrame, text="GM", command=calculator.getMemory)
+        SetMemoryButton = ttk.Button(self.WindowFrame, text="SM", command=lambda: self.setMemory(calculator))
+        GetMemoryButton = ttk.Button(self.WindowFrame, text="GM", command=lambda: self.getMemory(calculator))
         SinButton = ttk.Button(self.WindowFrame, text="sin", command=lambda: self.append("sin(", calculator))
         CosButton = ttk.Button(self.WindowFrame, text="cos", command=lambda: self.append("cos(", calculator))
         TanButton = ttk.Button(self.WindowFrame, text="tan", command=lambda: self.append("tan(", calculator))
@@ -668,6 +668,12 @@ class MainWindow(tk.Tk):
         self.updateDisplay(calculator)
     def backspace(self, calculator):
         calculator.backspace()
+        self.updateDisplay(calculator)
+    def setMemory(self, calculator):
+        calculator.setMemory()
+        self.updateDisplay(calculator)
+    def getMemory(self, calculator):
+        calculator.getMemory()
         self.updateDisplay(calculator)
 
 # settings window
