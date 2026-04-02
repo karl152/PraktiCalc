@@ -377,9 +377,13 @@ class PraktiCalculator:
     def xcheck(self): # debug function to return some variables
         return self.CalculationString, self.Memory, self.LastResult, self.HistoryList, self.operators
     def quickCalc(self, expression):
+        PreviousResult = self.LastResult
         self.clear()
         self.append(expression)
         result = self.calculate()
+        self.clear()
+        self.HistoryList.pop()
+        self.LastResult = PreviousResult
         return result
 
 # provides settings, theming and ajustments for windows
