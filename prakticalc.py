@@ -379,11 +379,17 @@ class PraktiCalculator:
     def quickCalc(self, expression):
         PreviousResult = self.LastResult
         self.clear()
+        self.operators["sin"] = lambda x: math.sin(x)
+        self.operators["cos"] = lambda x: math.cos(x)
+        self.operators["tan"] = lambda x: math.tan(x)
         self.append(expression)
         result = self.calculate()
         self.clear()
         self.HistoryList.pop()
         self.LastResult = PreviousResult
+        self.operators["sin"] = lambda x: math.sin(math.radians(x))
+        self.operators["cos"] = lambda x: math.cos(math.radians(x))
+        self.operators["tan"] = lambda x: math.tan(math.radians(x))
         return result
 
 # provides settings, theming and ajustments for windows
