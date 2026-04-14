@@ -929,8 +929,6 @@ class ExtensionWindow(tk.Toplevel):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
         if platform.system() == "Windows":
-            self.attributes("-toolwindow", True)
-            self.focus_force()
             self.FolderPath = Path.home() / "AppData" / "Roaming" / "PraktiXtensions"
         elif platform.system() == "Darwin":
             self.FolderPath = Path.home() / "Library" / "PraktiXtensions"
