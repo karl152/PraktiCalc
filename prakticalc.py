@@ -412,6 +412,7 @@ class PraktiCalculator:
         self.operators["ld"] = math.log2
         self.operators["ln"] = math.log
         self.operators["lg"] = math.log10
+        self.operators["fact"] = math.factorial
         self.operators["pi"] = math.pi
         self.operators["e"] = math.e
 
