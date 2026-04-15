@@ -529,8 +529,9 @@ class MainWindow(tk.Tk):
         self.WindowFrame.rowconfigure(6, weight=1)
         if BorderDisplay == True:
             self.WindowFrame.rowconfigure(0, weight=0, uniform="")
-        self.OutputFrame = ttk.Frame(self.WindowFrame, borderwidth=1, relief="sunken")
-        self.Output = ttk.Label(self.OutputFrame, text="0")
+        self.Output = ttk.Entry(self.WindowFrame)
+        self.Output.insert(0, "0")
+        self.Output.config(state="readonly")
         # BUTTONS
         PlusButton = ttk.Button(self.WindowFrame, text="+", command=lambda: self.append("plus", calculator))
         MinusButton = ttk.Button(self.WindowFrame, text="-", command=lambda: self.append("minus", calculator))
@@ -578,13 +579,12 @@ class MainWindow(tk.Tk):
         LgButton = ttk.Button(self.WindowFrame, text="lg", command=lambda: self.append("lg(", calculator))
         self.WindowFrame.grid(row=0, column=0, sticky="nesw")
         if BorderDisplay == False:
-            self.OutputFrame.grid(row=0, column=0, columnspan=4, sticky="nesw")
+            self.Output.grid(row=0, column=0, columnspan=4, sticky="nesw")
             self.CopyButton.grid(row=0, column=4, sticky="nesw")
             self.BackspaceButton.grid(row=0, column=5, sticky="nesw")
             self.ExitButton.grid(row=6, column=0, sticky="nesw")
         else:
             self.BackspaceButton.grid(row=6, column=0, sticky="nesw")
-        self.Output.pack(pady=1)
         PlusButton.grid(row=1, column=5, sticky="nesw")
         MinusButton.grid(row=2, column=5, sticky="nesw")
         MultiplyButton.grid(row=3, column=5, sticky="nesw")
@@ -656,7 +656,7 @@ class MainWindow(tk.Tk):
         if BorderDisplay == True:
             BorderDisplay = False
             self.title("PraktiCalc")
-            self.OutputFrame.grid(row=0, column=0, columnspan=4, sticky="nesw")
+            self.Output.grid(row=0, column=0, columnspan=4, sticky="nesw")
             self.CopyButton.grid(row=0, column=4, sticky="nesw")
             self.BackspaceButton.grid(row=0, column=5, sticky="nesw")
             self.ExitButton.grid(row=6, column=0, sticky="nesw")
@@ -665,7 +665,7 @@ class MainWindow(tk.Tk):
         elif BorderDisplay == False:
             BorderDisplay = True
             self.title("Border Display")
-            self.OutputFrame.grid_remove()
+            self.Output.grid_remove()
             self.CopyButton.grid_remove()
             self.BackspaceButton.grid_remove()
             self.ExitButton.grid_remove()
@@ -674,13 +674,16 @@ class MainWindow(tk.Tk):
             self.updateDisplay(calculator)
     def copyResult(self): # copies the result
         self.clipboard_clear()
-        self.clipboard_append(self.Output.cget("text"))
+        self.clipboard_append(self.Output.get())
         self.update()
     def updateDisplay(self, calculator): # updates output
         if BorderDisplay == True:
             self.title(calculator.CalculationString)
         else:
-            self.Output.config(text=calculator.CalculationString)
+            self.Output.config(state="normal")
+            self.Output.delete(0, tk.END)
+            self.Output.insert(0, calculator.CalculationString)
+            self.Output.config(state="readonly")
     def append(self, value, calculator):
         calculator.append(value)
         self.updateDisplay(calculator)
