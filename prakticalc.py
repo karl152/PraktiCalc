@@ -413,6 +413,7 @@ class PraktiCalculator:
         self.operators["ln"] = math.log
         self.operators["lg"] = math.log10
         self.operators["pi"] = math.pi
+        self.operators["e"] = math.e
 
 # provides settings, theming and ajustments for windows
 class WindowHelper:
