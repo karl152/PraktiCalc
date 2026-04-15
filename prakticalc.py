@@ -307,19 +307,12 @@ class XDGConfig:
 # Calculation Unit
 class PraktiCalculator:
     def __init__(self):
+        self.TrigMode = "rad" # rad, deg, gon
         self.CalculationString = "0"
         self.Memory = "0"
         self.HistoryList = []
         self.LastResult = "0"
-        self.operators = {}
-        self.operators["sqrt"] = math.sqrt
-        self.operators["sin"] = lambda x: math.sin(math.radians(x))
-        self.operators["cos"] = lambda x: math.cos(math.radians(x))
-        self.operators["tan"] = lambda x: math.tan(math.radians(x))
-        self.operators["ld"] = math.log2
-        self.operators["ln"] = math.log
-        self.operators["lg"] = math.log10
-        self.operators["pi"] = math.pi
+        self.setOperators(self.TrigMode)
     def calculate(self): # does the actual calculation, used to include 171 if-statements
         TheCalc = self.CalculationString.replace("\u221a", "sqrt")
         TheCalc = TheCalc.replace("\u03c0", "pi")
@@ -379,18 +372,47 @@ class PraktiCalculator:
     def quickCalc(self, expression):
         PreviousResult = self.LastResult
         self.clear()
-        self.operators["sin"] = lambda x: math.sin(x)
-        self.operators["cos"] = lambda x: math.cos(x)
-        self.operators["tan"] = lambda x: math.tan(x)
+        self.setOperators("rad")
         self.append(expression)
         result = self.calculate()
         self.clear()
         self.HistoryList.pop()
         self.LastResult = PreviousResult
-        self.operators["sin"] = lambda x: math.sin(math.radians(x))
-        self.operators["cos"] = lambda x: math.cos(math.radians(x))
-        self.operators["tan"] = lambda x: math.tan(math.radians(x))
+        self.setOperators(self.TrigMode)
         return result
+    def setOperators(self, TrigMode):
+        self.operators = {}
+        self.operators["sqrt"] = math.sqrt
+        if TrigMode == "rad":
+            self.operators["sin"] = math.sin
+            self.operators["cos"] = math.cos
+            self.operators["tan"] = math.tan
+            self.operators["asin"] = math.asin
+            self.operators["acos"] = math.acos
+            self.operators["atan"] = math.atan
+            self.operators["sinh"] = math.sinh
+            self.operators["cosh"] = math.cosh
+            self.operators["tanh"] = math.tanh
+            self.operators["asinh"] = math.asinh
+            self.operators["acosh"] = math.acosh
+            self.operators["atanh"] = math.atanh
+        elif TrigMode == "deg":
+            self.operators["sin"] = lambda x: math.sin(math.radians(x))
+            self.operators["cos"] = lambda x: math.cos(math.radians(x))
+            self.operators["tan"] = lambda x: math.tan(math.radians(x))
+            self.operators["asin"] = lambda x: math.asin(math.radians(x))
+            self.operators["acos"] = lambda x: math.acos(math.radians(x))
+            self.operators["atan"] = lambda x: math.atan(math.radians(x))
+            self.operators["sinh"] = lambda x: math.sinh(math.radians(x))
+            self.operators["cosh"] = lambda x: math.cosh(math.radians(x))
+            self.operators["tanh"] = lambda x: math.tanh(math.radians(x))
+            self.operators["asinh"] = lambda x: math.asinh(math.radians(x))
+            self.operators["acosh"] = lambda x: math.acosh(math.radians(x))
+            self.operators["atanh"] = lambda x: math.atanh(math.radians(x))
+        self.operators["ld"] = math.log2
+        self.operators["ln"] = math.log
+        self.operators["lg"] = math.log10
+        self.operators["pi"] = math.pi
 
 # provides settings, theming and ajustments for windows
 class WindowHelper:
