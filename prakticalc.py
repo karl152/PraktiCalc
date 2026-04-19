@@ -499,7 +499,7 @@ class WindowHelper:
 
 # main window
 class MainWindow(tk.Tk):
-    def __init__(self, helper, calculator):
+    def __init__(self, helper, calculator, dialog):
         global wingdingsfont, webdingsfont, LargeUnicodeFont
         super().__init__()
         self.title("PraktiCalc")
@@ -548,8 +548,8 @@ class MainWindow(tk.Tk):
         OneButton = ttk.Button(self.WindowFrame, text="1", command=lambda: self.append("1", calculator))
         TwoButton = ttk.Button(self.WindowFrame, text="2", command=lambda: self.append("2", calculator))
         ThreeButton = ttk.Button(self.WindowFrame, text="3", command=lambda: self.append("3", calculator))
-        EqualButton = ttk.Button(self.WindowFrame, text="=", command=lambda: self.calculate(self, helper, calculator))
-        InfoButton = ttk.Button(self.WindowFrame, text="i", command=lambda: Dialog().info(self, helper))
+        EqualButton = ttk.Button(self.WindowFrame, text="=", command=lambda: self.calculate(self, helper, calculator, dialog))
+        InfoButton = ttk.Button(self.WindowFrame, text="i", command=lambda: dialog.info(self, helper))
         ZeroButton = ttk.Button(self.WindowFrame, text="0", command=lambda: self.zero(calculator))
         self.ExitButton = ttk.Button(self.WindowFrame, text="X", command=lambda: helper.close(self))
         LeftParenButton = ttk.Button(self.WindowFrame, text="(", command=lambda: self.append("parenleft", calculator))
@@ -567,7 +567,7 @@ class MainWindow(tk.Tk):
         ModuloButton = ttk.Button(self.WindowFrame, text="%", command=lambda: self.append("%", calculator))
         Checkb = ttk.Button(self, text="Check", command=lambda: print(calculator.xcheck())) # some debug thing
         sqrtButton = ttk.Button(self.WindowFrame, text="\u221a", command=lambda: self.append("\u221a" + "(", calculator))
-        More = ttk.Button(self.WindowFrame, text="...", command=lambda: ExtensionWindow(self, helper, calculator))
+        More = ttk.Button(self.WindowFrame, text="...", command=lambda: ExtensionWindow(self, helper, calculator, dialog))
         PowerButton = ttk.Button(self.WindowFrame, text="x^y", command=lambda: self.append("^", calculator))
         SetMemoryButton = ttk.Button(self.WindowFrame, text="SM", command=lambda: self.setMemory(calculator))
         GetMemoryButton = ttk.Button(self.WindowFrame, text="GM", command=lambda: self.getMemory(calculator))
@@ -639,11 +639,11 @@ class MainWindow(tk.Tk):
         else:
             Keys = {
                 "0": lambda: self.zero(calculator),
-                "equal": lambda: self.calculate(self, helper, calculator),
-                "Return": lambda: self.calculate(self, helper, calculator),
+                "equal": lambda: self.calculate(self, helper, calculator, dialog),
+                "Return": lambda: self.calculate(self, helper, calculator, dialog),
                 "h": lambda: HistoryWindow(self, calculator, helper),
                 "H": lambda: HistoryWindow(self, calculator, helper),
-                "i": lambda: Dialog().info(self, helper),
+                "i": lambda: dialog.info(self, helper),
                 "s": lambda: SettingsWindow(self, helper, calculator),
                 "S": lambda: SettingsWindow(self, helper, calculator),
                 "BackSpace": lambda: self.backspace(calculator),
@@ -690,11 +690,11 @@ class MainWindow(tk.Tk):
     def zero(self, calculator):
         calculator.zero()
         self.updateDisplay(calculator)
-    def calculate(self, parent, helper, calculator):
+    def calculate(self, parent, helper, calculator, dialog):
         try:
             calculator.calculate()
         except Exception as e:
-            Dialog().error(str(e), parent, helper)
+            dialog.error(str(e), parent, helper)
         self.updateDisplay(calculator)
     def clear(self, calculator):
         calculator.clear()
@@ -950,7 +950,7 @@ class HistoryWindow(tk.Toplevel):
 
 # extension window
 class ExtensionWindow(tk.Toplevel):
-    def __init__(self, parent, helper, calculator):
+    def __init__(self, parent, helper, calculator, dialog):
         super().__init__(parent)
         self.title("Extensions")
         self.rowconfigure(0, weight=1)
@@ -967,8 +967,8 @@ class ExtensionWindow(tk.Toplevel):
         self.update_idletasks()
         helper.WindowList.append(self)
         helper.changeTheme(self)
-        self.after(250, lambda: self.loadExtensions(parent, helper, calculator))
-    def loadExtensions(self, parent, helper, calculator):
+        self.after(250, lambda: self.loadExtensions(parent, helper, calculator, dialog))
+    def loadExtensions(self, parent, helper, calculator, dialog):
         if not self.FolderPath.exists():
             self.FolderPath.mkdir(parents=True)
             self.updateDecimalConverter()
@@ -977,17 +977,17 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "DecimalConverter.ini").exists():
             DecimalConverterMeta = configparser.ConfigParser()
             DecimalConverterMeta.read(self.FolderPath / "DecimalConverter.ini")
-            if DecimalConverterMeta["PraktiXtension"]["version"] != "1.0":
+            if DecimalConverterMeta["PraktiXtension"]["version"] != "1.1":
                 self.updateDecimalConverter()
         if Path(self.FolderPath / "ExtensionManager.ini").exists():
             ExtensionManagerMeta = configparser.ConfigParser()
             ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini")
-            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.3":
+            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.4":
                 self.updateExtensionManager()
         if Path(self.FolderPath / "PraktiGraph.ini").exists():
             PraktiGraphMeta = configparser.ConfigParser()
             PraktiGraphMeta.read(self.FolderPath / "PraktiGraph.ini")
-            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.1":
+            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.2":
                 self.updatePraktiGraph()
         for file in self.FolderPath.iterdir():
             if file.suffix == ".py":
@@ -1009,17 +1009,17 @@ class ExtensionWindow(tk.Toplevel):
                         module = importlib.util.module_from_spec(spec)
                         spec.loader.exec_module(module)
                         classs = getattr(module, file.stem)
-                        instance = classs(self.Tabs, self, parent, helper, calculator)
+                        instance = classs(self.Tabs, self, parent, helper, calculator, dialog)
                         self.Tabs.add(instance, text=meta["PraktiXtension"]["name"])
                         print("loaded extension " + meta["PraktiXtension"]["name"])
                     else:
-                        Dialog().error("incompatible Python version", parent, helper)
+                        dialog.error("incompatible Python version", parent, helper)
                 else:
                     spec = importlib.util.spec_from_file_location(file.stem, file)
                     module = importlib.util.module_from_spec(spec)
                     spec.loader.exec_module(module)
                     classs = getattr(module, file.stem)
-                    instance = classs(self.Tabs, self, parent, helper, calculator)
+                    instance = classs(self.Tabs, self, parent, helper, calculator, dialog)
                     self.Tabs.add(instance, text=file.stem)
                     print("loaded extension " + file.stem)
     def updateDecimalConverter(self):
@@ -1034,7 +1034,7 @@ from tkinter import messagebox
 import platform
 
 class DecimalConverter(ttk.Frame):
-    def __init__(self, tabs, parent, mainWin, helper, calculator):
+    def __init__(self, tabs, parent, mainWin, helper, calculator, dialog):
         super().__init__(tabs)
         DecimalFrame = ttk.LabelFrame(self, text="Decimal")
         self.DecimalInput = ttk.Entry(DecimalFrame, width=70)
@@ -1042,7 +1042,7 @@ class DecimalConverter(ttk.Frame):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.rowconfigure(1, weight=1)
-        InsertButton = ttk.Button(DecimalFrame, text="OK", command=lambda: self.convert(mainWin, helper))
+        InsertButton = ttk.Button(DecimalFrame, text="OK", command=lambda: self.convert(parent, helper, dialog))
         binFrame = ttk.LabelFrame(self, text="Binary")
         hexFrame = ttk.LabelFrame(self, text="Hexadecimal")
         binFrame.rowconfigure(0, weight=1)
@@ -1064,7 +1064,7 @@ class DecimalConverter(ttk.Frame):
         HexCopyButton.grid(row=1, column=0, pady=(0, 5))
         if platform.system() != "Windows":
             self.DecimalInput.focus_set()
-    def convert(self, mainWin, helper): # converts decimal numbers into binary and hexadecimal
+    def convert(self, parent, helper, dialog): # converts decimal numbers into binary and hexadecimal
         cp = str(self.DecimalInput.get())
         try:
             DecimalNumber = int(cp)
@@ -1073,7 +1073,7 @@ class DecimalConverter(ttk.Frame):
             self.BinaryLabel.config(text=str(BinaryNumber))
             self.HexLabel.config(text=str(HexadecimalNumber))
         except:
-            messagebox.showerror("Error", "Please enter a real number!")
+            dialog.error("Please enter a real number!", parent, helper)
     def copybin(self, mainWin): # copies the binary output
         mainWin.clipboard_clear()
         mainWin.clipboard_append(self.BinaryLabel.cget("text"))
@@ -1084,7 +1084,7 @@ class DecimalConverter(ttk.Frame):
         mainWin.update()"""
             DecimalConverterMetadata = configparser.ConfigParser()
             DecimalConverterMetadata["PraktiXtension"] = {"name": "Decimal Converter",
-                                                          "version": "1.0",
+                                                          "version": "1.1",
                                                           "filename": "DecimalConverter.py",
                                                           "description": "The PraktiCalc Decimal Converter",
                                                           "website": "",
@@ -1112,7 +1112,7 @@ from pathlib import Path
 import webbrowser, configparser, zipfile, tempfile, hashlib, shutil
 
 class ExtensionManager(ttk.Frame):
-    def __init__(self, tabs, parent, mainWin, helper, calculator):
+    def __init__(self, tabs, parent, mainWin, helper, calculator, dialog):
         super().__init__(tabs)
         self.style = ttk.Style()
         self.style.configure("ExtensionTitle.TLabel", font=font.Font(family="TkDefaultFont", size=15))
@@ -1130,7 +1130,7 @@ class ExtensionManager(ttk.Frame):
                 self.ExtensionTree.insert("", tk.END, text=file.stem)
         ttk.Label(self.RightFrame).grid(row=0, column=0)
         self.ExtensionTree.grid(row=0, column=0, columnspan=2, sticky="news")
-        self.AddButton = ttk.Button(self.LeftFrame, text="Add", command=lambda: self.addExtension(parent))
+        self.AddButton = ttk.Button(self.LeftFrame, text="Add", command=lambda: self.addExtension(parent, helper, dialog))
         self.AddButton.grid(row=1, column=0, padx=10, pady=10, sticky="w")
         self.RemoveButton = ttk.Button(self.LeftFrame, text="Remove", state="disabled", command=lambda: self.removeExtension(parent))
         self.RemoveButton.grid(row=1, column=1, padx=10, pady=10, sticky="w")
@@ -1238,7 +1238,7 @@ class ExtensionManager(ttk.Frame):
         Path(parent.FolderPath / f"{ext}.ini").unlink(missing_ok=True)
         Path(parent.FolderPath / f"{ext}.txt").unlink(missing_ok=True)
         self.ExtensionTree.delete(self.ExtensionTree.selection()[0])
-    def addExtension(self, parent):
+    def addExtension(self, parent, helper, dialog):
         file = filedialog.askopenfilename(filetypes=[("PraktiXtension", "*.pxt")])
         if file == () or file == "":
             return
@@ -1246,7 +1246,7 @@ class ExtensionManager(ttk.Frame):
             with zipfile.ZipFile(file, "r") as Extension:
                 for filename in Extension.namelist():
                     if ".." in filename or filename.startswith("/"):
-                        messagebox.showerror("Security alert", "Installing this extension would creates files outside of the usual extension directories, thus it's installation is aborted.")
+                        dialog.error("Installing this extension would creates files outside of the usual extension directories, thus it's installation is aborted.", parent, helper)
                         return
                 if not "info.ini" in Extension.namelist():
                     abort = True
@@ -1257,7 +1257,7 @@ class ExtensionManager(ttk.Frame):
                 if abort == False:
                     Extension.extractall(tempdir)
                 else:
-                    messagebox.showwarning("Warning", "Extension couldn't be installed")
+                    dialog.error("Extension couldn't be installed", parent, helper)
                     return
                 try:
                     metadata = configparser.ConfigParser()
@@ -1285,20 +1285,20 @@ class ExtensionManager(ttk.Frame):
                     shutil.move(Path(tempdir) / ExtensionName, parent.FolderPath / ExtensionName)
                     self.ExtensionTree.insert("", tk.END, text=ExtensionName[:-3])
                 except FileNotFoundError:
-                    messagebox.showerror("Error", "Extension not found in file")
+                    dialog.error("Extension not found in file", parent, helper)
                     return
                 except ResourceWarning:
-                    messagebox.showerror("Cryptographic verification of extension failed")
+                    dialog.error("Cryptographic verification of extension failed", parent, helper)
                     return
                 except ImportWarning:
-                    messagebox.showerror("Incompatible Python version")
+                    dialog.error("Incompatible Python version", parent, helper)
                     return
                 except Exception as e:
-                    messagebox.showerror("Error", str(e))
+                    dialog.error(str(e), parent, helper)
                     return"""
             ExtensionManagerMetadata = configparser.ConfigParser()
             ExtensionManagerMetadata["PraktiXtension"] = {"name": "Extension Manager",
-                                                          "version": "1.3",
+                                                          "version": "1.4",
                                                           "filename": "ExtensionManager.py",
                                                           "description": "The PraktiCalc Extension Manager",
                                                           "website": "",
@@ -1324,7 +1324,7 @@ class ExtensionManager(ttk.Frame):
 from tkinter import ttk, messagebox, colorchooser
 
 class PraktiGraph(ttk.Frame):
-    def __init__(self, tabs, parent, mainWin, helper, calculator):
+    def __init__(self, tabs, parent, mainWin, helper, calculator, dialog):
         super().__init__(tabs)
         self.fxColor = "#000000"
         self.gxColor = "#340098"
@@ -1439,7 +1439,7 @@ class PraktiGraph(ttk.Frame):
         pass"""
             PraktiGraphMetadata = configparser.ConfigParser()
             PraktiGraphMetadata["PraktiXtension"] = {"name": "PraktiGraph",
-                                                          "version": "1.1",
+                                                          "version": "1.2",
                                                           "filename": "PraktiGraph.py",
                                                           "description": "The PraktiCalc Graph Thing",
                                                           "website": "",
@@ -1580,7 +1580,8 @@ class ConsoleWindow(tk.Toplevel):
 if __name__ == "__main__":
     Calculator = PraktiCalculator()
     WindowHelp = WindowHelper()
-    Window = MainWindow(WindowHelp, Calculator)
+    WindowDialog = Dialog()
+    Window = MainWindow(WindowHelp, Calculator, WindowDialog)
     if "--console" in sys.argv:
         cmd = Console()
         CMDWindow = ConsoleWindow(Window, WindowHelp, cmd)
