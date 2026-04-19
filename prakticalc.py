@@ -969,6 +969,7 @@ class ExtensionWindow(tk.Toplevel):
         helper.changeTheme(self)
         self.after(250, lambda: self.loadExtensions(parent, helper, calculator, dialog))
     def loadExtensions(self, parent, helper, calculator, dialog):
+        global DarkMode
         if not self.FolderPath.exists():
             self.FolderPath.mkdir(parents=True)
             self.updateDecimalConverter()
@@ -977,17 +978,17 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "DecimalConverter.ini").exists():
             DecimalConverterMeta = configparser.ConfigParser()
             DecimalConverterMeta.read(self.FolderPath / "DecimalConverter.ini")
-            if DecimalConverterMeta["PraktiXtension"]["version"] != "1.1":
+            if DecimalConverterMeta["PraktiXtension"]["version"] != "1.2":
                 self.updateDecimalConverter()
         if Path(self.FolderPath / "ExtensionManager.ini").exists():
             ExtensionManagerMeta = configparser.ConfigParser()
             ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini")
-            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.4":
+            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.5":
                 self.updateExtensionManager()
         if Path(self.FolderPath / "PraktiGraph.ini").exists():
             PraktiGraphMeta = configparser.ConfigParser()
             PraktiGraphMeta.read(self.FolderPath / "PraktiGraph.ini")
-            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.2":
+            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.3":
                 self.updatePraktiGraph()
         for file in self.FolderPath.iterdir():
             if file.suffix == ".py":
@@ -1009,7 +1010,7 @@ class ExtensionWindow(tk.Toplevel):
                         module = importlib.util.module_from_spec(spec)
                         spec.loader.exec_module(module)
                         classs = getattr(module, file.stem)
-                        instance = classs(self.Tabs, self, parent, helper, calculator, dialog)
+                        instance = classs(self.Tabs, self, parent, helper, calculator, dialog, DarkMode)
                         self.Tabs.add(instance, text=meta["PraktiXtension"]["name"])
                         print("loaded extension " + meta["PraktiXtension"]["name"])
                     else:
@@ -1019,7 +1020,7 @@ class ExtensionWindow(tk.Toplevel):
                     module = importlib.util.module_from_spec(spec)
                     spec.loader.exec_module(module)
                     classs = getattr(module, file.stem)
-                    instance = classs(self.Tabs, self, parent, helper, calculator, dialog)
+                    instance = classs(self.Tabs, self, parent, helper, calculator, dialog, DarkMode)
                     self.Tabs.add(instance, text=file.stem)
                     print("loaded extension " + file.stem)
     def updateDecimalConverter(self):
@@ -1034,7 +1035,7 @@ from tkinter import messagebox
 import platform
 
 class DecimalConverter(ttk.Frame):
-    def __init__(self, tabs, parent, mainWin, helper, calculator, dialog):
+    def __init__(self, tabs, parent, mainWin, helper, calculator, dialog, DarkMode):
         super().__init__(tabs)
         DecimalFrame = ttk.LabelFrame(self, text="Decimal")
         self.DecimalInput = ttk.Entry(DecimalFrame, width=70)
@@ -1084,7 +1085,7 @@ class DecimalConverter(ttk.Frame):
         mainWin.update()"""
             DecimalConverterMetadata = configparser.ConfigParser()
             DecimalConverterMetadata["PraktiXtension"] = {"name": "Decimal Converter",
-                                                          "version": "1.1",
+                                                          "version": "1.2",
                                                           "filename": "DecimalConverter.py",
                                                           "description": "The PraktiCalc Decimal Converter",
                                                           "website": "",
@@ -1112,7 +1113,7 @@ from pathlib import Path
 import webbrowser, configparser, zipfile, tempfile, hashlib, shutil
 
 class ExtensionManager(ttk.Frame):
-    def __init__(self, tabs, parent, mainWin, helper, calculator, dialog):
+    def __init__(self, tabs, parent, mainWin, helper, calculator, dialog, DarkMode):
         super().__init__(tabs)
         self.style = ttk.Style()
         self.style.configure("ExtensionTitle.TLabel", font=font.Font(family="TkDefaultFont", size=15))
@@ -1298,7 +1299,7 @@ class ExtensionManager(ttk.Frame):
                     return"""
             ExtensionManagerMetadata = configparser.ConfigParser()
             ExtensionManagerMetadata["PraktiXtension"] = {"name": "Extension Manager",
-                                                          "version": "1.4",
+                                                          "version": "1.5",
                                                           "filename": "ExtensionManager.py",
                                                           "description": "The PraktiCalc Extension Manager",
                                                           "website": "",
@@ -1324,10 +1325,18 @@ class ExtensionManager(ttk.Frame):
 from tkinter import ttk, messagebox, colorchooser
 
 class PraktiGraph(ttk.Frame):
-    def __init__(self, tabs, parent, mainWin, helper, calculator, dialog):
+    def __init__(self, tabs, parent, mainWin, helper, calculator, dialog, DarkMode):
         super().__init__(tabs)
-        self.fxColor = "#000000"
-        self.gxColor = "#340098"
+        if DarkMode == False:
+            self.ForegroundColor = "#000000"
+            self.BackgroundColor = "#ffffff"
+            self.fxColor = "#000000"
+            self.gxColor = "#340098"
+        else:
+            self.ForegroundColor = "#ffffff"
+            self.BackgroundColor = "#000000"
+            self.fxColor = "#ffffff"
+            self.gxColor = "#5d00ff"
         self.Scale = tk.IntVar(value=100)
         self.ClearStatus = True
         self.TextOffset = 15
@@ -1335,7 +1344,7 @@ class PraktiGraph(ttk.Frame):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=1)
-        self.Canvas = tk.Canvas(self)
+        self.Canvas = tk.Canvas(self, background=self.BackgroundColor)
         self.Canvas.grid(row=0, column=0, columnspan=4, sticky="news")
         ttk.Separator(self, orient="horizontal").grid(row=1, column=0, columnspan=4, sticky="ew")
         ttk.Label(self, text="f(x) = ").grid(row=2, column=0, sticky="e")
@@ -1371,13 +1380,13 @@ class PraktiGraph(ttk.Frame):
         self.Canvas.create_line(width/2, 0, width/2, height, fill="grey", width=2)
         for i in range(100):
             self.Canvas.create_line(width/2+i*self.Scale.get(), 0, width/2+i*self.Scale.get(), height, fill="grey")
-            self.Canvas.create_text(width/2+i*self.Scale.get(), height/2+self.TextOffset, text=str(i)) if i != 0 and self.Numbers.get() == True else self.doNothing()
+            self.Canvas.create_text(width/2+i*self.Scale.get(), height/2+self.TextOffset, text=str(i), fill=self.ForegroundColor) if i != 0 and self.Numbers.get() == True else self.doNothing()
             self.Canvas.create_line(width/2-i*self.Scale.get(), 0, width/2-i*self.Scale.get(), height, fill="grey")
-            self.Canvas.create_text(width/2-i*self.Scale.get(), height/2+self.TextOffset, text=f"-{i}") if i != 0 and self.Numbers.get() == True else self.doNothing()
+            self.Canvas.create_text(width/2-i*self.Scale.get(), height/2+self.TextOffset, text=f"-{i}", fill=self.ForegroundColor) if i != 0 and self.Numbers.get() == True else self.doNothing()
             self.Canvas.create_line(0, height/2+i*self.Scale.get(), width, height/2+i*self.Scale.get(), fill="grey")
-            self.Canvas.create_text(width/2+self.TextOffset, height/2+i*self.Scale.get(), text=f"-{i}") if i != 0 and self.Numbers.get() == True else self.doNothing()
+            self.Canvas.create_text(width/2+self.TextOffset, height/2+i*self.Scale.get(), text=f"-{i}", fill=self.ForegroundColor) if i != 0 and self.Numbers.get() == True else self.doNothing()
             self.Canvas.create_line(0, height/2-i*self.Scale.get(), width, height/2-i*self.Scale.get(), fill="grey")
-            self.Canvas.create_text(width/2+self.TextOffset, height/2-i*self.Scale.get(), text=str(i)) if i != 0 and self.Numbers.get() == True else self.doNothing()
+            self.Canvas.create_text(width/2+self.TextOffset, height/2-i*self.Scale.get(), text=str(i), fill=self.ForegroundColor) if i != 0 and self.Numbers.get() == True else self.doNothing()
         if self.fxEntry.get() != "":
             values = []
             for col in self.cols:
@@ -1439,7 +1448,7 @@ class PraktiGraph(ttk.Frame):
         pass"""
             PraktiGraphMetadata = configparser.ConfigParser()
             PraktiGraphMetadata["PraktiXtension"] = {"name": "PraktiGraph",
-                                                          "version": "1.2",
+                                                          "version": "1.3",
                                                           "filename": "PraktiGraph.py",
                                                           "description": "The PraktiCalc Graph Thing",
                                                           "website": "",
