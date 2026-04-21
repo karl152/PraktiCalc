@@ -185,6 +185,7 @@ debug = "--debug" in sys.argv
 class Configuration:
     def __init__(self):
         # Configuration TODO:
+        # - use UTF-8 where possible
         # - make it possible to delete values
         # - does overwriting work?
         if platform.system() == "Windows":
