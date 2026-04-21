@@ -997,7 +997,7 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "ExtensionManager.ini").exists():
             ExtensionManagerMeta = configparser.ConfigParser()
             ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini")
-            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.5":
+            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.6":
                 self.updateExtensionManager()
         if Path(self.FolderPath / "PraktiGraph.ini").exists():
             PraktiGraphMeta = configparser.ConfigParser()
@@ -1254,7 +1254,7 @@ class ExtensionManager(ttk.Frame):
         Path(parent.FolderPath / f"{ext}.txt").unlink(missing_ok=True)
         self.ExtensionTree.delete(self.ExtensionTree.selection()[0])
     def addExtension(self, parent, helper, dialog):
-        file = filedialog.askopenfilename(filetypes=[("PraktiXtension", "*.pxt")])
+        file = filedialog.askopenfilename(parent=parent, filetypes=[("PraktiXtension", "*.pxt")])
         if file == () or file == "":
             return
         with tempfile.TemporaryDirectory() as tempdir:
@@ -1313,7 +1313,7 @@ class ExtensionManager(ttk.Frame):
                     return"""
             ExtensionManagerMetadata = configparser.ConfigParser()
             ExtensionManagerMetadata["PraktiXtension"] = {"name": "Extension Manager",
-                                                          "version": "1.5",
+                                                          "version": "1.6",
                                                           "filename": "ExtensionManager.py",
                                                           "description": "The PraktiCalc Extension Manager",
                                                           "website": "",
