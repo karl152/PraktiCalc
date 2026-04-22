@@ -259,7 +259,7 @@ def actuallyInstall():
                     Progress.config(value=5)
                     winreg.SetValueEx(PraktiKey, "DisplayName", 0, winreg.REG_SZ, "PraktiCalc")
                     Progress.config(value=6)
-                    winreg.SetValueEx(PraktiKey, "DisplayVersion", 0, winreg.REG_SZ, "1.4.2")
+                    winreg.SetValueEx(PraktiKey, "DisplayVersion", 0, winreg.REG_SZ, "1.4.3")
                     Progress.config(value=7)
                     winreg.SetValueEx(PraktiKey, "UninstallString", 0, winreg.REG_SZ, r"C:\Program Files\PraktiCalc\PraktiCalcUninstaller\PraktiCalcUninstaller.exe")
                     Progress.config(value=8)
