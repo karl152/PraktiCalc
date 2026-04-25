@@ -201,8 +201,6 @@ class Configuration:
         self.backend.create()
     def reset(self):
         self.backend.reset()
-        MainWindow.destroy()
-        sys.exit(0)
 
 class WindowsConfig:
     def get(self, key):
