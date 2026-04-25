@@ -185,7 +185,6 @@ debug = "--debug" in sys.argv
 class Configuration:
     def __init__(self):
         # Configuration TODO:
-        # - use UTF-8 where possible
         # - make it possible to delete values
         # - does overwriting work?
         if platform.system() == "Windows":
@@ -269,7 +268,7 @@ class XDGConfig:
         self.folder = Path.home() / ".config" / "PraktiCalc"
         self.path = self.folder / "config.ini"
     def get(self, key):
-        self.config.read(self.path)
+        self.config.read(self.path, encoding="utf-8")
         value = self.config["General"][str(key)]
         try:
             return int(value)
@@ -295,12 +294,12 @@ class XDGConfig:
                 showError("Error saving Configuration")
             except:
                 messagebox.showerror("Error writing configuration")
-        with open(self.path, "w") as configfile:
+        with open(self.path, "w", encoding="utf-8") as configfile:
             self.config.write(configfile)
     def create(self):
         self.folder.mkdir(parents=True)
         self.config["General"] = {}
-        with open(self.path, "w") as configfile:
+        with open(self.path, "w", encoding="utf-8") as configfile:
             self.config.write(configfile)
     def reset(self):
         shutil.rmtree(self.folder)
