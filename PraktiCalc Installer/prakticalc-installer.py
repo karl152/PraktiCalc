@@ -31,7 +31,8 @@ def speakAndWait(string):
 auto = "--auto" in sys.argv
 TTS = "--TTS" in sys.argv
 BulletPoint = "\u2022"
-# if Path("C:/Program Files/PraktiCalc").exists() == True:
+if Path("C:/Program Files/PraktiCalc").exists() == True:
+    UninstallFirst = True
     # UninstallBaseString = "PraktiCalc is already installed on your system. If you want to reinstall or update it, please uninstall it first using "
     # UninstallWinString = "Control Panel -> Programs -> Programs and Features -> PraktiCalc -> Uninstall/Change"
     # UninstallWin11String = "Settings -> Apps -> Installed Apps -> PraktiCalc -> Uninstall"
@@ -40,6 +41,8 @@ BulletPoint = "\u2022"
     # else:
         # messagebox.showerror("Not installing", UninstallBaseString + UninstallWinString)
     # sys.exit(1)
+else:
+    UninstallFirst = False
 
 if auto == False:
     WizardPage = 0
@@ -233,6 +236,15 @@ def actuallyInstall():
         if platform.release() == "Vista" or "7" or "8" or "8.1" or "10" or "11":
             ProgressText += ("\ncorrect Windows version: " + platform.release())
             InstallProgressText.config(text=ProgressText)
+            if UninstallFirst == True:
+                ProgressText += "\nremoving previous installation...\n"
+                InstallProgressText.config(text=ProgressText)
+                subprocess.getoutput(r'reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /f')
+                shutil.rmtree("C:/Program Files/PraktiCalc")
+                Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc.url").unlink(missing_ok=True)
+                Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc.lnk").unlink(missing_ok=True)
+                Path("C:/Users/" + username + "/Desktop/PraktiCalc.url").unlink(missing_ok=True)
+                Path("C:/Users/" + username + "/Desktop/PraktiCalc.lnk").unlink(missing_ok=True)
             ProgressText += "\ncreating installation directory...\n"
             InstallProgressText.config(text=ProgressText)
             Path("C:/Program Files/PraktiCalc").mkdir(parents=True, exist_ok=True)
