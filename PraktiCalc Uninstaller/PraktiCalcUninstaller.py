@@ -48,7 +48,7 @@ class Uninstaller(tk.Tk):
             Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc.lnk").unlink(missing_ok=True)
             Path("C:/Users/" + username + "/Desktop/PraktiCalc.url").unlink(missing_ok=True)
             Path("C:/Users/" + username + "/Desktop/PraktiCalc.lnk").unlink(missing_ok=True)
-            FinishUninstall = r'cmd /c echo Finishing Uninstallation... && timeout /t 2 > NUL && rmdir /S /Q "C:\Program Files\PraktiCalc"'
+            FinishUninstall = r'powershell.exe -NoProfile -Command Write-Host \"Finishing Uninstallation...\"; Start-Sleep 5; Remove-Item \"C:\Program Files\PraktiCalc\" -Recurse -Force -Verbose; Start-Sleep 1'
             subprocess.Popen(FinishUninstall)
         except:
             messagebox.showerror("Error", "Error during uninstall.\nTry running C:/Program Files/PraktiCalc/PraktiCalcUninstaller.exe as Administrator.")
