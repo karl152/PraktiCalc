@@ -228,50 +228,44 @@ def actuallyInstall():
     ProgressText = "checking system compatibility..."
     InstallProgressText.config(text=ProgressText)
     if platform.system() == "Windows":
-        Progress.stop()
-        Progress.config(mode="determinate", maximum=13, value=1)
         ProgressText += ("\ncorrect operating system: " + platform.system())
         InstallProgressText.config(text=ProgressText)
         if platform.release() == "Vista" or "7" or "8" or "8.1" or "10" or "11":
-            Progress.config(value=2)
             ProgressText += ("\ncorrect Windows version: " + platform.release())
             InstallProgressText.config(text=ProgressText)
             ProgressText += "\ncreating installation directory...\n"
             InstallProgressText.config(text=ProgressText)
             Path("C:/Program Files/PraktiCalc").mkdir(parents=True, exist_ok=True)
-            Progress.config(value=3)
             ProgressText += "\nmoving PraktiCalc program files...\n"
             InstallProgressText.config(text=ProgressText)
+            Progress.stop()
             with zipfile.ZipFile(PraktiCalcContentZIPPath, 'r') as ZipRef:
-                ZipRef.extractall(ExtractTo)
-            Progress.config(value=4)
+                files = []
+                for file in ZipRef.infolist():
+                    if not file.is_dir():
+                        files.append(file)
+                Progress.config(mode="determinate", maximum=len(files), value=0)
+                for index, file in enumerate(files, 1):
+                    ZipRef.extract(file, ExtractTo)
+                    Progress.config(value=index)
             ProgressText += "\nregistering program..."
             InstallProgressText.config(text=ProgressText)
             with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", 0, winreg.KEY_WRITE) as UninstallKey:
                 with winreg.CreateKey(UninstallKey, "PraktiCalc") as PraktiKey:
-                    Progress.config(value=5)
                     winreg.SetValueEx(PraktiKey, "DisplayName", 0, winreg.REG_SZ, "PraktiCalc")
-                    Progress.config(value=6)
-                    winreg.SetValueEx(PraktiKey, "DisplayVersion", 0, winreg.REG_SZ, "1.4.1")
-                    Progress.config(value=7)
+                    winreg.SetValueEx(PraktiKey, "DisplayVersion", 0, winreg.REG_SZ, "1.5")
                     winreg.SetValueEx(PraktiKey, "UninstallString", 0, winreg.REG_SZ, r"C:\Program Files\PraktiCalc\PraktiCalcUninstaller\PraktiCalcUninstaller.exe")
-                    Progress.config(value=8)
                     winreg.SetValueEx(PraktiKey, "Publisher", 0, winreg.REG_SZ, "karl152")
-                    Progress.config(value=9)
                     winreg.SetValueEx(PraktiKey, "InstallLocation", 0, winreg.REG_SZ, r"C:\Program Files\PraktiCalc")
-                    Progress.config(value=10)
                     winreg.SetValueEx(PraktiKey, "DisplayIcon", 0, winreg.REG_SZ, r"C:\Program Files\PraktiCalc\PraktiCalc.exe")
-                    Progress.config(value=11)
             if StartMenuEntry.get() == True:
                 ProgressText += "\ncreating start menu entry..."
                 InstallProgressText.config(text=ProgressText)
                 shutil.copy(ExtractTo + "/PraktiCalc.url", "C:/ProgramData/Microsoft/Windows/Start Menu/Programs")
-            Progress.config(value=12)
             if DesktopShortcut.get() == True:
                 ProgressText += "\ncreating desktop shortcut..."
                 InstallProgressText.config(text=ProgressText)
                 shutil.copy(ExtractTo + "/PraktiCalc.url", "C:/Users/" + username + "/Desktop")
-            Progress.config(value=13)
             WizardPage = 7
             pageReload()
         else:
