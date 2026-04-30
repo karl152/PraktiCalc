@@ -790,7 +790,7 @@ class SettingsWindow(tk.Toplevel):
         SettingsWindowFrame.columnconfigure(0, weight=1)
         ThemeFrame = ttk.LabelFrame(SettingsWindowFrame, text="Theme")
         ThemeFrame.columnconfigure(0, weight=1)
-        self.ThemeSelector = ttk.Combobox(ThemeFrame, values=["plastik", "keramik", "breeze", "yaru", "black", "scidgrey", "scidblue", "scidpurple", "scidpink", "scidgreen", "scidmint", "scidsand", "classic"])
+        self.ThemeSelector = ttk.Combobox(ThemeFrame, values=["plastik", "keramik", "breeze", "yaru", "black", "classic"])
         self.ThemeSelector.set(thettktheme)
         NativeThemeToggle = ttk.Checkbutton(ThemeFrame, text="native theme", variable=parent.UseNativeThemeTkVar)
         ThemeFrame.grid(row=0, column=0, sticky="news", padx=10)
