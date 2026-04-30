@@ -356,6 +356,8 @@ class PraktiCalculator:
             self.CalculationString = self.Memory
         else:
             self.CalculationString += self.Memory
+    def clearMemory(self):
+        self.Memory = "0"
     def clearHistory(self): # clears the history list
         self.HistoryList.clear()
     def xcheck(self): # debug function to return some variables
@@ -635,6 +637,7 @@ class MainWindow(tk.Tk):
         MemoryMenu = tk.Menu(MemoryButton, tearoff=TheTearoff)
         MemoryMenu.add_command(label="Set", command=lambda: self.setMemory(calculator))
         MemoryMenu.add_command(label="Get", command=lambda: self.getMemory(calculator))
+        MemoryMenu.add_command(label="Clear", command=lambda: self.clearMemory(calculator))
         MemoryButton["menu"] = MemoryMenu
         LogButton = ttk.Menubutton(self.WindowFrame, text="log")
         LogMenu = tk.Menu(LogButton, tearoff=TheTearoff)
@@ -768,6 +771,8 @@ class MainWindow(tk.Tk):
     def getMemory(self, calculator):
         calculator.getMemory()
         self.updateDisplay(calculator)
+    def clearMemory(self, calculator):
+        calculator.clearMemory()
 
 # settings window
 class SettingsWindow(tk.Toplevel):
