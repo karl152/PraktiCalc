@@ -85,7 +85,6 @@ if CLIHelp == True:
     if platform.system() == "Windows":
         messagebox.showinfo("PraktiCalc CLI Options", "PraktiCalc " + PraktiCalcVersion + """ CLI Options:
 --allowShutdownDialog: allow the use of the shutdown command to display messages
---big: start with bigger main window
 --borderdisplay: uses window title to show output
 --debug: add a test button for debugging
 --nodpiawareness: disable Windows DPI Awareness
@@ -96,8 +95,6 @@ if CLIHelp == True:
 --version: display version and exit""")
     else:
         print("PraktiCalc " + PraktiCalcVersion + " CLI Options")
-        if platform.system() != "Darwin":
-            print("--big           | start with bigger main window")
         print("--borderdisplay | uses window title to show output")
         print("--debug         | add a test button for debugging")
         if platform.system() != "Darwin":
@@ -155,10 +152,6 @@ breeze = "--breeze" in sys.argv
 yaru = "--yaru" in sys.argv
 keramik = "--keramik" in sys.argv
 equilux = "--equilux" in sys.argv
-if platform.system() != "Darwin":
-    big = "--big" in sys.argv
-else:
-    big = False
 if breeze == True:
     thettktheme = "breeze"
 elif yaru == True:
@@ -501,6 +494,11 @@ class MainWindow(tk.Tk):
         global wingdingsfont, webdingsfont, LargeUnicodeFont
         super().__init__()
         self.title("PraktiCalc")
+        self.DPI = self.winfo_fpixels("1i")
+        self.ScaleFactor = self.DPI/72
+        print(self.DPI)
+        print(self.ScaleFactor)
+        self.size = int(250*self.ScaleFactor)
         self.icon_mono = tk.BitmapImage(file=PraktiCalcIconMonoPath)
         self.icon = tk.PhotoImage(file=PraktiCalcIconPath)
         NativeMenubar = False
@@ -691,10 +689,8 @@ class MainWindow(tk.Tk):
             Checkb.grid(row=2, column=0, sticky="nesw")
         if platform.system() == "Darwin":
             pass
-        elif big == False:
-            self.geometry("250x250")
         else:
-            self.geometry("400x400")
+            self.geometry(f"{self.size}x{self.size}")
         self.protocol("WM_DELETE_WINDOW", lambda: helper.close(self))
         self.update_idletasks()
         helper.WindowList.append(self)
