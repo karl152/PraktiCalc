@@ -223,7 +223,8 @@ class WindowsConfig:
     def reset(self):
         print(subprocess.getoutput(r'reg delete "HKEY_CURRENT_USER\Software\PraktiCalc" /f'))
     def remove(self, key):
-        print("Feature not implemented yet, please use reset instead")
+        with winreg.OpenKeyEx(winreg.HKEY_CURRENT_USER, r"Software\PraktiCalc", 0, winreg.KEY_SET_VALUE) as PraktiKey:
+            winreg.DeleteValue(PraktiKey, key)
 
 class MacConfig:
     def __init__(self):
