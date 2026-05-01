@@ -1060,7 +1060,7 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "ExtensionManager.ini").exists():
             ExtensionManagerMeta = configparser.ConfigParser()
             ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini")
-            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.7":
+            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.8":
                 self.updateExtensionManager()
         if Path(self.FolderPath / "PraktiGraph.ini").exists():
             PraktiGraphMeta = configparser.ConfigParser()
@@ -1256,7 +1256,7 @@ class ExtensionManager(ttk.Frame):
         displays = [self.VersionDisplay, self.FileNameDisplay, self.LicenseDisplay, self.WebLinkDisplay, self.minPyVerDisplay, self.maxPyVerDisplay, self.ChecksumDisplay]
         if Path(parent.FolderPath / f"{ext}.ini").exists():
             metadata = configparser.ConfigParser()
-            metadata.read(Path(parent.FolderPath / f"{ext}.ini"))
+            metadata.read(Path(parent.FolderPath / f"{ext}.ini"), encoding="utf-8")
             self.TitleLabel.config(text=metadata["PraktiXtension"]["name"])
             self.DescriptionLabel.config(text=metadata["PraktiXtension"]["description"])
             if metadata["PraktiXtension"]["website"] != "":
@@ -1348,12 +1348,12 @@ class ExtensionManager(ttk.Frame):
                     return
                 try:
                     metadata = configparser.ConfigParser()
-                    metadata.read(Path(tempdir) / "info.ini")
+                    metadata.read(Path(tempdir) / "info.ini", encoding="utf-8")
                     ExtensionName = metadata["PraktiXtension"]["filename"]
                     if not ExtensionName in [file.name for file in Path(tempdir).iterdir() if file.is_file()]:
                         raise FileNotFoundError
                     with open(Path(tempdir) / ExtensionName, "rb") as ExtensionFile:
-                        if not metadata["PraktiXtension"]["sha256"] == "" or hashlib.sha256(ExtensionFile.read()).hexdigest() == metadata["PraktiXtension"]["sha256"]:
+                        if not metadata["PraktiXtension"]["sha256"] == "" and hashlib.sha256(ExtensionFile.read()).hexdigest() != metadata["PraktiXtension"]["sha256"]:
                             raise ResourceWarning
                     if metadata["PraktiXtension"]["minpython"] == "default":
                         if metadata["PraktiXtension"]["maxpython"] == "default":
@@ -1385,7 +1385,7 @@ class ExtensionManager(ttk.Frame):
                     return"""
             ExtensionManagerMetadata = configparser.ConfigParser()
             ExtensionManagerMetadata["PraktiXtension"] = {"name": "Extension Manager",
-                                                          "version": "1.7",
+                                                          "version": "1.8",
                                                           "filename": "ExtensionManager.py",
                                                           "description": "The PraktiCalc Extension Manager",
                                                           "website": "",
