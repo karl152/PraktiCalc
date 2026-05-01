@@ -194,6 +194,8 @@ class Configuration:
         self.backend.create()
     def reset(self):
         self.backend.reset()
+    def remove(self, key):
+        self.backend.remove(key)
 
 class WindowsConfig:
     def get(self, key):
@@ -220,6 +222,8 @@ class WindowsConfig:
         winreg.CreateKey(winreg.HKEY_CURRENT_USER, r"Software\PraktiCalc")
     def reset(self):
         print(subprocess.getoutput(r'reg delete "HKEY_CURRENT_USER\Software\PraktiCalc" /f'))
+    def remove(self, key):
+        print("Feature not implemented yet, please use reset instead")
 
 class MacConfig:
     def __init__(self):
@@ -252,6 +256,8 @@ class MacConfig:
             plistlib.dump({}, file)
     def reset(self):
         Path(self.filepath).unlink()
+    def remove(self, key):
+        print("Feature not implemented yet, please use reset instead")
 
 class XDGConfig:
     def __init__(self):
@@ -294,6 +300,11 @@ class XDGConfig:
             self.config.write(configfile)
     def reset(self):
         shutil.rmtree(self.folder)
+    def remove(self, key):
+        self.config.read(self.path, encoding="utf-8")
+        self.config.remove_option("General", key)
+        with open(self.path, "w", encoding="utf-8") as configfile:
+            self.config.write(configfile)
 
 # Calculation Unit
 class PraktiCalculator:
