@@ -1172,11 +1172,11 @@ class DecimalConverter(ttk.Frame):
                                                           "requiresinternet": "false",
                                                           "pxtxlink": ""}
             DecimalConverterDescription = "This is the known decimal converter that PraktiCalc includes by default, now as an extension."
-            with open(self.FolderPath / "DecimalConverter.py", "w") as dcfile:
+            with open(self.FolderPath / "DecimalConverter.py", "w", encoding="utf-8") as dcfile:
                 dcfile.write(DecimalConverterCode)
-            with open(self.FolderPath / "DecimalConverter.ini", "w") as dcmeta:
+            with open(self.FolderPath / "DecimalConverter.ini", "w", encoding="utf-8") as dcmeta:
                 DecimalConverterMetadata.write(dcmeta)
-            with open(self.FolderPath / "DecimalConverter.txt", "w") as dcdesc:
+            with open(self.FolderPath / "DecimalConverter.txt", "w", encoding="utf-8") as dcdesc:
                 dcdesc.write(DecimalConverterDescription)
     def updateExtensionManager(self):
         if Path(self.FolderPath / "ExtensionManager.py").exists():
@@ -1395,11 +1395,11 @@ class ExtensionManager(ttk.Frame):
                                                           "requiresinternet": "false",
                                                           "pxtxlink": ""}
             ExtensionManagerDescription = "A graphical user interface to easily manage extensions in PraktiCalc."
-            with open(self.FolderPath / "ExtensionManager.py", "w") as emfile:
+            with open(self.FolderPath / "ExtensionManager.py", "w", encoding="utf-8") as emfile:
                 emfile.write(ExtensionManagerCode)
-            with open(self.FolderPath / "ExtensionManager.ini", "w") as emmeta:
+            with open(self.FolderPath / "ExtensionManager.ini", "w", encoding="utf-8") as emmeta:
                 ExtensionManagerMetadata.write(emmeta)
-            with open(self.FolderPath / "ExtensionManager.txt", "w") as emdesc:
+            with open(self.FolderPath / "ExtensionManager.txt", "w", encoding="utf-8") as emdesc:
                 emdesc.write(ExtensionManagerDescription)
     def updatePraktiGraph(self):
         if Path(self.FolderPath / "PraktiGraph.py").exists():
@@ -1545,11 +1545,11 @@ class PraktiGraph(ttk.Frame):
                                                           "pxtxlink": ""}
             PraktiGraphDescription = """This extension allows to draw simple graphs from mathematical functions.
 Please note that you have to write all multiplication operators."""
-            with open(self.FolderPath / "PraktiGraph.py", "w") as pgfile:
+            with open(self.FolderPath / "PraktiGraph.py", "w", encoding="utf-8") as pgfile:
                 pgfile.write(PraktiGraphCode)
-            with open(self.FolderPath / "PraktiGraph.ini", "w") as pgmeta:
+            with open(self.FolderPath / "PraktiGraph.ini", "w", encoding="utf-8") as pgmeta:
                 PraktiGraphMetadata.write(pgmeta)
-            with open(self.FolderPath / "PraktiGraph.txt", "w") as pgdesc:
+            with open(self.FolderPath / "PraktiGraph.txt", "w", encoding="utf-8") as pgdesc:
                 pgdesc.write(PraktiGraphDescription)
 
 # console
