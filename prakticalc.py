@@ -617,7 +617,10 @@ class MainWindow(tk.Tk):
         self.config(width=256, height=315)
         self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
-        TheTearoff = cfg.get("menuTearoff")
+        if platform.system() != "Darwin":
+            TheTearoff = cfg.get("menuTearoff")
+        else:
+            TheTearoff = 0
         if NativeMenubar == True:
             self.Menubar = tk.Menu(self)
             self.CalculatorMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
