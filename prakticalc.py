@@ -217,19 +217,20 @@ class Configuration:
             DefaultConfiguration = (("theme", "black"),
                                     ("nativeTheme", True),
                                     ("dialogStyle", "Alternative"),
-                                    ("roundresult", True),
+                                    ("roundResult", True),
                                     ("showTrailing0", False),
                                     ("angleUnit", "deg"),
                                     ("borderDisplay", False),
                                     ("allowShutdownDialog", False),
                                     ("noDPIAwareness", False),
                                     ("nativeMenuBar", False),
+                                    ("menuTearoff", False),
                                     ("configVersion", "1.0"))
         elif platform.system() == "Darwin":
             DefaultConfiguration = (("theme", "plastik"),
                                     ("nativeTheme", True),
                                     ("dialogStyle", "Alternative"),
-                                    ("roundresult", True),
+                                    ("roundResult", True),
                                     ("showTrailing0", False),
                                     ("angleUnit", "deg"),
                                     ("borderDisplay", False),
@@ -239,11 +240,12 @@ class Configuration:
             DefaultConfiguration = (("theme", "plastik"),
                                     ("nativeTheme", False),
                                     ("dialogStyle", "Alternative"),
-                                    ("roundresult", True),
+                                    ("roundResult", True),
                                     ("showTrailing0", False),
                                     ("angleUnit", "deg"),
                                     ("borderDisplay", False),
                                     ("nativeMenuBar", False),
+                                    ("menuTearoff", False),
                                     ("configVersion", "1.0"))
         for value in DefaultConfiguration:
             self.backend.set(value[0], value[1])
@@ -615,7 +617,7 @@ class MainWindow(tk.Tk):
         self.config(width=256, height=315)
         self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
-        TheTearoff = 0
+        TheTearoff = cfg.get("menuTearoff")
         if NativeMenubar == True:
             self.Menubar = tk.Menu(self)
             self.CalculatorMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
