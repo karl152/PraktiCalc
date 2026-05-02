@@ -177,25 +177,92 @@ debug = "--debug" in sys.argv
 # CLASSES
 class Configuration:
     def __init__(self):
-        # Configuration TODO:
-        # - make it possible to delete values
-        # - does overwriting work?
         if platform.system() == "Windows":
             self.backend = WindowsConfig()
         elif platform.system() == "Darwin":
             self.backend = MacConfig()
         else:
             self.backend = XDGConfig()
+        try:
+            if str(self.get("configVersion")) == "1.0":
+                fail = False
+                return
+            else:
+                fail = True
+        except:
+            fail = True
+        finally:
+            if fail == True:
+                try:
+                    self.reset()
+                except:
+                    pass
+                finally:
+                    self.create()
     def get(self, key):
-        return self.backend.get(key)
+        try:
+            return self.backend.get(key)
+        except:
+            try:
+                self.reset()
+            except:
+                pass
+            finally:
+                self.create()
     def set(self, key, value):
-        self.backend.set(key, value)
+        try:
+            self.backend.set(key, value)
+        except:
+            try:
+                self.reset()
+            except:
+                pass
+            finally:
+                self.create()
     def create(self):
         self.backend.create()
+        if platform.system() == "Windows":
+            DefaultConfiguration = (("theme", "black"),
+                                    ("nativeTheme", True),
+                                    ("dialogStyle", "Alternative"),
+                                    ("roundresult", True),
+                                    ("showTrailing0", False),
+                                    ("angleUnit", "deg"),
+                                    ("borderDisplay", False),
+                                    ("allowShutdownDialog", False),
+                                    ("noDPIAwareness", False),
+                                    ("nativeMenuBar", False),
+                                    ("configVersion", "1.0"))
+        elif platform.system() == "Darwin":
+            DefaultConfiguration = (("theme", "plastik"),
+                                    ("nativeTheme", True),
+                                    ("dialogStyle", "Alternative"),
+                                    ("roundresult", True),
+                                    ("showTrailing0", False),
+                                    ("angleUnit", "deg"),
+                                    ("borderDisplay", False),
+                                    ("nativeMenuBar", True),
+                                    ("configVersion", "1.0"))
+        else:
+            DefaultConfiguration = (("theme", "plastik"),
+                                    ("nativeTheme", False),
+                                    ("dialogStyle", "Alternative"),
+                                    ("roundresult", True),
+                                    ("showTrailing0", False),
+                                    ("angleUnit", "deg"),
+                                    ("borderDisplay", False),
+                                    ("nativeMenuBar", False),
+                                    ("configVersion", "1.0"))
+        for value in DefaultConfiguration:
+            self.backend.set(value[0], value[1])
+            print("set " + value[0] + " to " + str(value[1]))
     def reset(self):
         self.backend.reset()
     def remove(self, key):
-        self.backend.remove(key)
+        try:
+            self.backend.remove(key)
+        except:
+            pass
 
 class WindowsConfig:
     def get(self, key):
@@ -1677,6 +1744,7 @@ class ConsoleWindow(tk.Toplevel):
         helper.ajustTitleBars()
 
 if __name__ == "__main__":
+    cfg = Configuration()
     Calculator = PraktiCalculator()
     WindowHelp = WindowHelper()
     WindowDialog = Dialog()
