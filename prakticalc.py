@@ -258,7 +258,11 @@ class MacConfig:
     def reset(self):
         Path(self.filepath).unlink()
     def remove(self, key):
-        print("Feature not implemented yet, please use reset instead")
+        with open(self.filepath, "rb") as file:
+            data = plistlib.load(file)
+        del data[str(key)]
+        with open(self.filepath, "wb") as file:
+            plistlib.dump(data, file)
 
 class XDGConfig:
     def __init__(self):
