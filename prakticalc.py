@@ -39,11 +39,9 @@ CLIVersion = "--version" in sys.argv
 PraktiCalcVersion = "1.5"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 allowWindowsShutdownDialog = "--allowShutdownDialog" in sys.argv
-UseNativeTheme = False
 MsgBoxStyles = ["Tkinter", "Alternative"]
 if platform.system() == "Windows":
     import ctypes
-    UseNativeTheme = True
     if theming != 0:
         NativeTheme = "vista"
     if shutil.which("wscript"):
@@ -64,7 +62,6 @@ if platform.system() == "Windows":
         dwmapi = ctypes.WinDLL("dwmapi")
         DWMWA_USE_IMMERSIVE_DARK_MODE = 20
 elif platform.system() == "Darwin":
-    UseNativeTheme = True
     if theming != 0:
         NativeTheme = "aqua"
     WingWebDings = False
@@ -77,7 +74,6 @@ else:
     for MsgBoxStyle in AdditionalLinuxMsgBoxStyles:
         if shutil.which(MsgBoxStyle):
             MsgBoxStyles.append(MsgBoxStyle)
-CurrentMsgBoxStyle = "Alternative"
 ThemingDisabled = "--notheming" in sys.argv
 if ThemingDisabled == True:
     theming = 0
@@ -164,14 +160,10 @@ if ThemingDisabled == False:
     DarkMode = "--dark" in sys.argv
     if DarkMode == True:
         thettktheme = "black"
-        UseNativeTheme = False
     if equilux == True:
         thettktheme = "equilux"
 else:
     DarkMode = False
-if breeze == True or yaru == True or keramik == True or equilux == True:
-    UseNativeTheme = False
-BorderDisplay = "--borderdisplay" in sys.argv
 debug = "--debug" in sys.argv
 
 # CLASSES
@@ -380,13 +372,15 @@ class XDGConfig:
 
 # Calculation Unit
 class PraktiCalculator:
-    def __init__(self):
-        self.TrigMode = "rad" # rad, deg, gon
+    def __init__(self, cfg):
+        self.TrigMode = cfg.get("angleUnit") # rad, deg, gon
         self.CalculationString = "0"
         self.Memory = "0"
         self.HistoryList = []
         self.LastResult = "0"
         self.setOperators(self.TrigMode)
+        self.Rounding = bool(cfg.get("roundResult"))
+        self.no0 = bool(cfg.get("showTrailing0"))
     def calculate(self): # does the actual calculation, used to include 171 if-statements
         TheCalc = self.CalculationString.replace("\u221a", "sqrt")
         TheCalc = TheCalc.replace("\u03c0", "pi")
@@ -397,9 +391,15 @@ class PraktiCalculator:
             Result = eval(TheCalc, {"__builtins__": None}, self.operators)
         except Exception as e:
             raise e
-        Result = str(round(float(Result), 12))
+        if self.Rounding == True:
+            Result = str(round(float(Result), 12))
+        else:
+            Result = str(Result)
         if str(Result).endswith(".0"):
-            Result = str(Result)[:-2]
+            if self.no0 == False:
+                Result = str(Result)[:-2]
+            else:
+                Result = str(Result)
         else:
             Result = str(Result)
         if Result == "-0":
@@ -494,22 +494,27 @@ class PraktiCalculator:
 
 # provides settings, theming and ajustments for windows
 class WindowHelper:
-    def __init__(self):
+    def __init__(self, cfg):
         self.WindowList = []
+        self.ConfigurationStorage = cfg
     def changeTheme(self, WindowName): # sets the theme for a given window
-        global theming
+        global theming, DarkMode
+        if bool(cfg.get("nativeTheme")) == False and cfg.get("theme") == "black" or cfg.get("theme") == "equilux":
+            DarkMode = True
+        else:
+            DarkMode = False
         if platform.system() == "Darwin":
-            if UseNativeTheme == False:
+            if bool(self.ConfigurationStorage.get("nativeTheme")) == False:
                 self.style = ThemedStyle(WindowName)
-                self.style.theme_use(thettktheme)
+                self.style.theme_use(self.ConfigurationStorage.get("theme"))
             else:
                 self.style = ttk.Style(WindowName)
                 self.style.theme_use(NativeTheme)
         elif platform.system() == "Windows":
             self.ajustTitleBars()
-            if UseNativeTheme == False:
+            if bool(self.ConfigurationStorage.get("nativeTheme")) == False:
                 self.style = ThemedStyle(WindowName)
-                self.style.theme_use(thettktheme)
+                self.style.theme_use(self.ConfigurationStorage.get("theme"))
             else:
                 self.style = ttk.Style(WindowName)
                 self.style.theme_use(NativeTheme)
@@ -521,9 +526,9 @@ class WindowHelper:
             self.style.configure("Treeview", rowheight=40)
         elif theming == 1 or theming == 2:
             try:
-                if UseNativeTheme == False:
+                if bool(self.ConfigurationStorage.get("nativeTheme")) == False:
                     self.style = ThemedStyle(WindowName)
-                    self.style.theme_use(thettktheme)
+                    self.style.theme_use(self.ConfigurationStorage.get("theme"))
                 else:
                     self.style = ttk.Style(WindowName)
                     self.style.theme_use(NativeTheme)
@@ -531,24 +536,24 @@ class WindowHelper:
                     self.style.configure("Treeview", rowheight=40)
             except:
                 theming = 2
-                if UseNativeTheme == True:
+                if bool(self.ConfigurationStorage.get("nativeTheme")) == True:
                     self.style = ttk.Style(WindowName)
                     self.style.theme_use(NativeTheme)
                 else:
                     theme_base = Path(sys._MEIPASS).joinpath("ttkthemes", "themes")
-                    theme_path = Path(theme_base).joinpath(thettktheme)
+                    theme_path = Path(theme_base).joinpath(self.ConfigurationStorage.get("theme"))
                     WindowName.tk.call("lappend", "auto_path", theme_base)
                     try:
-                        WindowName.tk.call("package", "require", f"ttk::theme::{thettktheme}")
+                        WindowName.tk.call("package", "require", f"ttk::theme::{self.ConfigurationStorage.get('theme')}")
                     except:
-                        theme_tcl = Path(theme_path).joinpath(thettktheme + ".tcl")
+                        theme_tcl = Path(theme_path).joinpath(self.ConfigurationStorage.get("theme") + ".tcl")
                         if Path(theme_tcl).exists():
                             WindowName.tk.call("source", theme_tcl)
                         else:
                             print(f"Couldn't find theme {theme_tcl}")
                     self.style = ttk.Style()
                     try:
-                        self.style.theme_use(thettktheme)
+                        self.style.theme_use(self.ConfigurationStorage.get("theme"))
                     except:
                         print("Using default ttk theme")
             try:
@@ -575,22 +580,27 @@ class WindowHelper:
 
 # main window
 class MainWindow(tk.Tk):
-    def __init__(self, helper, calculator, dialog):
+    def __init__(self, helper, calculator, dialog, cfg):
         global wingdingsfont, webdingsfont, LargeUnicodeFont
         super().__init__()
         self.title("PraktiCalc")
         self.DPI = self.winfo_fpixels("1i")
-        self.ScaleFactor = self.DPI/72
+        if platform.system() == "Windows":
+            if cfg.get("noDPIAwareness") == 1:
+                self.ScaleFactor = 1
+            else:
+                self.ScaleFactor = self.DPI/72
+        else:
+            self.ScaleFactor = self.DPI/72
         print(self.DPI)
         print(self.ScaleFactor)
         self.size = int(250*self.ScaleFactor)
         self.icon_mono = tk.BitmapImage(file=PraktiCalcIconMonoPath)
         self.icon = tk.PhotoImage(file=PraktiCalcIconPath)
-        NativeMenubar = False
+        NativeMenubar = bool(cfg.get("nativeMenuBar"))
         if platform.system() == "Darwin":
             self.macicon = tk.PhotoImage(file=PraktiCalcMacIconPath)
             self.iconphoto(True, self.macicon)
-            NativeMenubar = True
         else:
             self.iconphoto(True, self.icon)
         self.icon_mono_inverted = tk.BitmapImage(file=PraktiCalcIconMonoInvertedPath)
@@ -599,9 +609,9 @@ class MainWindow(tk.Tk):
             webdingsfont = font.Font(family="Webdings")
         else:
             LargeUnicodeFont = font.Font(family="TkDefaultFont", size=14)
-        self.UseNativeThemeTkVar = tk.BooleanVar(value=UseNativeTheme)
-        self.BorderDisplayTkVar = tk.BooleanVar(value=BorderDisplay)
-        self.CurrentMsgBoxStyleTkVar = tk.StringVar(value=CurrentMsgBoxStyle)
+        self.UseNativeThemeTkVar = tk.BooleanVar(value=bool(cfg.get("nativeTheme")))
+        self.BorderDisplayTkVar = tk.BooleanVar(value=bool(cfg.get("borderDisplay")))
+        self.CurrentMsgBoxStyleTkVar = tk.StringVar(value=cfg.get("dialogStyle"))
         self.config(width=256, height=315)
         self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
@@ -614,7 +624,7 @@ class MainWindow(tk.Tk):
             self.ToolMenu.add_command(label="History", command=lambda: HistoryWindow(self, calculator, helper))
             self.ToolMenu.add_command(label="Extensions", command=lambda: ExtensionWindow(self, helper, calculator, dialog))
             self.ToolMenu.add_separator()
-            self.ToolMenu.add_command(label="Settings", command=lambda: SettingsWindow(self, helper, calculator))
+            self.ToolMenu.add_command(label="Settings", command=lambda: SettingsWindow(self, helper, calculator, cfg))
             self.HelpMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
             self.HelpMenu.add_command(label="About", command=lambda: dialog.info(self, helper))
             self.Menubar.add_cascade(label="Calculator", menu=self.CalculatorMenu)
@@ -632,7 +642,7 @@ class MainWindow(tk.Tk):
             self.ToolCustomMenu.add_command(label="History", command=lambda: HistoryWindow(self, calculator, helper))
             self.ToolCustomMenu.add_command(label="Extensions", command=lambda: ExtensionWindow(self, helper, calculator, dialog))
             self.ToolCustomMenu.add_separator()
-            self.ToolCustomMenu.add_command(label="Settings", command=lambda: SettingsWindow(self, helper, calculator))
+            self.ToolCustomMenu.add_command(label="Settings", command=lambda: SettingsWindow(self, helper, calculator, cfg))
             self.ToolMenuButton["menu"] = self.ToolCustomMenu
             self.HelpMenuButton = ttk.Menubutton(self.MenuBarFrame, text="Help")
             self.HelpCustomMenu = tk.Menu(self.HelpMenuButton, tearoff=TheTearoff)
@@ -648,74 +658,74 @@ class MainWindow(tk.Tk):
             self.WindowFrame.columnconfigure(colrow, weight=1, uniform="buttons")
         self.WindowFrame.rowconfigure(5, weight=1)
         self.WindowFrame.rowconfigure(6, weight=1)
-        if BorderDisplay == True:
+        if bool(cfg.get("borderDisplay")) == True:
             self.WindowFrame.rowconfigure(0, weight=0, uniform="")
         self.Output = ttk.Entry(self.WindowFrame)
         self.Output.insert(0, "0")
         self.Output.config(state="readonly")
         # BUTTONS
-        PlusButton = ttk.Button(self.WindowFrame, text="+", command=lambda: self.append("plus", calculator))
-        MinusButton = ttk.Button(self.WindowFrame, text="-", command=lambda: self.append("minus", calculator))
-        MultiplyButton = ttk.Button(self.WindowFrame, text="x", command=lambda: self.append("asterisk", calculator))
-        DivideButton = ttk.Button(self.WindowFrame, text="÷", command=lambda: self.append("slash", calculator))
-        SevenButton = ttk.Button(self.WindowFrame, text="7", command=lambda: self.append("7", calculator))
-        EightButton = ttk.Button(self.WindowFrame, text="8", command=lambda: self.append("8", calculator))
-        NineButton = ttk.Button(self.WindowFrame, text="9", command=lambda: self.append("9", calculator))
-        CEButton = ttk.Button(self.WindowFrame, text="CE", command=lambda: self.clear(calculator))
-        FourButton = ttk.Button(self.WindowFrame, text="4", command=lambda: self.append("4", calculator))
-        FiveButton = ttk.Button(self.WindowFrame, text="5", command=lambda: self.append("5", calculator))
-        SixButton = ttk.Button(self.WindowFrame, text="6", command=lambda: self.append("6", calculator))
-        CommaButton = ttk.Button(self.WindowFrame, text=",", command=lambda: self.append("comma", calculator))
-        OneButton = ttk.Button(self.WindowFrame, text="1", command=lambda: self.append("1", calculator))
-        TwoButton = ttk.Button(self.WindowFrame, text="2", command=lambda: self.append("2", calculator))
-        ThreeButton = ttk.Button(self.WindowFrame, text="3", command=lambda: self.append("3", calculator))
-        EqualButton = ttk.Button(self.WindowFrame, text="=", command=lambda: self.calculate(self, helper, calculator, dialog))
+        PlusButton = ttk.Button(self.WindowFrame, text="+", command=lambda: self.append("plus", calculator, cfg))
+        MinusButton = ttk.Button(self.WindowFrame, text="-", command=lambda: self.append("minus", calculator, cfg))
+        MultiplyButton = ttk.Button(self.WindowFrame, text="x", command=lambda: self.append("asterisk", calculator, cfg))
+        DivideButton = ttk.Button(self.WindowFrame, text="÷", command=lambda: self.append("slash", calculator, cfg))
+        SevenButton = ttk.Button(self.WindowFrame, text="7", command=lambda: self.append("7", calculator, cfg))
+        EightButton = ttk.Button(self.WindowFrame, text="8", command=lambda: self.append("8", calculator, cfg))
+        NineButton = ttk.Button(self.WindowFrame, text="9", command=lambda: self.append("9", calculator, cfg))
+        CEButton = ttk.Button(self.WindowFrame, text="CE", command=lambda: self.clear(calculator, cfg))
+        FourButton = ttk.Button(self.WindowFrame, text="4", command=lambda: self.append("4", calculator, cfg))
+        FiveButton = ttk.Button(self.WindowFrame, text="5", command=lambda: self.append("5", calculator, cfg))
+        SixButton = ttk.Button(self.WindowFrame, text="6", command=lambda: self.append("6", calculator, cfg))
+        CommaButton = ttk.Button(self.WindowFrame, text=",", command=lambda: self.append("comma", calculator, cfg))
+        OneButton = ttk.Button(self.WindowFrame, text="1", command=lambda: self.append("1", calculator, cfg))
+        TwoButton = ttk.Button(self.WindowFrame, text="2", command=lambda: self.append("2", calculator, cfg))
+        ThreeButton = ttk.Button(self.WindowFrame, text="3", command=lambda: self.append("3", calculator, cfg))
+        EqualButton = ttk.Button(self.WindowFrame, text="=", command=lambda: self.calculate(self, helper, calculator, dialog, cfg))
         InfoButton = ttk.Button(self.WindowFrame, text="i", command=lambda: dialog.info(self, helper))
-        ZeroButton = ttk.Button(self.WindowFrame, text="0", command=lambda: self.zero(calculator))
+        ZeroButton = ttk.Button(self.WindowFrame, text="0", command=lambda: self.zero(calculator, cfg))
         self.ExitButton = ttk.Button(self.WindowFrame, text="X", command=lambda: helper.close(self))
-        LeftParenButton = ttk.Button(self.WindowFrame, text="(", command=lambda: self.append("parenleft", calculator))
-        RightParenButton = ttk.Button(self.WindowFrame, text=")", command=lambda: self.append("parenright", calculator))
+        LeftParenButton = ttk.Button(self.WindowFrame, text="(", command=lambda: self.append("parenleft", calculator, cfg))
+        RightParenButton = ttk.Button(self.WindowFrame, text=")", command=lambda: self.append("parenright", calculator, cfg))
         if WingWebDings == True:
-            SettingsButton = ttk.Button(self.WindowFrame, text="@", command=lambda: SettingsWindow(self, helper, calculator), style="Webdings.TButton")
-            self.BackspaceButton = ttk.Button(self.WindowFrame, text="Õ", command=lambda: self.backspace(calculator), style="Wingdings.TButton")
+            SettingsButton = ttk.Button(self.WindowFrame, text="@", command=lambda: SettingsWindow(self, helper, calculator, cfg), style="Webdings.TButton")
+            self.BackspaceButton = ttk.Button(self.WindowFrame, text="Õ", command=lambda: self.backspace(calculator, cfg), style="Wingdings.TButton")
             HistoryButton = ttk.Button(self.WindowFrame, text="0", command=lambda: HistoryWindow(self, calculator, helper), style="Wingdings.TButton")
             self.CopyButton = ttk.Button(self.WindowFrame, text="4", command=self.copyResult, style="Wingdings.TButton")
         else:
-            SettingsButton = ttk.Button(self.WindowFrame, text="\u26ed", command=lambda: SettingsWindow(self, helper, calculator), style="LargeUnicode.TButton")
-            self.BackspaceButton = ttk.Button(self.WindowFrame, text="\u232b", command=lambda: self.backspace(calculator))
+            SettingsButton = ttk.Button(self.WindowFrame, text="\u26ed", command=lambda: SettingsWindow(self, helper, calculator, cfg), style="LargeUnicode.TButton")
+            self.BackspaceButton = ttk.Button(self.WindowFrame, text="\u232b", command=lambda: self.backspace(calculator, cfg))
             HistoryButton = ttk.Button(self.WindowFrame, text="\u23f2", command=lambda: HistoryWindow(self, calculator, helper), style="LargeUnicode.TButton")
             self.CopyButton = ttk.Button(self.WindowFrame, text="\u2398", command=self.copyResult, style="LargeUnicode.TButton")
-        ModuloButton = ttk.Button(self.WindowFrame, text="%", command=lambda: self.append("%", calculator))
+        ModuloButton = ttk.Button(self.WindowFrame, text="%", command=lambda: self.append("%", calculator, cfg))
         Checkb = ttk.Button(self, text="Check", command=lambda: print(calculator.xcheck())) # some debug thing
-        sqrtButton = ttk.Button(self.WindowFrame, text="\u221a", command=lambda: self.append("\u221a" + "(", calculator))
+        sqrtButton = ttk.Button(self.WindowFrame, text="\u221a", command=lambda: self.append("\u221a" + "(", calculator, cfg))
         More = ttk.Button(self.WindowFrame, text="...", command=lambda: ExtensionWindow(self, helper, calculator, dialog))
-        PowerButton = ttk.Button(self.WindowFrame, text="x^y", command=lambda: self.append("^", calculator))
+        PowerButton = ttk.Button(self.WindowFrame, text="x^y", command=lambda: self.append("^", calculator, cfg))
         SetMemoryButton = ttk.Button(self.WindowFrame, text="SM", command=lambda: self.setMemory(calculator))
         GetMemoryButton = ttk.Button(self.WindowFrame, text="GM", command=lambda: self.getMemory(calculator))
         SinButton = ttk.Menubutton(self.WindowFrame, text="sin")
         SinMenu = tk.Menu(SinButton, tearoff=TheTearoff)
-        SinMenu.add_command(label="sin", command=lambda: self.append("sin(", calculator))
-        SinMenu.add_command(label="asin", command=lambda: self.append("asin(", calculator))
-        SinMenu.add_command(label="sinh", command=lambda: self.append("sinh(", calculator))
-        SinMenu.add_command(label="asinh", command=lambda: self.append("asinh(", calculator))
+        SinMenu.add_command(label="sin", command=lambda: self.append("sin(", calculator, cfg))
+        SinMenu.add_command(label="asin", command=lambda: self.append("asin(", calculator, cfg))
+        SinMenu.add_command(label="sinh", command=lambda: self.append("sinh(", calculator, cfg))
+        SinMenu.add_command(label="asinh", command=lambda: self.append("asinh(", calculator, cfg))
         SinButton["menu"] = SinMenu
         CosButton = ttk.Menubutton(self.WindowFrame, text="cos")
         CosMenu = tk.Menu(CosButton, tearoff=TheTearoff)
-        CosMenu.add_command(label="cos", command=lambda: self.append("cos(", calculator))
-        CosMenu.add_command(label="acos", command=lambda: self.append("acos(", calculator))
-        CosMenu.add_command(label="cosh", command=lambda: self.append("cosh(", calculator))
-        CosMenu.add_command(label="acosh", command=lambda: self.append("acosh(", calculator))
+        CosMenu.add_command(label="cos", command=lambda: self.append("cos(", calculator, cfg))
+        CosMenu.add_command(label="acos", command=lambda: self.append("acos(", calculator, cfg))
+        CosMenu.add_command(label="cosh", command=lambda: self.append("cosh(", calculator, cfg))
+        CosMenu.add_command(label="acosh", command=lambda: self.append("acosh(", calculator, cfg))
         CosButton["menu"] = CosMenu
         TanButton = ttk.Menubutton(self.WindowFrame, text="tan")
         TanMenu = tk.Menu(TanButton, tearoff=TheTearoff)
-        TanMenu.add_command(label="tan", command=lambda: self.append("tan(", calculator))
-        TanMenu.add_command(label="atan", command=lambda: self.append("atan(", calculator))
-        TanMenu.add_command(label="tanh", command=lambda: self.append("tanh(", calculator))
-        TanMenu.add_command(label="atanh", command=lambda: self.append("atanh(", calculator))
+        TanMenu.add_command(label="tan", command=lambda: self.append("tan(", calculator, cfg))
+        TanMenu.add_command(label="atan", command=lambda: self.append("atan(", calculator, cfg))
+        TanMenu.add_command(label="tanh", command=lambda: self.append("tanh(", calculator, cfg))
+        TanMenu.add_command(label="atanh", command=lambda: self.append("atanh(", calculator, cfg))
         TanButton["menu"] = TanMenu
-        LdButton = ttk.Button(self.WindowFrame, text="ld", command=lambda: self.append("ld(", calculator))
-        LnButton = ttk.Button(self.WindowFrame, text="ln", command=lambda: self.append("ln(", calculator))
-        LgButton = ttk.Button(self.WindowFrame, text="lg", command=lambda: self.append("lg(", calculator))
+        LdButton = ttk.Button(self.WindowFrame, text="ld", command=lambda: self.append("ld(", calculator, cfg))
+        LnButton = ttk.Button(self.WindowFrame, text="ln", command=lambda: self.append("ln(", calculator, cfg))
+        LgButton = ttk.Button(self.WindowFrame, text="lg", command=lambda: self.append("lg(", calculator, cfg))
         MemoryButton = ttk.Menubutton(self.WindowFrame, text="M")
         MemoryMenu = tk.Menu(MemoryButton, tearoff=TheTearoff)
         MemoryMenu.add_command(label="Set", command=lambda: self.setMemory(calculator))
@@ -724,18 +734,18 @@ class MainWindow(tk.Tk):
         MemoryButton["menu"] = MemoryMenu
         LogButton = ttk.Menubutton(self.WindowFrame, text="log")
         LogMenu = tk.Menu(LogButton, tearoff=TheTearoff)
-        LogMenu.add_command(label="ld", command=lambda: self.append("ld(", calculator))
-        LogMenu.add_command(label="ln", command=lambda: self.append("ln(", calculator))
-        LogMenu.add_command(label="lg", command=lambda: self.append("lg(", calculator))
+        LogMenu.add_command(label="ld", command=lambda: self.append("ld(", calculator, cfg))
+        LogMenu.add_command(label="ln", command=lambda: self.append("ln(", calculator, cfg))
+        LogMenu.add_command(label="lg", command=lambda: self.append("lg(", calculator, cfg))
         LogButton["menu"] = LogMenu
-        FactButton = ttk.Button(self.WindowFrame, text="!", command=lambda: self.append("fact(", calculator))
+        FactButton = ttk.Button(self.WindowFrame, text="!", command=lambda: self.append("fact(", calculator, cfg))
         KonstantButton = ttk.Menubutton(self.WindowFrame, text="\u03c0")
         KonstantMenu = tk.Menu(KonstantButton, tearoff=TheTearoff)
-        KonstantMenu.add_command(label="\u03c0", command=lambda: self.append("\u03c0", calculator))
-        KonstantMenu.add_command(label="e", command=lambda: self.append("e", calculator))
+        KonstantMenu.add_command(label="\u03c0", command=lambda: self.append("\u03c0", calculator, cfg))
+        KonstantMenu.add_command(label="e", command=lambda: self.append("e", calculator, cfg))
         KonstantButton["menu"] = KonstantMenu
         self.WindowFrame.grid(row=1, column=0, sticky="nesw")
-        if BorderDisplay == False:
+        if bool(cfg.get("borderDisplay")) == False:
             self.Output.grid(row=0, column=0, columnspan=3, sticky="nesw")
             self.CopyButton.grid(row=0, column=3, sticky="nesw")
             self.BackspaceButton.grid(row=0, column=4, sticky="nesw")
@@ -784,83 +794,81 @@ class MainWindow(tk.Tk):
     def KeyPress(self, event, calculator, helper): # processes keyboard input
         Key = event.keysym
         if Key in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "plus", "minus", "asterisk", "slash", "comma", "parenleft", "parenright"]:
-            self.append(Key, calculator)
+            self.append(Key, calculator, cfg)
         else:
             Keys = {
-                "0": lambda: self.zero(calculator),
+                "0": lambda: self.zero(calculator, cfg),
                 "equal": lambda: self.calculate(self, helper, calculator, dialog),
                 "Return": lambda: self.calculate(self, helper, calculator, dialog),
                 "h": lambda: HistoryWindow(self, calculator, helper),
                 "H": lambda: HistoryWindow(self, calculator, helper),
                 "i": lambda: dialog.info(self, helper),
-                "s": lambda: SettingsWindow(self, helper, calculator),
-                "S": lambda: SettingsWindow(self, helper, calculator),
-                "BackSpace": lambda: self.backspace(calculator),
+                "s": lambda: SettingsWindow(self, helper, calculator, cfg),
+                "S": lambda: SettingsWindow(self, helper, calculator, cfg),
+                "BackSpace": lambda: self.backspace(calculator, cfg),
                 }
             run = Keys.get(Key)
             if run:
                 run()
-    def toggleBorderDisplay(self, calculator): # toggles border display
-        global BorderDisplay
-        if BorderDisplay == True:
-            BorderDisplay = False
+    def toggleBorderDisplay(self, calculator, cfg): # toggles border display
+        if bool(cfg.get("borderDisplay")) == True:
+            cfg.set("borderDisplay", False)
             self.title("PraktiCalc")
             self.Output.grid(row=0, column=0, columnspan=3, sticky="nesw")
             self.CopyButton.grid(row=0, column=3, sticky="nesw")
             self.BackspaceButton.grid(row=0, column=4, sticky="nesw")
             self.WindowFrame.rowconfigure(0, weight=1)
-            self.updateDisplay(calculator)
-        elif BorderDisplay == False:
-            BorderDisplay = True
+            self.updateDisplay(calculator, cfg)
+        elif bool(cfg.get("borderDisplay")) == False:
+            cfg.set("borderDisplay", True)
             self.title("Border Display")
             self.Output.grid_remove()
             self.CopyButton.grid_remove()
             self.BackspaceButton.grid_remove()
             self.WindowFrame.rowconfigure(0, weight=0, uniform="")
-            self.updateDisplay(calculator)
+            self.updateDisplay(calculator, cfg)
     def copyResult(self): # copies the result
         self.clipboard_clear()
         self.clipboard_append(self.Output.get())
         self.update()
-    def updateDisplay(self, calculator): # updates output
-        if BorderDisplay == True:
+    def updateDisplay(self, calculator, cfg): # updates output
+        if cfg.get("borderDisplay") == True:
             self.title(calculator.CalculationString)
         else:
             self.Output.config(state="normal")
             self.Output.delete(0, tk.END)
             self.Output.insert(0, calculator.CalculationString)
             self.Output.config(state="readonly")
-    def append(self, value, calculator):
+    def append(self, value, calculator, cfg):
         calculator.append(value)
-        self.updateDisplay(calculator)
-    def zero(self, calculator):
+        self.updateDisplay(calculator, cfg)
+    def zero(self, calculator, cfg):
         calculator.zero()
-        self.updateDisplay(calculator)
-    def calculate(self, parent, helper, calculator, dialog):
+        self.updateDisplay(calculator, cfg)
+    def calculate(self, parent, helper, calculator, dialog, cfg):
         try:
             calculator.calculate()
         except Exception as e:
             dialog.error(str(e), parent, helper)
-        self.updateDisplay(calculator)
-    def clear(self, calculator):
+        self.updateDisplay(calculator, cfg)
+    def clear(self, calculator, cfg):
         calculator.clear()
-        self.updateDisplay(calculator)
-    def backspace(self, calculator):
+        self.updateDisplay(calculator, cfg)
+    def backspace(self, calculator, cfg):
         calculator.backspace()
-        self.updateDisplay(calculator)
+        self.updateDisplay(calculator, cfg)
     def setMemory(self, calculator):
         calculator.setMemory()
-        self.updateDisplay(calculator)
-    def getMemory(self, calculator):
+    def getMemory(self, calculator, cfg):
         calculator.getMemory()
-        self.updateDisplay(calculator)
+        self.updateDisplay(calculator, cfg)
     def clearMemory(self, calculator):
         calculator.clearMemory()
 
 # settings window
 class SettingsWindow(tk.Toplevel):
-    def __init__(self, parent, helper, calculator):
-        global MsgBoxStyles, CurrentMsgBoxStyle, BorderDisplay, theming
+    def __init__(self, parent, helper, calculator, cfg):
+        global MsgBoxStyles, theming
         super().__init__(parent)
         self.title("Settings")
         self.config(width=250, height=152)
@@ -874,16 +882,16 @@ class SettingsWindow(tk.Toplevel):
         ThemeFrame = ttk.LabelFrame(SettingsWindowFrame, text="Theme")
         ThemeFrame.columnconfigure(0, weight=1)
         self.ThemeSelector = ttk.Combobox(ThemeFrame, values=["plastik", "keramik", "breeze", "yaru", "black", "classic"])
-        self.ThemeSelector.set(thettktheme)
+        self.ThemeSelector.set(cfg.get("theme"))
         NativeThemeToggle = ttk.Checkbutton(ThemeFrame, text="native theme", variable=parent.UseNativeThemeTkVar)
         ThemeFrame.grid(row=0, column=0, sticky="news", padx=10)
         self.ThemeSelector.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
         NativeThemeToggle.grid(row=1, column=0, sticky="w")
-        BorderDisplayToggle = ttk.Checkbutton(SettingsWindowFrame, text="Border Display", variable=parent.BorderDisplayTkVar, command=lambda: parent.toggleBorderDisplay(calculator))
+        BorderDisplayToggle = ttk.Checkbutton(SettingsWindowFrame, text="Border Display", variable=parent.BorderDisplayTkVar, command=lambda: parent.toggleBorderDisplay(calculator, cfg))
         MsgBoxStyleFrame = ttk.LabelFrame(SettingsWindowFrame, text="Dialog Style")
         MsgBoxStyleFrame.columnconfigure(0, weight=1)
-        MsgBoxStyleSelect = ttk.OptionMenu(MsgBoxStyleFrame, parent.CurrentMsgBoxStyleTkVar, CurrentMsgBoxStyle, *MsgBoxStyles)
-        SettingsOKButton = ttk.Button(SettingsWindowFrame, text="OK", command=lambda: self.loadTheme(parent, helper))
+        MsgBoxStyleSelect = ttk.OptionMenu(MsgBoxStyleFrame, parent.CurrentMsgBoxStyleTkVar, cfg.get("dialogStyle"), *MsgBoxStyles)
+        SettingsOKButton = ttk.Button(SettingsWindowFrame, text="OK", command=lambda: self.loadTheme(parent, helper, cfg))
         SettingsWindowFrame.grid(row=0, column=0, sticky="nesw")
         if theming == 0:
             self.ThemeSelector.config(state="disabled")
@@ -896,29 +904,26 @@ class SettingsWindow(tk.Toplevel):
         self.update_idletasks()
         helper.WindowList.append(self)
         helper.changeTheme(self)
-    def loadTheme(self, parent, helper): # saves the selected theme choice in the settigns window
-        global CurrentMsgBoxStyle, thettktheme, DarkMode, UseNativeTheme
-        thettktheme = self.ThemeSelector.get()
-        UseNativeTheme = parent.UseNativeThemeTkVar.get()
-        if UseNativeTheme == False and self.ThemeSelector.get() == "black" or self.ThemeSelector.get() == "equilux":
-            DarkMode = True
-        else:
-            DarkMode = False
-        helper.ajustTitleBars()
-        CurrentMsgBoxStyle = parent.CurrentMsgBoxStyleTkVar.get()
+    def loadTheme(self, parent, helper, cfg): # saves the selected theme choice in the settigns window
+        cfg.set("theme", self.ThemeSelector.get())
+        cfg.set("nativeTheme", parent.UseNativeThemeTkVar.get())
         try:
             helper.changeTheme(parent)
         except:
             pass
+        helper.ajustTitleBars()
+        cfg.set("dialogStyle", parent.CurrentMsgBoxStyleTkVar.get())
         helper.close(self)
 
 # info and error dialogs
 class Dialog:
+    def __init__(self, cfg):
+        self.ConfigurationStorage = cfg
     def info(self, parent, helper): # shows info dialogs
         infotext = "PraktiCalc\nVersion " + PraktiCalcVersion + "\nrunning on Python "+ platform.python_version() + "\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/\nthemes provided by the ttkthemes library"
-        if CurrentMsgBoxStyle == "Tkinter":
+        if self.ConfigurationStorage.get("dialogStyle") == "Tkinter":
             messagebox.showinfo("About PraktiCalc", infotext)
-        elif CurrentMsgBoxStyle == "Alternative":
+        elif self.ConfigurationStorage.get("dialogStyle") == "Alternative":
             CustomInfox = tk.Toplevel(parent)
             CustomInfox.title("About PraktiCalc")
             CustomInfox.bind("<Return>", lambda event: self.close(helper, CustomInfox))
@@ -953,10 +958,10 @@ class Dialog:
                     "VBScript": lambda: subprocess.Popen(["wscript", VBSInfoPath, PraktiCalcVersion, pyver]),
                     "Windows Messaging Service": lambda: subprocess.Popen(["msg", getpass.getuser(), infotext]),
                     }
-                opendialog = styles.get(CurrentMsgBoxStyle)
+                opendialog = styles.get(self.ConfigurationStorage.get("dialogStyle"))
                 if opendialog:
                     opendialog()
-                elif CurrentMsgBoxStyle == "Windows Shutdown":
+                elif self.ConfigurationStorage.get("dialogStyle") == "Windows Shutdown":
                     subprocess.Popen(["shutdown", "/s", "/t", "60", "/c", infotext])
                     time.sleep(20)
                     subprocess.Popen(["shutdown", "/a"])
@@ -973,15 +978,15 @@ class Dialog:
                     "Xdialog": lambda: subprocess.Popen(["Xdialog", "--title=About PraktiCalc", "--msgbox", infotext, "10", "40"]),
                     "notify-send": lambda: subprocess.Popen(["notify-send", "About PraktiCalc", infotext]),
                     }
-                opendialog = styles.get(CurrentMsgBoxStyle)
+                opendialog = styles.get(self.ConfigurationStorage.get("dialogStyle"))
                 if opendialog:
                     opendialog()
                 else:
                     print("ERROR: Unknown Message Box Style")
     def error(self, message, parent, helper): # shows error dialogs
-        if CurrentMsgBoxStyle == "Tkinter":
+        if self.ConfigurationStorage.get("dialogStyle") == "Tkinter":
             messagebox.showerror("Error", message)
-        elif CurrentMsgBoxStyle == "Alternative":
+        elif self.ConfigurationStorage.get("dialogStyle") == "Alternative":
             ErrorWindow = tk.Toplevel(parent)
             ErrorWindow.title("Error")
             ErrorWindow.bind("<Return>", lambda event: helper.close(ErrorWindow))
@@ -1012,10 +1017,10 @@ class Dialog:
                     "VBScript": lambda: subprocess.Popen(["wscript", VBSErrorPath, message]),
                     "Windows Messaging Service": lambda: subprocess.Popen(["msg", getpass.getuser(), message]),
                     }
-                opendialog = styles.get(CurrentMsgBoxStyle)
+                opendialog = styles.get(self.ConfigurationStorage.get("dialogStyle"))
                 if opendialog:
                     opendialog()
-                elif CurrentMsgBoxStyle == "Windows Shutdown":
+                elif self.ConfigurationStorage.get("dialogStyle") == "Windows Shutdown":
                     subprocess.Popen(["shutdown", "/s", "/t", "60", "/c", message])
                     time.sleep(10)
                     subprocess.Popen(["shutdown", "/a"])
@@ -1032,7 +1037,7 @@ class Dialog:
                     "Xdialog": lambda: subprocess.Popen(["Xdialog", "--title=Error", "--msgbox", message, "10", "40"]),
                     "notify-send": lambda: subprocess.Popen(["notify-send", "Error", message]),
                     }
-                opendialog = styles.get(CurrentMsgBoxStyle)
+                opendialog = styles.get(self.ConfigurationStorage.get("dialogStyle"))
                 if opendialog:
                     opendialog()
                 else:
@@ -1625,6 +1630,8 @@ Please note that you have to write all multiplication operators."""
 
 # console
 class Console:
+    def __init__(self, cfg):
+        self.ConfigurationStorage = cfg
     def execute(self, command): # interpretes and executes a given command
         global lcc
         lcc = command
@@ -1745,11 +1752,11 @@ class ConsoleWindow(tk.Toplevel):
 
 if __name__ == "__main__":
     cfg = Configuration()
-    Calculator = PraktiCalculator()
-    WindowHelp = WindowHelper()
-    WindowDialog = Dialog()
-    Window = MainWindow(WindowHelp, Calculator, WindowDialog)
+    Calculator = PraktiCalculator(cfg)
+    WindowHelp = WindowHelper(cfg)
+    WindowDialog = Dialog(cfg)
+    Window = MainWindow(WindowHelp, Calculator, WindowDialog, cfg)
     if "--console" in sys.argv:
-        cmd = Console()
+        cmd = Console(cfg)
         CMDWindow = ConsoleWindow(Window, WindowHelp, cmd)
     Window.mainloop()
