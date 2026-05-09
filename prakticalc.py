@@ -1141,7 +1141,7 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "ExtensionManager.ini").exists():
             ExtensionManagerMeta = configparser.ConfigParser()
             ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini")
-            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.8":
+            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.9":
                 self.updateExtensionManager()
         if Path(self.FolderPath / "PraktiGraph.ini").exists():
             PraktiGraphMeta = configparser.ConfigParser()
@@ -1294,9 +1294,12 @@ class ExtensionManager(ttk.Frame):
         ttk.Label(self.RightFrame).grid(row=0, column=0)
         self.ExtensionTree.grid(row=0, column=0, columnspan=2, sticky="news")
         self.AddButton = ttk.Button(self.LeftFrame, text="Add", command=lambda: self.addExtension(parent, helper, dialog))
-        self.AddButton.grid(row=1, column=0, padx=10, pady=10, sticky="w")
+        self.AddButton.grid(row=1, column=0, padx=10, pady=10, sticky="we")
         self.RemoveButton = ttk.Button(self.LeftFrame, text="Remove", state="disabled", command=lambda: self.removeExtension(parent))
-        self.RemoveButton.grid(row=1, column=1, padx=10, pady=10, sticky="w")
+        self.RemoveButton.grid(row=1, column=1, padx=10, pady=10, sticky="we")
+        self.ResetButton = ttk.Button(self.LeftFrame, text="Reset Extension Folder", command=lambda: self.reset(parent, mainWin, helper))
+        self.ResetButton.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="we")
+        self.LeftFrame.columnconfigure(0, weight=1)
         self.LeftFrame.columnconfigure(1, weight=1)
         self.RightFrame.columnconfigure(0, weight=1)
         self.TitleLabel = ttk.Label(self.RightFrame, text="", style="ExtensionTitle.TLabel")
@@ -1463,10 +1466,13 @@ class ExtensionManager(ttk.Frame):
                     return
                 except Exception as e:
                     dialog.error(str(e), parent, helper)
-                    return"""
+                    return
+    def reset(self, parent, mainWin, helper):
+        shutil.rmtree(parent.FolderPath)
+        helper.close(parent)"""
             ExtensionManagerMetadata = configparser.ConfigParser()
             ExtensionManagerMetadata["PraktiXtension"] = {"name": "Extension Manager",
-                                                          "version": "1.8",
+                                                          "version": "1.9",
                                                           "filename": "ExtensionManager.py",
                                                           "description": "The PraktiCalc Extension Manager",
                                                           "website": "",
