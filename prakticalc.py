@@ -614,6 +614,10 @@ class MainWindow(tk.Tk):
         self.UseNativeThemeTkVar = tk.BooleanVar(value=bool(cfg.get("nativeTheme")))
         self.BorderDisplayTkVar = tk.BooleanVar(value=bool(cfg.get("borderDisplay")))
         self.CurrentMsgBoxStyleTkVar = tk.StringVar(value=cfg.get("dialogStyle"))
+        self.NativeMenubarTkVar = tk.BooleanVar(value=NativeMenubar)
+        self.AngleUnitTkVar = tk.StringVar(value=cfg.get("angleUnit"))
+        self.RoundResultTkVar = tk.BooleanVar(value=bool(cfg.get("roundResult")))
+        self.showTrailingZeroTkVar = tk.BooleanVar(value=bool(cfg.get("showTrailing0")))
         self.config(width=256, height=315)
         self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
@@ -621,6 +625,7 @@ class MainWindow(tk.Tk):
             TheTearoff = cfg.get("menuTearoff")
         else:
             TheTearoff = 0
+        self.MenuTearoffTkVar = tk.BooleanVar(value=bool(TheTearoff))
         if NativeMenubar == True:
             self.Menubar = tk.Menu(self)
             self.CalculatorMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
@@ -815,17 +820,15 @@ class MainWindow(tk.Tk):
             run = Keys.get(Key)
             if run:
                 run()
-    def toggleBorderDisplay(self, calculator, cfg): # toggles border display
-        if bool(cfg.get("borderDisplay")) == True:
-            cfg.set("borderDisplay", False)
+    def applySettings(self, calculator, cfg): # toggles border display
+        if bool(cfg.get("borderDisplay")) == False:
             self.title("PraktiCalc")
             self.Output.grid(row=0, column=0, columnspan=3, sticky="nesw")
             self.CopyButton.grid(row=0, column=3, sticky="nesw")
             self.BackspaceButton.grid(row=0, column=4, sticky="nesw")
             self.WindowFrame.rowconfigure(0, weight=1)
             self.updateDisplay(calculator, cfg)
-        elif bool(cfg.get("borderDisplay")) == False:
-            cfg.set("borderDisplay", True)
+        elif bool(cfg.get("borderDisplay")) == True:
             self.title("Border Display")
             self.Output.grid_remove()
             self.CopyButton.grid_remove()
@@ -884,7 +887,17 @@ class SettingsWindow(tk.Toplevel):
             self.focus_force()
         SettingsWindowFrame = ttk.Frame(self)
         SettingsWindowFrame.columnconfigure(0, weight=1)
-        ThemeFrame = ttk.LabelFrame(SettingsWindowFrame, text="Theme")
+        SettingsWindowFrame.columnconfigure(1, weight=1)
+        SettingsWindowFrame.rowconfigure(0, weight=1)
+        SettingsTabs = ttk.Notebook(SettingsWindowFrame)
+        SettingsTabs.grid(row=0, column=0, columnspan=2, sticky="news")
+        AppearanceFrame = ttk.Frame(SettingsTabs)
+        AppearanceFrame.columnconfigure(0, weight=1)
+        BehaviorFrame = ttk.Frame(SettingsTabs)
+        BehaviorFrame.columnconfigure(0, weight=1)
+        SettingsTabs.add(AppearanceFrame, text="Appearance")
+        SettingsTabs.add(BehaviorFrame, text="Behavior")
+        ThemeFrame = ttk.LabelFrame(AppearanceFrame, text="Theme")
         ThemeFrame.columnconfigure(0, weight=1)
         self.ThemeSelector = ttk.Combobox(ThemeFrame, values=["plastik", "keramik", "breeze", "yaru", "black", "classic"])
         self.ThemeSelector.set(cfg.get("theme"))
@@ -892,33 +905,58 @@ class SettingsWindow(tk.Toplevel):
         ThemeFrame.grid(row=0, column=0, sticky="news", padx=10)
         self.ThemeSelector.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
         NativeThemeToggle.grid(row=1, column=0, sticky="w")
-        BorderDisplayToggle = ttk.Checkbutton(SettingsWindowFrame, text="Border Display", variable=parent.BorderDisplayTkVar, command=lambda: parent.toggleBorderDisplay(calculator, cfg))
-        MsgBoxStyleFrame = ttk.LabelFrame(SettingsWindowFrame, text="Dialog Style")
+        BorderDisplayToggle = ttk.Checkbutton(AppearanceFrame, text="Border Display", variable=parent.BorderDisplayTkVar)
+        NativeMenubarToggle = ttk.Checkbutton(AppearanceFrame, text="Native Menubar", variable=parent.NativeMenubarTkVar)
+        if platform.system() != "Darwin":
+            MenuTearoffToggle = ttk.Checkbutton(AppearanceFrame, text="Menu Tearoff", variable=parent.MenuTearoffTkVar)
+        MsgBoxStyleFrame = ttk.LabelFrame(AppearanceFrame, text="Dialog Style")
         MsgBoxStyleFrame.columnconfigure(0, weight=1)
         MsgBoxStyleSelect = ttk.OptionMenu(MsgBoxStyleFrame, parent.CurrentMsgBoxStyleTkVar, cfg.get("dialogStyle"), *MsgBoxStyles)
-        SettingsOKButton = ttk.Button(SettingsWindowFrame, text="OK", command=lambda: self.loadTheme(parent, helper, cfg))
+        AngleUnitFrame = ttk.LabelFrame(BehaviorFrame, text="Angle unit")
+        ttk.Radiobutton(AngleUnitFrame, text="Degrees", value="deg", variable=parent.AngleUnitTkVar).grid(row=0, column=0, sticky="w")
+        ttk.Radiobutton(AngleUnitFrame, text="Radians", value="rad", variable=parent.AngleUnitTkVar).grid(row=1, column=0, sticky="w")
+        ttk.Radiobutton(AngleUnitFrame, text="Gradians", value="gon", variable=parent.AngleUnitTkVar, state="disabled").grid(row=2, column=0, sticky="w")
+        AngleUnitFrame.grid(row=0, column=0, padx=10, sticky="we")
+        ttk.Checkbutton(BehaviorFrame, text="Round result", variable=parent.RoundResultTkVar).grid(row=1, column=0, padx=10, sticky="w")
+        ttk.Checkbutton(BehaviorFrame, text="Show trailing .0", variable=parent.showTrailingZeroTkVar).grid(row=2, column=0, padx=10, sticky="w")
+        SettingsOKButton = ttk.Button(SettingsWindowFrame, text="OK", command=lambda: self.loadTheme(parent, helper, cfg, calculator))
+        SettingsResetButton = ttk.Button(SettingsWindowFrame, text="Reset", command=lambda: self.reset(parent, helper, cfg))
         SettingsWindowFrame.grid(row=0, column=0, sticky="nesw")
         if theming == 0:
             self.ThemeSelector.config(state="disabled")
             NativeThemeToggle.config(state="disabled")
         BorderDisplayToggle.grid(row=1, column=0, sticky="w", padx=10)
-        MsgBoxStyleFrame.grid(row=3, column=0, sticky="ew", padx=10)
+        NativeMenubarToggle.grid(row=2, column=0, sticky="w", padx=10)
+        if platform.system() != "Darwin":
+            MenuTearoffToggle.grid(row=3, column=0, sticky="w", padx=10)
+        MsgBoxStyleFrame.grid(row=4, column=0, sticky="ew", padx=10, pady=(0, 10))
         MsgBoxStyleSelect.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
-        SettingsOKButton.grid(row=4, column=0, sticky="ew", padx=10, pady=10)
+        SettingsOKButton.grid(row=1, column=0, sticky="ew", padx=10, pady=10)
+        SettingsResetButton.grid(row=1, column=1, sticky="ew", padx=10, pady=10)
         self.protocol("WM_DELETE_WINDOW", lambda: helper.close(self))
         self.update_idletasks()
         helper.WindowList.append(self)
         helper.changeTheme(self)
-    def loadTheme(self, parent, helper, cfg): # saves the selected theme choice in the settigns window
+    def loadTheme(self, parent, helper, cfg, calculator): # saves the selected theme choice in the settigns window
         cfg.set("theme", self.ThemeSelector.get())
         cfg.set("nativeTheme", parent.UseNativeThemeTkVar.get())
+        cfg.set("borderDisplay", parent.BorderDisplayTkVar.get())
+        cfg.set("nativeMenuBar", parent.NativeMenubarTkVar.get())
+        cfg.set("menuTearoff", parent.MenuTearoffTkVar.get())
+        cfg.set("roundResult", parent.RoundResultTkVar.get())
+        cfg.set("showTrailing0", parent.showTrailingZeroTkVar.get())
+        cfg.set("angleUnit", parent.AngleUnitTkVar.get())
         try:
             helper.changeTheme(parent)
         except:
             pass
         helper.ajustTitleBars()
         cfg.set("dialogStyle", parent.CurrentMsgBoxStyleTkVar.get())
+        parent.applySettings(calculator, cfg)
         helper.close(self)
+    def reset(self, parent, helper, cfg):
+        cfg.reset()
+        helper.close(parent)
 
 # info and error dialogs
 class Dialog:
