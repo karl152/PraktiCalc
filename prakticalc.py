@@ -914,15 +914,15 @@ class SettingsWindow(tk.Toplevel):
         ThemeFrame.columnconfigure(0, weight=1)
         self.ThemeSelector = ttk.Combobox(ThemeFrame, values=["plastik", "keramik", "breeze", "yaru", "black", "classic"])
         self.ThemeSelector.set(cfg.get("theme"))
-        NativeThemeToggle = ttk.Checkbutton(ThemeFrame, text="native theme", variable=parent.UseNativeThemeTkVar)
+        NativeThemeToggle = ttk.Checkbutton(ThemeFrame, text="Native theme", variable=parent.UseNativeThemeTkVar)
         ThemeFrame.grid(row=0, column=0, sticky="news", padx=10)
         self.ThemeSelector.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
         NativeThemeToggle.grid(row=1, column=0, sticky="w")
-        BorderDisplayToggle = ttk.Checkbutton(AppearanceFrame, text="Border Display", variable=parent.BorderDisplayTkVar)
-        NativeMenubarToggle = ttk.Checkbutton(AppearanceFrame, text="Native Menubar", variable=parent.NativeMenubarTkVar)
+        BorderDisplayToggle = ttk.Checkbutton(AppearanceFrame, text="Border display", variable=parent.BorderDisplayTkVar)
+        NativeMenubarToggle = ttk.Checkbutton(AppearanceFrame, text="Native menubar", variable=parent.NativeMenubarTkVar)
         if platform.system() != "Darwin":
-            MenuTearoffToggle = ttk.Checkbutton(AppearanceFrame, text="Menu Tearoff", variable=parent.MenuTearoffTkVar, command=lambda: messagebox.showinfo("Restart required", "You have to restart PraktiCalc to apply this setting"))
-        MsgBoxStyleFrame = ttk.LabelFrame(AppearanceFrame, text="Dialog Style")
+            MenuTearoffToggle = ttk.Checkbutton(AppearanceFrame, text="Menu tearoff", variable=parent.MenuTearoffTkVar, command=lambda: messagebox.showinfo("Restart required", "You have to restart PraktiCalc to apply this setting"))
+        MsgBoxStyleFrame = ttk.LabelFrame(AppearanceFrame, text="Dialog style")
         MsgBoxStyleFrame.columnconfigure(0, weight=1)
         MsgBoxStyleSelect = ttk.OptionMenu(MsgBoxStyleFrame, parent.CurrentMsgBoxStyleTkVar, cfg.get("dialogStyle"), *MsgBoxStyles)
         AngleUnitFrame = ttk.LabelFrame(BehaviorFrame, text="Angle unit")
@@ -1148,7 +1148,7 @@ class HistoryWindow(tk.Toplevel):
         self.HistoryTreeview.heading("#0", text="History")
         for entry in calculator.HistoryList:
             self.HistoryTreeview.insert("", tk.END, text=entry)
-        HistoryClearButton = ttk.Button(HistoryWindowFrame, text="Clear History", command=lambda: self.clear(calculator))
+        HistoryClearButton = ttk.Button(HistoryWindowFrame, text="Clear history", command=lambda: self.clear(calculator))
         self.HistoryTreeview.grid(row=0, column=0, sticky="nesw")
         HistoryClearButton.grid(row=1, column=0, sticky="nesw", padx=5, pady=5)
         self.protocol("WM_DELETE_WINDOW", lambda: helper.close(self))
@@ -1225,7 +1225,7 @@ class ExtensionWindow(tk.Toplevel):
                         self.Tabs.add(instance, text=meta["PraktiXtension"]["name"])
                         print("loaded extension " + meta["PraktiXtension"]["name"])
                     else:
-                        dialog.error("incompatible Python version", parent, helper)
+                        dialog.error("Incompatible Python version", parent, helper)
                 else:
                     spec = importlib.util.spec_from_file_location(file.stem, file)
                     module = importlib.util.module_from_spec(spec)
