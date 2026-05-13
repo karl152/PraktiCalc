@@ -133,6 +133,7 @@ if RunningAsOneFileExe == True:
     PraktiCalcIconPath = (sys._MEIPASS + "/PraktiCalculator_icon.png")
     PraktiCalcIconMonoPath = (sys._MEIPASS + "/PraktiCalculator_icon.xbm")
     PraktiCalcIconMonoInvertedPath = (sys._MEIPASS + "/PraktiCalculator_icon_inverted.xbm")
+    PythonPowerPath = (sys._MEIPASS + "/python-powered.png")
     VBSInfoPath = (sys._MEIPASS + "/info.vbs")
     VBSErrorPath = (sys._MEIPASS + "/error.vbs")
 else:
@@ -141,6 +142,7 @@ else:
     PraktiCalcIconPath = "PraktiCalculator_icon.png"
     PraktiCalcIconMonoPath = "PraktiCalculator_icon.xbm"
     PraktiCalcIconMonoInvertedPath = "PraktiCalculator_icon_inverted.xbm"
+    PythonPowerPath = "python-powered.png"
     VBSInfoPath = "info.vbs"
     VBSErrorPath = "error.vbs"
 
@@ -793,7 +795,7 @@ class MainWindow(tk.Tk):
         LogButton.grid(row=6, column=3, sticky="nesw")
         FactButton.grid(row=5, column=4, sticky="nesw")
         KonstantButton.grid(row=6, column=4, sticky="nesw")
-        self.bind("<Key>", lambda event: self.KeyPress(event, calculator, helper))
+        self.bind("<Key>", lambda event: self.KeyPress(event, calculator, helper, dialog))
         if debug == True:
             Checkb.grid(row=2, column=0, sticky="nesw")
         if platform.system() == "Darwin":
@@ -804,7 +806,7 @@ class MainWindow(tk.Tk):
         self.update_idletasks()
         helper.WindowList.append(self)
         helper.changeTheme(self)
-    def KeyPress(self, event, calculator, helper): # processes keyboard input
+    def KeyPress(self, event, calculator, helper, dialog): # processes keyboard input
         Key = event.keysym
         if Key in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "plus", "minus", "asterisk", "slash", "comma", "parenleft", "parenright"]:
             self.append(Key, calculator, cfg)
@@ -979,6 +981,7 @@ class Dialog:
             messagebox.showinfo("About PraktiCalc", infotext)
         elif self.ConfigurationStorage.get("dialogStyle") == "Alternative":
             CustomInfox = tk.Toplevel(parent)
+            self.PythonPower = tk.PhotoImage(file=PythonPowerPath)
             CustomInfox.title("About PraktiCalc")
             CustomInfox.bind("<Return>", lambda event: self.close(helper, CustomInfox))
             CustomInfox.rowconfigure(0, weight=1)
@@ -998,6 +1001,7 @@ class Dialog:
             ExtInfoText1 = ttk.Label(ExtendedInfoFrame, text=infotext, justify="left")
             CustomInfoFrame.grid(row=0, column=0, sticky="nesw")
             CustomInfoExit.grid(row=1, column=1, padx=10, pady=10)
+            ttk.Button(CustomInfoFrame, image=self.PythonPower, command=lambda: webbrowser.open_new_tab("https://www.python.org/")).grid(row=1, column=0, padx=10, pady=10, sticky="sw")
             ExtendedInfoFrame.grid(row=0, column=0, padx=20, pady=10, sticky="nesw")
             ExtInfoIcon.grid(row=0, column=0)
             ExtInfoText1.grid(row=1, column=0)

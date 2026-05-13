@@ -18,6 +18,7 @@ sed -i "s/dash/sh/g" linux-pkg-builds/tce/usr/bin/prakticalc
 sed -i "s|/usr/bin/python3|/usr/local/bin/python3.14|g" linux-pkg-builds/tce/usr/bin/prakticalc
 cp prakticalc.py linux-pkg-builds/tce/usr/share/prakticalc/
 cp *_icon* linux-pkg-builds/tce/usr/share/prakticalc/
+cp python-powered.png linux-pkg-builds/tce/usr/share/prakticalc/
 cp -r linux-pkg-builds/debian/prakticalc/usr/share/applications/ linux-pkg-builds/tce/usr/share/applications
 cp -r linux-pkg-builds/debian/prakticalc/usr/share/icons/ linux-pkg-builds/tce/usr/share/icons
 cp LICENSE linux-pkg-builds/tce/usr/share/prakticalc/

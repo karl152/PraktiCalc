@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/dash
 
 # PraktiCalc © 2024-2026 Karl "karl152"
 # Licensed under the GNU General Public License v3.0.
@@ -23,6 +23,7 @@ cp ./LICENSE linux-pkg-builds/debian/prakticalc/usr/share/prakticalc/
 cp ./PraktiCalculator_icon_inverted.xbm linux-pkg-builds/debian/prakticalc/usr/share/prakticalc/
 cp ./PraktiCalculator_icon.png linux-pkg-builds/debian/prakticalc/usr/share/prakticalc/
 cp ./PraktiCalculator_icon.xbm linux-pkg-builds/debian/prakticalc/usr/share/prakticalc/
+cp ./python-powered.png linux-pkg-builds/debian/prakticalc/usr/share/prakticalc/
 
 # edit changelog
 gunzip linux-pkg-builds/debian/prakticalc/usr/share/doc/prakticalc/changelog.gz

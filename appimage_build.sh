@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # PraktiCalc © 2024-2026 Karl "karl152"
 # Licensed under the GNU General Public License v3.0.
@@ -19,7 +19,7 @@ rm linux-pkg-builds/AppImage/PraktiCalc-$(uname -m).AppImage
 mkdir -p linux-pkg-builds/AppImage/com.github.karl152.prakticalc.AppDir/usr/bin
 
 echo "Building Executable"
-python3 -m PyInstaller prakticalc.py --onedir --strip --clean --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data /usr/share/tcltk/ttkthemes:ttkthemes --icon PraktiCalculator.ico
+python3 -m PyInstaller prakticalc.py --onedir --strip --clean --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data python-powered.png:. --add-data /usr/share/tcltk/ttkthemes:ttkthemes --icon PraktiCalculator.ico
 cd ./dist/prakticalc/_internal/
 echo "Cleaning libraries..."
 rm libX11.so.6

@@ -14,7 +14,7 @@ $mode = $args[0]
 if ($mode -eq "portable"){
 Write-Host "Building portable executable for PraktiCalc..."
 Remove-Item .\prakticalc.exe -ErrorAction SilentlyContinue
-python.exe -m PyInstaller .\prakticalc.py --onefile --clean --windowed --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data info.vbs:. --add-data error.vbs:. --icon PraktiCalculator.ico
+python.exe -m PyInstaller .\prakticalc.py --onefile --clean --windowed --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data python-powered.png:. --add-data info.vbs:. --add-data error.vbs:. --icon PraktiCalculator.ico
 Copy-Item .\dist\prakticalc.exe .
 Write-Host "Cleaning up..."
 Remove-Item .\dist -Recurse -Force
@@ -26,7 +26,7 @@ elseif ($mode -eq "installer"){
 Write-Host "Building installer for PraktiCalc..."
 Write-Host "[1/3] Building PraktiCalc..."
 Remove-Item .\prakticalc-installer.exe -ErrorAction SilentlyContinue
-python.exe -m PyInstaller .\prakticalc.py --onedir --clean --windowed --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data info.vbs:. --add-data error.vbs:. --icon PraktiCalculator.ico
+python.exe -m PyInstaller .\prakticalc.py --onedir --clean --windowed --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data python-powered.png:. --add-data info.vbs:. --add-data error.vbs:. --icon PraktiCalculator.ico
 Copy-Item .\dist\prakticalc\* '.\PraktiCalc Installer\content' -Recurse -Verbose
 Remove-Item .\dist -Recurse -Force
 Remove-Item .\build -Recurse -Force
