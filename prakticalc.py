@@ -842,6 +842,7 @@ class MainWindow(tk.Tk):
         elif bool(cfg.get("nativeMenuBar")) == False:
             self.MenuBarFrame.grid(row=0, column=0, sticky="ew")
             self.config(menu="")
+        calculator.setOperators(cfg.get("angleUnit"))
             
     def copyResult(self): # copies the result
         self.clipboard_clear()
