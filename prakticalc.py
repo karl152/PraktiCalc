@@ -80,7 +80,6 @@ if ThemingDisabled == True:
 if CLIHelp == True:
     if platform.system() == "Windows":
         messagebox.showinfo("PraktiCalc CLI Options", "PraktiCalc " + PraktiCalcVersion + """ CLI Options:
---allowShutdownDialog: allow the use of the shutdown command to display messages
 --borderdisplay: uses window title to show output
 --debug: add a test button for debugging
 --nodpiawareness: disable Windows DPI Awareness
@@ -91,7 +90,6 @@ if CLIHelp == True:
 --version: display version and exit""")
     else:
         print("PraktiCalc " + PraktiCalcVersion + " CLI Options")
-        print("--borderdisplay | uses window title to show output")
         print("--debug         | add a test button for debugging")
         if platform.system() != "Darwin":
             if theming != 0:
@@ -99,9 +97,6 @@ if CLIHelp == True:
         print("--console       | show console for debugging")
         if theming != 0:
             print("--notheming     | disables theming")
-            print("--breeze        | set the light theme to breeze")
-            print("--yaru          | set the light theme to yaru")
-            print("--keramik       | set the light theme to keramik")
             print("--equilux       | set the dark theme to equilux")
         print("--help          | display this help text and exit")
         print("--version       | display version and exit")
