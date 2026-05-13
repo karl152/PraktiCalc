@@ -468,12 +468,6 @@ class PraktiCalculator:
             self.operators["asin"] = math.asin
             self.operators["acos"] = math.acos
             self.operators["atan"] = math.atan
-            self.operators["sinh"] = math.sinh
-            self.operators["cosh"] = math.cosh
-            self.operators["tanh"] = math.tanh
-            self.operators["asinh"] = math.asinh
-            self.operators["acosh"] = math.acosh
-            self.operators["atanh"] = math.atanh
         elif TrigMode == "deg":
             self.operators["sin"] = lambda x: math.sin(math.radians(x))
             self.operators["cos"] = lambda x: math.cos(math.radians(x))
@@ -481,12 +475,19 @@ class PraktiCalculator:
             self.operators["asin"] = lambda x: math.asin(math.radians(x))
             self.operators["acos"] = lambda x: math.acos(math.radians(x))
             self.operators["atan"] = lambda x: math.atan(math.radians(x))
-            self.operators["sinh"] = lambda x: math.sinh(math.radians(x))
-            self.operators["cosh"] = lambda x: math.cosh(math.radians(x))
-            self.operators["tanh"] = lambda x: math.tanh(math.radians(x))
-            self.operators["asinh"] = lambda x: math.asinh(math.radians(x))
-            self.operators["acosh"] = lambda x: math.acosh(math.radians(x))
-            self.operators["atanh"] = lambda x: math.atanh(math.radians(x))
+        elif TrigMode == "gon":
+            self.operators["sin"] = lambda x: math.sin(x * math.pi / 200)
+            self.operators["cos"] = lambda x: math.cos(x * math.pi / 200)
+            self.operators["tan"] = lambda x: math.tan(x * math.pi / 200)
+            self.operators["asin"] = lambda x: math.asin(x) * 200 / math.pi
+            self.operators["acos"] = lambda x: math.acos(x) * 200 / math.pi
+            self.operators["atan"] = lambda x: math.atan(x) * 200 / math.pi
+        self.operators["sinh"] = math.sinh
+        self.operators["cosh"] = math.cosh
+        self.operators["tanh"] = math.tanh
+        self.operators["asinh"] = math.asinh
+        self.operators["acosh"] = math.acosh
+        self.operators["atanh"] = math.atanh
         self.operators["ld"] = math.log2
         self.operators["ln"] = math.log
         self.operators["lg"] = math.log10
@@ -922,7 +923,7 @@ class SettingsWindow(tk.Toplevel):
         AngleUnitFrame = ttk.LabelFrame(BehaviorFrame, text="Angle unit")
         ttk.Radiobutton(AngleUnitFrame, text="Degrees", value="deg", variable=parent.AngleUnitTkVar).grid(row=0, column=0, sticky="w")
         ttk.Radiobutton(AngleUnitFrame, text="Radians", value="rad", variable=parent.AngleUnitTkVar).grid(row=1, column=0, sticky="w")
-        ttk.Radiobutton(AngleUnitFrame, text="Gradians", value="gon", variable=parent.AngleUnitTkVar, state="disabled").grid(row=2, column=0, sticky="w")
+        ttk.Radiobutton(AngleUnitFrame, text="Gradians", value="gon", variable=parent.AngleUnitTkVar).grid(row=2, column=0, sticky="w")
         AngleUnitFrame.grid(row=0, column=0, padx=10, sticky="we")
         ttk.Checkbutton(BehaviorFrame, text="Round result", variable=parent.RoundResultTkVar).grid(row=1, column=0, padx=10, sticky="w")
         ttk.Checkbutton(BehaviorFrame, text="Show trailing .0", variable=parent.showTrailingZeroTkVar).grid(row=2, column=0, padx=10, sticky="w")
