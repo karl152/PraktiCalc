@@ -919,7 +919,7 @@ class SettingsWindow(tk.Toplevel):
         BorderDisplayToggle = ttk.Checkbutton(AppearanceFrame, text="Border Display", variable=parent.BorderDisplayTkVar)
         NativeMenubarToggle = ttk.Checkbutton(AppearanceFrame, text="Native Menubar", variable=parent.NativeMenubarTkVar)
         if platform.system() != "Darwin":
-            MenuTearoffToggle = ttk.Checkbutton(AppearanceFrame, text="Menu Tearoff", variable=parent.MenuTearoffTkVar)
+            MenuTearoffToggle = ttk.Checkbutton(AppearanceFrame, text="Menu Tearoff", variable=parent.MenuTearoffTkVar, command=lambda: messagebox.showinfo("Restart required", "You have to restart PraktiCalc to apply this setting"))
         MsgBoxStyleFrame = ttk.LabelFrame(AppearanceFrame, text="Dialog Style")
         MsgBoxStyleFrame.columnconfigure(0, weight=1)
         MsgBoxStyleSelect = ttk.OptionMenu(MsgBoxStyleFrame, parent.CurrentMsgBoxStyleTkVar, cfg.get("dialogStyle"), *MsgBoxStyles)
