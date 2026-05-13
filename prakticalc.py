@@ -626,42 +626,42 @@ class MainWindow(tk.Tk):
         else:
             TheTearoff = 0
         self.MenuTearoffTkVar = tk.BooleanVar(value=bool(TheTearoff))
+        self.Menubar = tk.Menu(self)
+        self.CalculatorMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
+        self.CalculatorMenu.add_command(label="Quit", command=lambda: helper.close(self))
+        self.ToolMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
+        self.ToolMenu.add_command(label="History", command=lambda: HistoryWindow(self, calculator, helper))
+        self.ToolMenu.add_command(label="Extensions", command=lambda: ExtensionWindow(self, helper, calculator, dialog))
+        self.ToolMenu.add_separator()
+        self.ToolMenu.add_command(label="Settings", command=lambda: SettingsWindow(self, helper, calculator, cfg))
+        self.HelpMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
+        self.HelpMenu.add_command(label="About", command=lambda: dialog.info(self, helper))
+        self.Menubar.add_cascade(label="Calculator", menu=self.CalculatorMenu)
+        self.Menubar.add_cascade(label="Tools", menu=self.ToolMenu)
+        self.Menubar.add_cascade(label="Help", menu=self.HelpMenu)
+        self.MenuBarFrame = ttk.Frame(self)
+        self.CalculatorMenuButton = ttk.Menubutton(self.MenuBarFrame, text="Calculator")
+        self.CalculatorCustomMenu = tk.Menu(self.CalculatorMenuButton, tearoff=TheTearoff)
+        self.CalculatorCustomMenu.add_command(label="Quit", command=lambda: helper.close(self))
+        self.CalculatorMenuButton["menu"] = self.CalculatorCustomMenu
+        self.ToolMenuButton = ttk.Menubutton(self.MenuBarFrame, text="Tools")
+        self.ToolCustomMenu = tk.Menu(self.ToolMenuButton, tearoff=TheTearoff)
+        self.ToolCustomMenu.add_command(label="History", command=lambda: HistoryWindow(self, calculator, helper))
+        self.ToolCustomMenu.add_command(label="Extensions", command=lambda: ExtensionWindow(self, helper, calculator, dialog))
+        self.ToolCustomMenu.add_separator()
+        self.ToolCustomMenu.add_command(label="Settings", command=lambda: SettingsWindow(self, helper, calculator, cfg))
+        self.ToolMenuButton["menu"] = self.ToolCustomMenu
+        self.HelpMenuButton = ttk.Menubutton(self.MenuBarFrame, text="Help")
+        self.HelpCustomMenu = tk.Menu(self.HelpMenuButton, tearoff=TheTearoff)
+        self.HelpCustomMenu.add_command(label="About", command=lambda: dialog.info(self, helper))
+        self.HelpMenuButton["menu"] = self.HelpCustomMenu
+        self.CalculatorMenuButton.grid(row=0, column=0, sticky="w")
+        self.ToolMenuButton.grid(row=0, column=1, sticky="w")
+        self.HelpMenuButton.grid(row=0, column=2, sticky="w")
         if NativeMenubar == True:
-            self.Menubar = tk.Menu(self)
-            self.CalculatorMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
-            self.CalculatorMenu.add_command(label="Quit", command=lambda: helper.close(self))
-            self.ToolMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
-            self.ToolMenu.add_command(label="History", command=lambda: HistoryWindow(self, calculator, helper))
-            self.ToolMenu.add_command(label="Extensions", command=lambda: ExtensionWindow(self, helper, calculator, dialog))
-            self.ToolMenu.add_separator()
-            self.ToolMenu.add_command(label="Settings", command=lambda: SettingsWindow(self, helper, calculator, cfg))
-            self.HelpMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
-            self.HelpMenu.add_command(label="About", command=lambda: dialog.info(self, helper))
-            self.Menubar.add_cascade(label="Calculator", menu=self.CalculatorMenu)
-            self.Menubar.add_cascade(label="Tools", menu=self.ToolMenu)
-            self.Menubar.add_cascade(label="Help", menu=self.HelpMenu)
             self.config(menu=self.Menubar)
         else:
-            self.MenuBarFrame = ttk.Frame(self)
-            self.CalculatorMenuButton = ttk.Menubutton(self.MenuBarFrame, text="Calculator")
-            self.CalculatorCustomMenu = tk.Menu(self.CalculatorMenuButton, tearoff=TheTearoff)
-            self.CalculatorCustomMenu.add_command(label="Quit", command=lambda: helper.close(self))
-            self.CalculatorMenuButton["menu"] = self.CalculatorCustomMenu
-            self.ToolMenuButton = ttk.Menubutton(self.MenuBarFrame, text="Tools")
-            self.ToolCustomMenu = tk.Menu(self.ToolMenuButton, tearoff=TheTearoff)
-            self.ToolCustomMenu.add_command(label="History", command=lambda: HistoryWindow(self, calculator, helper))
-            self.ToolCustomMenu.add_command(label="Extensions", command=lambda: ExtensionWindow(self, helper, calculator, dialog))
-            self.ToolCustomMenu.add_separator()
-            self.ToolCustomMenu.add_command(label="Settings", command=lambda: SettingsWindow(self, helper, calculator, cfg))
-            self.ToolMenuButton["menu"] = self.ToolCustomMenu
-            self.HelpMenuButton = ttk.Menubutton(self.MenuBarFrame, text="Help")
-            self.HelpCustomMenu = tk.Menu(self.HelpMenuButton, tearoff=TheTearoff)
-            self.HelpCustomMenu.add_command(label="About", command=lambda: dialog.info(self, helper))
-            self.HelpMenuButton["menu"] = self.HelpCustomMenu
             self.MenuBarFrame.grid(row=0, column=0, sticky="ew")
-            self.CalculatorMenuButton.grid(row=0, column=0, sticky="w")
-            self.ToolMenuButton.grid(row=0, column=1, sticky="w")
-            self.HelpMenuButton.grid(row=0, column=2, sticky="w")
         self.WindowFrame = ttk.Frame(self)
         for colrow in range(5):
             self.WindowFrame.rowconfigure(colrow, weight=1, uniform="buttons")
@@ -835,6 +835,13 @@ class MainWindow(tk.Tk):
             self.BackspaceButton.grid_remove()
             self.WindowFrame.rowconfigure(0, weight=0, uniform="")
             self.updateDisplay(calculator, cfg)
+        if bool(cfg.get("nativeMenuBar")) == True:
+            self.MenuBarFrame.grid_remove()
+            self.config(menu=self.Menubar)
+        elif bool(cfg.get("nativeMenuBar")) == False:
+            self.MenuBarFrame.grid(row=0, column=0, sticky="ew")
+            self.config(menu="")
+            
     def copyResult(self): # copies the result
         self.clipboard_clear()
         self.clipboard_append(self.Output.get())
