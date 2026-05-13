@@ -375,14 +375,11 @@ class XDGConfig:
 # Calculation Unit
 class PraktiCalculator:
     def __init__(self, cfg):
-        self.TrigMode = cfg.get("angleUnit") # rad, deg, gon
         self.CalculationString = "0"
         self.Memory = "0"
         self.HistoryList = []
         self.LastResult = "0"
-        self.setOperators(self.TrigMode)
-        self.Rounding = bool(cfg.get("roundResult"))
-        self.no0 = bool(cfg.get("showTrailing0"))
+        self.updateFromSettings(cfg)
     def calculate(self): # does the actual calculation, used to include 171 if-statements
         TheCalc = self.CalculationString.replace("\u221a", "sqrt")
         TheCalc = TheCalc.replace("\u03c0", "pi")
@@ -494,6 +491,11 @@ class PraktiCalculator:
         self.operators["fact"] = math.factorial
         self.operators["pi"] = math.pi
         self.operators["e"] = math.e
+    def updateFromSettings(self, cfg):
+        self.TrigMode = cfg.get("angleUnit") # rad, deg, gon
+        self.setOperators(self.TrigMode)
+        self.Rounding = bool(cfg.get("roundResult"))
+        self.no0 = bool(cfg.get("showTrailing0"))
 
 # provides settings, theming and ajustments for windows
 class WindowHelper:
@@ -842,7 +844,7 @@ class MainWindow(tk.Tk):
         elif bool(cfg.get("nativeMenuBar")) == False:
             self.MenuBarFrame.grid(row=0, column=0, sticky="ew")
             self.config(menu="")
-        calculator.setOperators(cfg.get("angleUnit"))
+        calculator.updateFromSettings(cfg)
             
     def copyResult(self): # copies the result
         self.clipboard_clear()
