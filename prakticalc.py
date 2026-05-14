@@ -1228,7 +1228,7 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "PraktiGraph.ini").exists():
             PraktiGraphMeta = configparser.ConfigParser()
             PraktiGraphMeta.read(self.FolderPath / "PraktiGraph.ini")
-            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.3":
+            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.4":
                 self.updatePraktiGraph()
         for file in self.FolderPath.iterdir():
             if file.suffix == ".py":
@@ -1576,8 +1576,13 @@ class ExtensionManager(ttk.Frame):
             Path(self.FolderPath / "PraktiGraph.ini").unlink(missing_ok=True)
             Path(self.FolderPath / "PraktiGraph.txt").unlink(missing_ok=True)
         if not Path(self.FolderPath / "PraktiGraph.py").exists():
-            PraktiGraphCode = """import tkinter as tk
+            PraktiGraphCode = """# PraktiGraph
+# Copyright (C) 2026 Karl "karl152"
+# SPDX-License-Identifier: GPL-3.0
+
+import tkinter as tk
 from tkinter import ttk, messagebox, colorchooser
+import platform
 
 class PraktiGraph(ttk.Frame):
     def __init__(self, tabs, parent, mainWin, helper, calculator, dialog, DarkMode):
@@ -1608,8 +1613,11 @@ class PraktiGraph(ttk.Frame):
         self.gxEntry = ttk.Entry(self)
         self.fxEntry.grid(row=2, column=1, columnspan=2, sticky="ew")
         self.gxEntry.grid(row=3, column=1, columnspan=2, sticky="ew")
-        self.fxColorButton = tk.Button(self, text="color", fg=self.fxColor, bg=self.fxColor, command=lambda: self.setFxColor(parent, calculator))
-        self.gxColorButton = tk.Button(self, text="color", fg=self.gxColor, bg=self.gxColor, command=lambda: self.setGxColor(parent, calculator))
+        self.fxColorButton = tk.Button(self, text="Color", fg=self.fxColor, bg=self.fxColor, command=lambda: self.setFxColor(parent, calculator))
+        self.gxColorButton = tk.Button(self, text="Color", fg=self.gxColor, bg=self.gxColor, command=lambda: self.setGxColor(parent, calculator))
+        if platform.system() == "Darwin":
+            self.fxColorButton.config(font=("TkDefaultFont", 11))
+            self.gxColorButton.config(font=("TkDefaultFont", 11))
         self.fxColorButton.grid(row=2, column=3, padx=10)
         self.gxColorButton.grid(row=3, column=3, padx=10)
         self.cols = ("-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5")
@@ -1619,6 +1627,10 @@ class PraktiGraph(ttk.Frame):
             self.Table.heading(col, text=col)
         self.FirstTableRow = self.Table.insert("", tk.END, text="f(x)")
         self.SecondTableRow = self.Table.insert("", tk.END, text="g(x)")
+        fullwidth = parent.winfo_width()
+        self.Table.column("#0", width=fullwidth // 12)
+        for col in self.Table["columns"]:
+            self.Table.column(col, width=fullwidth // 12)
         self.Table.grid(row=4, column=0, columnspan=4, sticky="news")
         ttk.Button(self, text="Clear", command=self.clear).grid(row=5, column=1, pady=10, padx=20, sticky="e")
         ttk.Button(self, text="Draw", command=lambda: self.redraw(calculator)).grid(row=5, column=2, pady=10, padx=20, sticky="w")
@@ -1703,7 +1715,7 @@ class PraktiGraph(ttk.Frame):
         pass"""
             PraktiGraphMetadata = configparser.ConfigParser()
             PraktiGraphMetadata["PraktiXtension"] = {"name": "PraktiGraph",
-                                                          "version": "1.3",
+                                                          "version": "1.4",
                                                           "filename": "PraktiGraph.py",
                                                           "description": "The PraktiCalc Graph Thing",
                                                           "website": "",
