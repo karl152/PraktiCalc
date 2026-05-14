@@ -1816,7 +1816,7 @@ class ConsoleWindow(tk.Toplevel):
         ConsoleAboutSpacer1 = tk.Label(ConsoleAboutWindow, bg="black")
         ConsoleAboutSpacer2 = tk.Label(ConsoleAboutWindow, bg="black")
         ConsoleAboutIcon = tk.Label(ConsoleAboutWindow, image=parent.icon_mono_inverted, fg="black", bg="white")
-        ConsoleAboutText = tk.Label(ConsoleAboutWindow, bg="black", text="PraktiCalc Console\nrunning on PraktiCalc " + PraktiCalcVersion + "\npowered by Python " + platform.python_version(), fg="white")
+        ConsoleAboutText = tk.Label(ConsoleAboutWindow, bg="black", text="PraktiCalc Console\nrunning on PraktiCalc " + PraktiCalcVersion + "\npowered by Python " + platform.python_version() + "\n Tcl: " + str(tk.TclVersion) + " | Tk: " + str(tk.TkVersion), fg="white")
         ConsoleAboutSpacer1.grid(row=0, column=0, sticky="nesw")
         ConsoleAboutIcon.grid(row=0, column=0, padx=152, pady=20)
         ConsoleAboutText.grid(row=2, column=0, sticky="nesw")
