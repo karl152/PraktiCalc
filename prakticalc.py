@@ -640,9 +640,14 @@ class MainWindow(tk.Tk):
         self.ToolMenu.add_command(label="Settings", command=lambda: SettingsWindow(self, helper, calculator, cfg))
         self.HelpMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
         self.HelpMenu.add_command(label="About", command=lambda: dialog.info(self, helper))
+        self.MemoryDisplay = tk.Menu(self.Menubar, tearoff=TheTearoff)
+        self.MemoryDisplay.add_command(label="Set memory", command=lambda: self.setMemory(calculator))
+        self.MemoryDisplay.add_command(label="Get memory", command=lambda: self.getMemory(calculator, cfg))
+        self.MemoryDisplay.add_command(label="Clear memory", command=lambda: self.clearMemory(calculator))
         self.Menubar.add_cascade(label="Calculator", menu=self.CalculatorMenu)
         self.Menubar.add_cascade(label="Tools", menu=self.ToolMenu)
         self.Menubar.add_cascade(label="Help", menu=self.HelpMenu)
+        self.Menubar.add_cascade(label="M: " + calculator.Memory, menu=self.MemoryDisplay)
         self.MenuBarFrame = ttk.Frame(self)
         self.CalculatorMenuButton = ttk.Menubutton(self.MenuBarFrame, text="Calculator")
         self.CalculatorCustomMenu = tk.Menu(self.CalculatorMenuButton, tearoff=TheTearoff)
@@ -662,6 +667,8 @@ class MainWindow(tk.Tk):
         self.CalculatorMenuButton.grid(row=0, column=0, sticky="w")
         self.ToolMenuButton.grid(row=0, column=1, sticky="w")
         self.HelpMenuButton.grid(row=0, column=2, sticky="w")
+        self.CustomMemoryDisplay = ttk.Label(self.MenuBarFrame, text="M: 0")
+        self.CustomMemoryDisplay.grid(row=0, column=3, padx=(7, 0), sticky="w")
         if NativeMenubar == True:
             self.config(menu=self.Menubar)
         else:
@@ -715,7 +722,7 @@ class MainWindow(tk.Tk):
         More = ttk.Button(self.WindowFrame, text="...", command=lambda: ExtensionWindow(self, helper, calculator, dialog))
         PowerButton = ttk.Button(self.WindowFrame, text="x^y", command=lambda: self.append("^", calculator, cfg))
         SetMemoryButton = ttk.Button(self.WindowFrame, text="SM", command=lambda: self.setMemory(calculator))
-        GetMemoryButton = ttk.Button(self.WindowFrame, text="GM", command=lambda: self.getMemory(calculator))
+        GetMemoryButton = ttk.Button(self.WindowFrame, text="GM", command=lambda: self.getMemory(calculator, cfg))
         SinButton = ttk.Menubutton(self.WindowFrame, text="sin")
         SinMenu = tk.Menu(SinButton, tearoff=TheTearoff)
         SinMenu.add_command(label="sin", command=lambda: self.append("sin(", calculator, cfg))
@@ -743,7 +750,7 @@ class MainWindow(tk.Tk):
         MemoryButton = ttk.Menubutton(self.WindowFrame, text="M")
         MemoryMenu = tk.Menu(MemoryButton, tearoff=TheTearoff)
         MemoryMenu.add_command(label="Set", command=lambda: self.setMemory(calculator))
-        MemoryMenu.add_command(label="Get", command=lambda: self.getMemory(calculator))
+        MemoryMenu.add_command(label="Get", command=lambda: self.getMemory(calculator, cfg))
         MemoryMenu.add_command(label="Clear", command=lambda: self.clearMemory(calculator))
         MemoryButton["menu"] = MemoryMenu
         LogButton = ttk.Menubutton(self.WindowFrame, text="log")
@@ -879,11 +886,17 @@ class MainWindow(tk.Tk):
         self.updateDisplay(calculator, cfg)
     def setMemory(self, calculator):
         calculator.setMemory()
+        NewLabel = "M: " + calculator.Memory
+        self.CustomMemoryDisplay.config(text=NewLabel)
+        self.Menubar.entryconfig(3, label=NewLabel)
     def getMemory(self, calculator, cfg):
         calculator.getMemory()
         self.updateDisplay(calculator, cfg)
     def clearMemory(self, calculator):
         calculator.clearMemory()
+        NewLabel = "M: " + calculator.Memory
+        self.CustomMemoryDisplay.config(text=NewLabel)
+        self.Menubar.entryconfig(3, label=NewLabel)
 
 # settings window
 class SettingsWindow(tk.Toplevel):
