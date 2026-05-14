@@ -42,8 +42,7 @@ allowWindowsShutdownDialog = "--allowShutdownDialog" in sys.argv
 MsgBoxStyles = ["Tkinter", "Alternative"]
 if platform.system() == "Windows":
     import ctypes
-    if theming != 0:
-        NativeTheme = "vista"
+    NativeTheme = "vista"
     if shutil.which("wscript"):
         MsgBoxStyles.append("VBScript")
     if shutil.which("msg"):
@@ -62,14 +61,12 @@ if platform.system() == "Windows":
         dwmapi = ctypes.WinDLL("dwmapi")
         DWMWA_USE_IMMERSIVE_DARK_MODE = 20
 elif platform.system() == "Darwin":
-    if theming != 0:
-        NativeTheme = "aqua"
+    NativeTheme = "aqua"
     WingWebDings = False
     MsgBoxStyles.append("AppleScript")
 else:
     WingWebDings = False
-    if theming != 0:
-        NativeTheme = "default"
+    NativeTheme = "default"
     AdditionalLinuxMsgBoxStyles = ["xmessage", "gxmessage", "yad", "kdialog", "zenity", "Xdialog", "notify-send"]
     for MsgBoxStyle in AdditionalLinuxMsgBoxStyles:
         if shutil.which(MsgBoxStyle):
