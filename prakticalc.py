@@ -512,6 +512,10 @@ class WindowHelper:
             else:
                 self.style = ttk.Style(WindowName)
                 self.style.theme_use(NativeTheme)
+                if subprocess.getoutput("defaults read -g AppleInterfaceStyle") == "Dark":
+                    DarkMode = True
+                else:
+                    DarkMode = False
         elif platform.system() == "Windows":
             self.ajustTitleBars()
             if bool(self.ConfigurationStorage.get("nativeTheme")) == False:
