@@ -77,26 +77,19 @@ if ThemingDisabled == True:
 if CLIHelp == True:
     if platform.system() == "Windows":
         messagebox.showinfo("PraktiCalc CLI Options", "PraktiCalc " + PraktiCalcVersion + """ CLI Options:
---borderdisplay: uses window title to show output
+--allowShutdownDialog: allow the shutdown dialog to be used
 --debug: add a test button for debugging
 --nodpiawareness: disable Windows DPI Awareness
---dark: enable dark mode by default
 --console: show console for debugging
---equilux: set the dark theme to equilux
 --help: display this help text and exit
 --version: display version and exit""")
     else:
         print("PraktiCalc " + PraktiCalcVersion + " CLI Options")
-        print("--debug         | add a test button for debugging")
-        if platform.system() != "Darwin":
-            if theming != 0:
-                print("--dark          | enable dark mode by default")
-        print("--console       | show console for debugging")
-        if theming != 0:
-            print("--notheming     | disables theming")
-            print("--equilux       | set the dark theme to equilux")
-        print("--help          | display this help text and exit")
-        print("--version       | display version and exit")
+        print("--debug      | add a test button for debugging")
+        print("--console    | show console for debugging")
+        print("--notheming  | disables theming")
+        print("--help       | display this help text and exit")
+        print("--version    | display version and exit")
     sys.exit(0)
 if CLIVersion == True:
     if platform.system() == "Windows":
@@ -138,26 +131,7 @@ else:
     VBSInfoPath = "info.vbs"
     VBSErrorPath = "error.vbs"
 
-breeze = "--breeze" in sys.argv
-yaru = "--yaru" in sys.argv
-keramik = "--keramik" in sys.argv
-equilux = "--equilux" in sys.argv
-if breeze == True:
-    thettktheme = "breeze"
-elif yaru == True:
-    thettktheme = "yaru"
-elif keramik == True:
-    thettktheme = "keramik"
-else:
-    thettktheme = "plastik"
-if ThemingDisabled == False:
-    DarkMode = "--dark" in sys.argv
-    if DarkMode == True:
-        thettktheme = "black"
-    if equilux == True:
-        thettktheme = "equilux"
-else:
-    DarkMode = False
+DarkMode = False
 debug = "--debug" in sys.argv
 
 # CLASSES
