@@ -7,7 +7,7 @@
 # - Windows 7 or newer
 # - PowerShell 2+ with 7-Zip or PowerShell 5/7
 # - Python 3.8 or newer with tkinter and pip
-# - PIP Modules: ttkthemes, simpleeval, pyinstaller
+# - PIP Modules: ttkthemes, pyinstaller
 
 $mode = $args[0]
 

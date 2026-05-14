@@ -10,7 +10,6 @@
 # - python3
 # - python3-tk
 # - python3-ttkthemes
-# - python3-simpleeval
 
 # clean up last build
 rm linux-pkg-builds/debian/prakticalc.deb

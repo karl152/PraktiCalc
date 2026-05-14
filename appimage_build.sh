@@ -10,13 +10,12 @@
 # - python3
 # - python3-tk
 # - python3-ttkthemes
-# - python3-simpleeval
 # - python3-pyinstaller
 
 echo "Cleaning"
 rm linux-pkg-builds/AppImage/PraktiCalc-$(uname -m).AppImage
 
-mkdir -p linux-pkg-builds/AppImage/com.github.karl152.prakticalc.AppDir/usr/bin
+mkdir -p linux-pkg-builds/AppImage/de.karl_52.PraktiCalc.AppDir/usr/bin
 
 echo "Building Executable"
 python3 -m PyInstaller prakticalc.py --onedir --strip --clean --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data python-powered.png:. --add-data /usr/share/tcltk/ttkthemes:ttkthemes --icon PraktiCalculator.ico
@@ -48,9 +47,9 @@ rm libimagequant.so.0
 rm liblcms2.so.2
 rm libopenjp2.so.7
 cd ../../../
-mv ./dist/prakticalc/* ./linux-pkg-builds/AppImage/com.github.karl152.prakticalc.AppDir/usr/bin/
-chmod +x ./linux-pkg-builds/AppImage/com.github.karl152.prakticalc.AppDir/AppRun
-chmod +x ./linux-pkg-builds/AppImage/com.github.karl152.prakticalc.AppDir/usr/bin/prakticalc
+mv ./dist/prakticalc/* ./linux-pkg-builds/AppImage/de.karl_52.PraktiCalc.AppDir/usr/bin/
+chmod +x ./linux-pkg-builds/AppImage/de.karl_52.PraktiCalc.AppDir/AppRun
+chmod +x ./linux-pkg-builds/AppImage/de.karl_52.PraktiCalc.AppDir/usr/bin/prakticalc
 echo ""
 echo "------------------------------------------------------------------------------------"
 echo "The script will now download appimagetool from https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -m).AppImage. If you don't want that, press CTRL+C now."
@@ -63,12 +62,12 @@ mv ./appimagetool-$(uname -m).AppImage ./linux-pkg-builds/AppImage/
 
 echo "Building AppImage"
 cd ./linux-pkg-builds/AppImage
-./appimagetool-$(uname -m).AppImage com.github.karl152.prakticalc.AppDir
+./appimagetool-$(uname -m).AppImage de.karl_52.PraktiCalc.AppDir
 
 echo "Cleaning"
 rm appimagetool-$(uname -m).AppImage
 cd ../..
-rm -rf ./linux-pkg-builds/AppImage/com.github.karl152.prakticalc.AppDir/usr/bin
+rm -rf ./linux-pkg-builds/AppImage/de.karl_52.PraktiCalc.AppDir/usr/bin
 rm -rf dist/
 rm -rf build/
 rm prakticalc.spec
