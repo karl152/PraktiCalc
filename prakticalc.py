@@ -164,7 +164,13 @@ debug = "--debug" in sys.argv
 class Configuration:
     def __init__(self):
         if platform.system() == "Windows":
-            self.backend = WindowsConfig()
+            if RunningAsOneFileExe == True:
+                if sys.executable == r"C:\Program Files\PraktiCalc\prakticalc.exe":
+                    self.backend = WindowsConfig()
+                else:
+                    self.backend = XDGConfig()
+            else:
+                self.backend = WindowsConfig()
         elif platform.system() == "Darwin":
             self.backend = MacConfig()
         else:
@@ -322,7 +328,11 @@ class MacConfig:
 class XDGConfig:
     def __init__(self):
         self.config = configparser.ConfigParser()
-        self.folder = Path.home() / ".config" / "PraktiCalc"
+        if platform.system() == "Windows":
+            f1 = Path(sys.executable).parent
+            self.folder = f1 / "settings"
+        else:
+            self.folder = Path.home() / ".config" / "PraktiCalc"
         self.path = self.folder / "config.ini"
     def get(self, key):
         self.config.read(self.path, encoding="utf-8")
