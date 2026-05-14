@@ -1189,7 +1189,14 @@ class ExtensionWindow(tk.Toplevel):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
         if platform.system() == "Windows":
-            self.FolderPath = Path.home() / "AppData" / "Roaming" / "PraktiXtensions"
+            if RunningAsOneFileExe == True:
+                if sys.executable == r"C:\Program Files\PraktiCalc\prakticalc.exe":
+                    self.FolderPath = Path.home() / "AppData" / "Roaming" / "PraktiXtensions"
+                else:
+                    f1 = Path(sys.executable).parent
+                    self.FolderPath = f1 / "extensions"
+            else:
+                self.FolderPath = Path.home() / "AppData" / "Roaming" / "PraktiXtensions"
         elif platform.system() == "Darwin":
             self.FolderPath = Path.home() / "Library" / "PraktiXtensions"
         else:
