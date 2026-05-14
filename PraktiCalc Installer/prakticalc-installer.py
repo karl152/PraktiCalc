@@ -128,8 +128,8 @@ def pageReload():
             LicenseText.insert(tk.END, LicenseToInsert.read())
         LicenseText.config(state="disabled")
         LicensePreText.grid(row=0, column=0, padx=10, pady=10)
-        LicenseText.grid(row=1, column=0, padx=10, pady=10, sticky="nesw")
-        LicenseTextScrollbar.grid(row=1, column=1, padx=10, pady=10, sticky="nes")
+        LicenseText.grid(row=1, column=0, padx=(10, 0), pady=10, sticky="nesw")
+        LicenseTextScrollbar.grid(row=1, column=1, padx=(0, 10), pady=10, sticky="nes")
         if TTS == True:
             speak("This software is licensed under the GNU General Public License, Version 3. Continue if you accept that.")
     elif WizardPage == 2:
