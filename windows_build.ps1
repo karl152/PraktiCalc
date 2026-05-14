@@ -1,4 +1,4 @@
-﻿# PraktiCalc © 2024-2026 Karl "karl152"
+# PraktiCalc © 2024-2026 Karl "karl152"
 # Licensed under the GNU General Public License v3.0.
 # See https://www.gnu.org/licenses/gpl-3.0.txt for details.
 # SPDX-License-Identifier: GPL-3.0
@@ -13,9 +13,10 @@ $mode = $args[0]
 
 if ($mode -eq "portable"){
 Write-Host "Building portable executable for PraktiCalc..."
-Remove-Item .\prakticalc.exe -ErrorAction SilentlyContinue
-python.exe -m PyInstaller .\prakticalc.py --onefile --clean --windowed --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data python-powered.png:. --add-data info.vbs:. --add-data error.vbs:. --icon PraktiCalculator.ico
-Copy-Item .\dist\prakticalc.exe .
+Remove-Item .\prakticalc-portable.zip -ErrorAction SilentlyContinue
+python.exe -m PyInstaller .\prakticalc.py --onedir --clean --windowed --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data python-powered.png:. --add-data info.vbs:. --add-data error.vbs:. --icon PraktiCalculator.ico
+try {Compress-Archive -Path .\dist\prakticalc\* -DestinationPath .\prakticalc-portable.zip -CompressionLevel Optimal -Verbose}
+catch {& "C:\Program Files\7-Zip\7z.exe" a .\prakticalc-portable.zip .\dist\prakticalc\* -mx9}
 Write-Host "Cleaning up..."
 Remove-Item .\dist -Recurse -Force
 Remove-Item .\build -Recurse -Force
