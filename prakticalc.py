@@ -861,7 +861,7 @@ class MainWindow(tk.Tk):
         calculator.setMemory()
         NewLabel = "M: " + calculator.Memory
         self.CustomMemoryDisplay.config(text=NewLabel)
-        self.Menubar.entryconfig(3, label=NewLabel)
+        self.Menubar.entryconfig(4, label=NewLabel)
     def getMemory(self, calculator, cfg):
         calculator.getMemory()
         self.updateDisplay(calculator, cfg)
@@ -869,7 +869,7 @@ class MainWindow(tk.Tk):
         calculator.clearMemory()
         NewLabel = "M: " + calculator.Memory
         self.CustomMemoryDisplay.config(text=NewLabel)
-        self.Menubar.entryconfig(3, label=NewLabel)
+        self.Menubar.entryconfig(4, label=NewLabel)
 
 # settings window
 class SettingsWindow(tk.Toplevel):
