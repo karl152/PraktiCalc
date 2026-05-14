@@ -239,8 +239,10 @@ def actuallyInstall():
             if UninstallFirst == True:
                 ProgressText += "\nremoving previous installation...\n"
                 InstallProgressText.config(text=ProgressText)
+                with winreg.OpenKeyEx(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc") as PraktiKey:
+                    PrevInstallPath = winreg.QueryValueEx(PraktiKey, "InstallLocation")[0]
                 subprocess.getoutput(r'reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /f')
-                shutil.rmtree("C:/Program Files/PraktiCalc")
+                shutil.rmtree(PrevInstallPath)
                 Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc.url").unlink(missing_ok=True)
                 Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc.lnk").unlink(missing_ok=True)
                 Path("C:/Users/" + username + "/Desktop/PraktiCalc.url").unlink(missing_ok=True)

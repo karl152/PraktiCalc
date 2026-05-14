@@ -25,7 +25,7 @@ from tkinter import messagebox
 import subprocess
 import threading
 from pathlib import Path
-import getpass
+import winreg
 
 class Uninstaller(tk.Tk):
     def __init__(self):
@@ -40,10 +40,12 @@ class Uninstaller(tk.Tk):
         self.Progress.pack(padx=20, pady=10)
         threading.Thread(target=self.uninstall, daemon=True).start()
     def uninstall(self):
-        username = getpass.getuser()
+        username = Path.home().stem
         try:
+            with winreg.OpenKeyEx(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc") as PraktiKey:
+                InstallPath = winreg.QueryValueEx(PraktiKey, "InstallLocation")[0]
             subprocess.getoutput(r'reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /f')
-            subprocess.getoutput('rmdir /S /Q "C:\Program Files\PraktiCalc"')
+            subprocess.getoutput(f'rmdir /S /Q "{InstallPath}"')
             Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc.url").unlink(missing_ok=True)
             Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc.lnk").unlink(missing_ok=True)
             Path("C:/Users/" + username + "/Desktop/PraktiCalc.url").unlink(missing_ok=True)
