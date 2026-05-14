@@ -1000,7 +1000,10 @@ class Dialog:
             ExtInfoText1 = ttk.Label(ExtendedInfoFrame, text=infotext, justify="left")
             CustomInfoFrame.grid(row=0, column=0, sticky="nesw")
             CustomInfoExit.grid(row=1, column=1, padx=10, pady=10)
-            ttk.Button(CustomInfoFrame, image=self.PythonPower, command=lambda: webbrowser.open_new_tab("https://www.python.org/")).grid(row=1, column=0, padx=10, pady=10, sticky="sw")
+            if platform.system() == "Darwin" and self.ConfigurationStorage.get("nativeTheme") == 1:
+                tk.Button(CustomInfoFrame, font=("Tk.DefaultFont", 11), image=self.PythonPower, command=lambda: webbrowser.open_new_tab("https://www.python.org/")).grid(row=1, column=0, padx=10, pady=10, sticky="sw")
+            else:
+                ttk.Button(CustomInfoFrame, image=self.PythonPower, command=lambda: webbrowser.open_new_tab("https://www.python.org/")).grid(row=1, column=0, padx=10, pady=10, sticky="sw")
             ExtendedInfoFrame.grid(row=0, column=0, padx=20, pady=10, sticky="nesw")
             ExtInfoIcon.grid(row=0, column=0)
             ExtInfoText1.grid(row=1, column=0, padx=10, pady=(0, 5))
