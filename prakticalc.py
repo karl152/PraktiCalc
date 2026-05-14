@@ -264,7 +264,7 @@ class WindowsConfig:
 class MacConfig:
     def __init__(self):
         self.folder = Path.home() / "Library" / "Preferences"
-        self.filepath = self.folder / "com.github.karl152.PraktiCalc.plist"
+        self.filepath = self.folder / "de.karl_52.PraktiCalc.plist"
     def get(self, key):
         with open(self.filepath, "rb") as file:
             content = plistlib.load(file)
