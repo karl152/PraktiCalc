@@ -1185,24 +1185,24 @@ class ExtensionWindow(tk.Toplevel):
             self.updatePraktiGraph()
         if Path(self.FolderPath / "DecimalConverter.ini").exists():
             DecimalConverterMeta = configparser.ConfigParser()
-            DecimalConverterMeta.read(self.FolderPath / "DecimalConverter.ini")
+            DecimalConverterMeta.read(self.FolderPath / "DecimalConverter.ini", encoding="utf-8")
             if DecimalConverterMeta["PraktiXtension"]["version"] != "1.2":
                 self.updateDecimalConverter()
         if Path(self.FolderPath / "ExtensionManager.ini").exists():
             ExtensionManagerMeta = configparser.ConfigParser()
-            ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini")
+            ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini", encoding="utf-8")
             if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.9":
                 self.updateExtensionManager()
         if Path(self.FolderPath / "PraktiGraph.ini").exists():
             PraktiGraphMeta = configparser.ConfigParser()
-            PraktiGraphMeta.read(self.FolderPath / "PraktiGraph.ini")
+            PraktiGraphMeta.read(self.FolderPath / "PraktiGraph.ini", encoding="utf-8")
             if PraktiGraphMeta["PraktiXtension"]["version"] != "1.4":
                 self.updatePraktiGraph()
         for file in self.FolderPath.iterdir():
             if file.suffix == ".py":
                 if Path(self.FolderPath / f"{file.stem}.ini").exists():
                     meta = configparser.ConfigParser()
-                    meta.read(Path(self.FolderPath / f"{file.stem}.ini"))
+                    meta.read(Path(self.FolderPath / f"{file.stem}.ini"), encoding="utf-8")
                     if meta["PraktiXtension"]["minpython"] == "default":
                         if meta["PraktiXtension"]["maxpython"] == "default":
                             canload = True
