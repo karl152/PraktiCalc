@@ -18,6 +18,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, font, scrolledtext, filedialog, colorchooser
 from pathlib import Path
+from decimal import Decimal
 try:
     from ttkthemes import ThemedStyle
     theming = 1
