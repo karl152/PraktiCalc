@@ -333,7 +333,7 @@ def calc() :
                 showError("Result is a complex number")
                 clear()
             else:
-                FinalResult = FinalResult ** 0.5
+                FinalResult = FinalResult ** Decimal("0.5")
                 if str(FinalResult).endswith(".0"):
                     FinalResult = int(str(FinalResult)[:-2])
                 Output.config(text=str(FinalResult))
