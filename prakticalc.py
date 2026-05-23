@@ -330,8 +330,7 @@ def calc() :
             historylist.append(f"{aFinalResult} {Operator} {Input2} = {FinalResult}")
         elif Operator == "sqrt" :
             if aFinalResult < 0:
-                showError("Result is a complex number")
-                clear()
+                complainAboutComplexity()
             else:
                 FinalResult = FinalResult ** Decimal("0.5")
                 if str(FinalResult).endswith(".0"):
@@ -365,8 +364,7 @@ def calc() :
             historylist.append(f"{Input1} {Operator} {Input2} = {FinalResult}")
         elif Operator == "sqrt" :
             if Decimal(Input1) < 0:
-                showError("Result is a complex number")
-                clear()
+                complainAboutComplexity()
             else:
                 Input2 = Decimal(Input1) ** Decimal("0.5")
                 if str(Input2).endswith(".0"):
@@ -374,8 +372,7 @@ def calc() :
                 Output.config(text=str(Input2))
     if Operator == "sqrt" and Stage == 3:
             if Decimal(Input1) < 0:
-                showError("Result is a complex number")
-                clear()
+                complainAboutComplexity()
             else:
                 FinalResult = Decimal(Input1) ** Decimal("0.5")
                 if str(FinalResult).endswith(".0"):
@@ -731,6 +728,15 @@ def rooty() :
     if Stage == 1 or Stage == 2:
         Stage = 3
     calc()
+
+# shows error for complex numbers
+def complainAboutComplexity():
+    if StatusBar == True:
+        clear()
+        Status.config(text="Error: result is a complex number")
+    else:
+        showError("Result is a complex number")
+        clear()
 
 # window for additional calculating stuff, cuttently only with a decimal number converter
 def More() :
