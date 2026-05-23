@@ -52,7 +52,7 @@ if platform.system() == "Windows":
         MsgBoxStyles.append("Windows Shutdown")
     if BypassWindowsDPIFix == False:
         try:
-            ctypes.windll.shcore.SetProcessDpiAwareness(1)
+            ctypes.windll.shcore.SetProcessDpiAwareness(2)
         except:
             pass
     if platform.release() == "Vista" or platform.release() == "7" or platform.release() == "8" or platform.release() == "8.1":
