@@ -400,8 +400,11 @@ class PraktiCalculator:
         char = char.replace("parenright", ")")
         if self.CalculationString == "0" and char != ".":
             self.CalculationString = char
+        elif self.LastResult != "0" and char not in "+-*/":
+            self.CalculationString = char
         else:
             self.CalculationString += char
+            self.LastResult = "0"
     def backspace(self): # backspace button
         if self.CalculationString == "0":
             pass
