@@ -1215,7 +1215,7 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "PraktiGraph.ini").exists():
             PraktiGraphMeta = configparser.ConfigParser()
             PraktiGraphMeta.read(self.FolderPath / "PraktiGraph.ini", encoding="utf-8")
-            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.4":
+            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.5":
                 self.updatePraktiGraph()
         for file in self.FolderPath.iterdir():
             if file.suffix == ".py":
@@ -1636,18 +1636,25 @@ class PraktiGraph(ttk.Frame):
             #Xvalues.append(X)
             XvaluesConverted.append(self.XbacktoX(X))
 
-        # Coordinate grid
+        # Coordinate axes and arrows
         self.Canvas.create_line(0, height/2, width, height/2, fill="grey", width=2)
         self.Canvas.create_line(width/2, 0, width/2, height, fill="grey", width=2)
-        for i in range(100):
+        self.Canvas.create_line(width, height/2, width-10, height/2-10, fill="grey", width=2)
+        self.Canvas.create_line(width, height/2, width-10, height/2+10, fill="grey", width=2)
+        self.Canvas.create_line(width/2, 0, width/2-10, 10, fill="grey", width=2)
+        self.Canvas.create_line(width/2, 0, width/2+10, 10, fill="grey", width=2)
+        # Coordinate grid
+        for i in range(int(self.XbacktoX(width))+1):
             self.Canvas.create_line(width/2+i*self.Scale.get(), 0, width/2+i*self.Scale.get(), height, fill="grey")
             self.Canvas.create_text(width/2+i*self.Scale.get(), height/2+self.TextOffset, text=str(i), fill=self.ForegroundColor) if i != 0 and self.Numbers.get() == True else self.doNothing()
             self.Canvas.create_line(width/2-i*self.Scale.get(), 0, width/2-i*self.Scale.get(), height, fill="grey")
             self.Canvas.create_text(width/2-i*self.Scale.get(), height/2+self.TextOffset, text=f"-{i}", fill=self.ForegroundColor) if i != 0 and self.Numbers.get() == True else self.doNothing()
+        for i in range(int(self.YbacktoY(height))+1):
             self.Canvas.create_line(0, height/2+i*self.Scale.get(), width, height/2+i*self.Scale.get(), fill="grey")
             self.Canvas.create_text(width/2+self.TextOffset, height/2+i*self.Scale.get(), text=f"-{i}", fill=self.ForegroundColor) if i != 0 and self.Numbers.get() == True else self.doNothing()
             self.Canvas.create_line(0, height/2-i*self.Scale.get(), width, height/2-i*self.Scale.get(), fill="grey")
             self.Canvas.create_text(width/2+self.TextOffset, height/2-i*self.Scale.get(), text=str(i), fill=self.ForegroundColor) if i != 0 and self.Numbers.get() == True else self.doNothing()
+
         # f(x)
         if self.fxEntry.get() != "":
             # table
@@ -1711,13 +1718,15 @@ class PraktiGraph(ttk.Frame):
         return float(self.Canvas.winfo_height())/2.0-float(y) * self.Scale.get()
     def XtoX(self, x):
         return float(self.Canvas.winfo_width())/2.0+float(x) * self.Scale.get()
+    def YbacktoY(self, y):
+        return float(y) / self.Scale.get() - (float(self.Canvas.winfo_height())/2.0) / self.Scale.get()
     def XbacktoX(self, x):
         return float(x) / self.Scale.get() - (float(self.Canvas.winfo_width())/2.0) / self.Scale.get()
     def doNothing(self):
         pass"""
             PraktiGraphMetadata = configparser.ConfigParser()
             PraktiGraphMetadata["PraktiXtension"] = {"name": "PraktiGraph",
-                                                          "version": "1.4",
+                                                          "version": "1.5",
                                                           "filename": "PraktiGraph.py",
                                                           "description": "The PraktiCalc Graph Thing",
                                                           "website": "",
