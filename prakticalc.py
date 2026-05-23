@@ -98,14 +98,15 @@ if CLIVersion == True:
         print("PraktiCalc " + PraktiCalcVersion)
     sys.exit(0)
 
-def testPyInstallerOneFile():
+# test if this is running as a pyinstaller executable
+def testForPyInstaller():
     try:
         print(sys._MEIPASS)
         return True
     except:
         return False
 
-RunningAsOneFileExe = testPyInstallerOneFile()
+RunningAsOneFileExe = testForPyInstaller()
 
 # ttkthemes directory workaround for AppImage
 if Path("./usr/share/tcltk/ttkthemes").exists():
@@ -165,7 +166,7 @@ class Configuration:
                     pass
                 finally:
                     self.create()
-    def get(self, key):
+    def get(self, key): # reads a value and returns it
         try:
             return self.backend.get(key)
         except:
@@ -175,7 +176,7 @@ class Configuration:
                 pass
             finally:
                 self.create()
-    def set(self, key, value):
+    def set(self, key, value): # sets a value and returns it
         try:
             self.backend.set(key, value)
         except:
@@ -185,7 +186,7 @@ class Configuration:
                 pass
             finally:
                 self.create()
-    def create(self):
+    def create(self): # creates local configuration storage
         self.backend.create()
         if platform.system() == "Windows":
             DefaultConfiguration = (("theme", "black"),
@@ -224,14 +225,15 @@ class Configuration:
         for value in DefaultConfiguration:
             self.backend.set(value[0], value[1])
             print("set " + value[0] + " to " + str(value[1]))
-    def reset(self):
+    def reset(self): # deletes local configuration storage
         self.backend.reset()
-    def remove(self, key):
+    def remove(self, key): # deletes a value from configuration
         try:
             self.backend.remove(key)
         except:
             pass
 
+# Windows configuration backend
 class WindowsConfig:
     def get(self, key):
         with winreg.OpenKeyEx(winreg.HKEY_CURRENT_USER, r"Software\PraktiCalc") as PraktiKey:
@@ -261,6 +263,7 @@ class WindowsConfig:
         with winreg.OpenKeyEx(winreg.HKEY_CURRENT_USER, r"Software\PraktiCalc", 0, winreg.KEY_SET_VALUE) as PraktiKey:
             winreg.DeleteValue(PraktiKey, key)
 
+# macOS configuration backend
 class MacConfig:
     def __init__(self):
         self.folder = Path.home() / "Library" / "Preferences"
@@ -299,6 +302,7 @@ class MacConfig:
         with open(self.filepath, "wb") as file:
             plistlib.dump(data, file)
 
+# INI configuration backend
 class XDGConfig:
     def __init__(self):
         self.config = configparser.ConfigParser()
@@ -425,7 +429,7 @@ class PraktiCalculator:
         self.HistoryList.clear()
     def xcheck(self): # debug function to return some variables
         return self.CalculationString, self.Memory, self.LastResult, self.HistoryList, self.operators
-    def quickCalc(self, expression):
+    def quickCalc(self, expression): # calculates an entire calculation string and returns the result
         PreviousResult = self.LastResult
         self.clear()
         self.setOperators("rad")
@@ -436,7 +440,7 @@ class PraktiCalculator:
         self.LastResult = PreviousResult
         self.setOperators(self.TrigMode)
         return result
-    def setOperators(self, TrigMode):
+    def setOperators(self, TrigMode): # defines all the additional operators
         self.operators = {}
         self.operators["sqrt"] = math.sqrt
         if TrigMode == "rad":
@@ -472,7 +476,7 @@ class PraktiCalculator:
         self.operators["fact"] = math.factorial
         self.operators["pi"] = math.pi
         self.operators["e"] = math.e
-    def updateFromSettings(self, cfg):
+    def updateFromSettings(self, cfg): # applies settings
         self.TrigMode = cfg.get("angleUnit") # rad, deg, gon
         self.setOperators(self.TrigMode)
         self.Rounding = bool(cfg.get("roundResult"))
@@ -580,7 +584,7 @@ class WindowHelper:
                 self.ajustTitleBar(ctypes.windll.user32.GetParent(window.winfo_id()))
             except:
                 pass
-    def close(self, window):
+    def close(self, window): # closes the given window and removes it from the window list
         window.destroy()
         self.WindowList.remove(window)
 
@@ -858,6 +862,7 @@ class MainWindow(tk.Tk):
             self.Output.delete(0, tk.END)
             self.Output.insert(0, calculator.CalculationString)
             self.Output.config(state="readonly")
+    #  -#- the following methods call the calculator methods and update the display -#-
     def append(self, value, calculator, cfg):
         calculator.append(value)
         self.updateDisplay(calculator, cfg)
@@ -971,7 +976,7 @@ class SettingsWindow(tk.Toplevel):
         cfg.set("dialogStyle", parent.CurrentMsgBoxStyleTkVar.get())
         parent.applySettings(calculator, cfg)
         helper.close(self)
-    def reset(self, parent, helper, cfg):
+    def reset(self, parent, helper, cfg): # resets the settings
         cfg.reset()
         helper.close(parent)
 
@@ -1164,7 +1169,7 @@ class HistoryWindow(tk.Toplevel):
         self.update_idletasks()
         helper.WindowList.append(self)
         helper.changeTheme(self)
-    def clear(self, calculator):
+    def clear(self, calculator): # clears the history
         calculator.clearHistory()
         self.HistoryTreeview.delete(*self.HistoryTreeview.get_children())
 
@@ -1195,7 +1200,7 @@ class ExtensionWindow(tk.Toplevel):
         helper.WindowList.append(self)
         helper.changeTheme(self)
         self.after(250, lambda: self.loadExtensions(parent, helper, calculator, dialog))
-    def loadExtensions(self, parent, helper, calculator, dialog):
+    def loadExtensions(self, parent, helper, calculator, dialog): # loads extensions from the folder, writes default extensions to folder if folder doesn't exist
         global DarkMode
         if not self.FolderPath.exists():
             self.FolderPath.mkdir(parents=True)
@@ -1250,7 +1255,7 @@ class ExtensionWindow(tk.Toplevel):
                     instance = classs(self.Tabs, self, parent, helper, calculator, dialog, DarkMode)
                     self.Tabs.add(instance, text=file.stem)
                     print("loaded extension " + file.stem)
-    def updateDecimalConverter(self):
+    def updateDecimalConverter(self): # updates decimal converter extension to the version embedded here
         if Path(self.FolderPath / "DecimalConverter.py").exists():
             Path(self.FolderPath / "DecimalConverter.py").unlink()
             Path(self.FolderPath / "DecimalConverter.ini").unlink(missing_ok=True)
@@ -1328,7 +1333,7 @@ class DecimalConverter(ttk.Frame):
                 DecimalConverterMetadata.write(dcmeta)
             with open(self.FolderPath / "DecimalConverter.txt", "w", encoding="utf-8") as dcdesc:
                 dcdesc.write(DecimalConverterDescription)
-    def updateExtensionManager(self):
+    def updateExtensionManager(self): # updates extension manager extension to the version embedded here
         if Path(self.FolderPath / "ExtensionManager.py").exists():
             Path(self.FolderPath / "ExtensionManager.py").unlink()
             Path(self.FolderPath / "ExtensionManager.ini").unlink(missing_ok=True)
@@ -1557,7 +1562,7 @@ class ExtensionManager(ttk.Frame):
                 ExtensionManagerMetadata.write(emmeta)
             with open(self.FolderPath / "ExtensionManager.txt", "w", encoding="utf-8") as emdesc:
                 emdesc.write(ExtensionManagerDescription)
-    def updatePraktiGraph(self):
+    def updatePraktiGraph(self): # updates PraktiGraph extension to the version embedded here
         if Path(self.FolderPath / "PraktiGraph.py").exists():
             Path(self.FolderPath / "PraktiGraph.py").unlink()
             Path(self.FolderPath / "PraktiGraph.ini").unlink(missing_ok=True)
@@ -1824,7 +1829,7 @@ class ConsoleWindow(tk.Toplevel):
         self.update_idletasks()
         helper.WindowList.append(self)
         helper.ajustTitleBars()
-    def run(self, parent, helper, console):
+    def run(self, parent, helper, console): # runs a command
         self.lcc = command = self.ConsoleInput.get()
         if command == "clear":
             self.ConsoleOutput.delete("1.0", tk.END)
@@ -1838,7 +1843,7 @@ class ConsoleWindow(tk.Toplevel):
             self.ConsoleOutput.insert(tk.END, str(comoutput) + "\n")
             self.ConsoleOutput.see("end")
         self.ConsoleInput.delete(0, tk.END)
-    def ConsoleKey(self, event):
+    def ConsoleKey(self, event): # sets entry to previous input if UP pressed
         key = event.keysym
         if key == "Up":
             self.ConsoleInput.delete(0, tk.END)
