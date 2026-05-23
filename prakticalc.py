@@ -505,6 +505,15 @@ class WindowHelper:
             else:
                 self.style = ttk.Style(WindowName)
                 self.style.theme_use(NativeTheme)
+                try:
+                    ClassicStyleEnabled = ctypes.c_bool()
+                    ctypes.windll.dwmapi.DwmIsCompositionEnabled(ctypes.byref(ClassicStyleEnabled))
+                    ClassicStyleEnabled = not ClassicStyleEnabled.value
+                except Exception:
+                    ClassicStyleEnabled = True
+                if ClassicStyleEnabled == True:
+                    if ctypes.windll.user32.GetSysColor(5) == 0:
+                        DarkMode = True
             if WingWebDings == True:
                 self.style.configure("Webdings.TButton", font=webdingsfont)
                 self.style.configure("Wingdings.TButton", font=wingdingsfont)
