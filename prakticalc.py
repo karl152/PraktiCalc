@@ -1683,7 +1683,8 @@ class PraktiGraph(ttk.Frame):
                 except:
                     pass
             for f in range(len(values)-1):
-                self.Canvas.create_line(self.XtoX(values[f][0]), self.YtoY(values[f][1]), self.XtoX(values[f+1][0]), self.YtoY(values[f+1][1]), fill=self.gxColor)
+                if not abs(float(values[f][1]) - float(values[f+1][1])) > 10:
+                    self.Canvas.create_line(self.XtoX(values[f][0]), self.YtoY(values[f][1]), self.XtoX(values[f+1][0]), self.YtoY(values[f+1][1]), fill=self.gxColor)
 
     def clear(self):
         self.Canvas.delete("all")
