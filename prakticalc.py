@@ -1630,6 +1630,11 @@ class PraktiGraph(ttk.Frame):
         self.ClearStatus = False
         height = self.Canvas.winfo_height()
         width = self.Canvas.winfo_width()
+        #Xvalues = []
+        XvaluesConverted = []
+        for X in range(width):
+            #Xvalues.append(X)
+            XvaluesConverted.append(self.XbacktoX(X))
 
         # Coordinate grid
         self.Canvas.create_line(0, height/2, width, height/2, fill="grey", width=2)
@@ -1655,10 +1660,9 @@ class PraktiGraph(ttk.Frame):
             self.Table.item(self.FirstTableRow, values=values)
             # graph
             values = []
-            for i in range(-1000, 1000):
-                realI = i*0.1 # because range doesn't support floats
+            for i in XvaluesConverted:
                 try:
-                    values.append((realI, calculator.quickCalc(self.fxEntry.get().replace("x", f"({realI})"))))
+                    values.append((i, calculator.quickCalc(self.fxEntry.get().replace("x", f"({i})"))))
                 except:
                     pass
             for f in range(len(values)-1):
@@ -1676,10 +1680,9 @@ class PraktiGraph(ttk.Frame):
             self.Table.item(self.SecondTableRow, values=values)
             # graph
             values = []
-            for i in range(-1000, 1000):
-                realI = i*0.1 # because range doesn't support floats
+            for i in XvaluesConverted:
                 try:
-                    values.append((realI, calculator.quickCalc(self.gxEntry.get().replace("x", f"({realI})"))))
+                    values.append((i, calculator.quickCalc(self.gxEntry.get().replace("x", f"({i})"))))
                 except:
                     pass
             for f in range(len(values)-1):
@@ -1708,6 +1711,8 @@ class PraktiGraph(ttk.Frame):
         return float(self.Canvas.winfo_height())/2.0-float(y) * self.Scale.get()
     def XtoX(self, x):
         return float(self.Canvas.winfo_width())/2.0+float(x) * self.Scale.get()
+    def XbacktoX(self, x):
+        return float(x) / self.Scale.get() - (float(self.Canvas.winfo_width())/2.0) / self.Scale.get()
     def doNothing(self):
         pass"""
             PraktiGraphMetadata = configparser.ConfigParser()
