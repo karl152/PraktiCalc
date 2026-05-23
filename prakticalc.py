@@ -31,10 +31,11 @@ import subprocess
 import sys
 import shutil
 import os
+from decimal import Decimal
 # variables
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.3.4"
+PraktiCalcVersion = "1.3.5"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 if platform.system() == "Windows":
     MsgBoxStyles = ["Tkinter", "Alternative", "VBS"]
@@ -296,24 +297,22 @@ def calc() :
         historylist.pop(0)
     if Stage == 6 :
         aFinalResult = FinalResult
-        aFinalResult = round(float(aFinalResult), 12)
         if str(aFinalResult).endswith(".0"):
             aFinalResult = int(str(aFinalResult)[:-2])
         if Operator in SimpleOperators:
             if Operator == "+":
-                FinalResult = FinalResult + float(Input2)
+                FinalResult = FinalResult + Decimal(Input2)
             elif Operator == "-":
-                FinalResult = FinalResult - float(Input2)
+                FinalResult = FinalResult - Decimal(Input2)
             elif Operator == "*":
-                FinalResult = FinalResult * float(Input2)
+                FinalResult = FinalResult * Decimal(Input2)
             elif Operator == "/":
-                if float(Input2) == 0.0:
+                if Decimal(Input2) == Decimal("0.0"):
                     CustomDiv0()
                     clear()
                     return
                 else:
-                    FinalResult = FinalResult / float(Input2)
-            FinalResult = round(float(FinalResult), 12)
+                    FinalResult = FinalResult / Decimal(Input2)
             if str(FinalResult).endswith(".0"):
                 FinalResult = int(str(FinalResult)[:-2])
             Output.config(text=str(FinalResult))
@@ -324,7 +323,6 @@ def calc() :
                 clear()
             else:
                 FinalResult = FinalResult ** 0.5
-                FinalResult = round(float(FinalResult), 12)
                 if str(FinalResult).endswith(".0"):
                     FinalResult = int(str(FinalResult)[:-2])
                 Output.config(text=str(FinalResult))
@@ -333,40 +331,37 @@ def calc() :
         Stage = 6
         if Operator in SimpleOperators:
             if Operator == "+":
-                FinalResult = (float(Input1) + float(Input2))
+                FinalResult = (Decimal(Input1) + Decimal(Input2))
             elif Operator == "-":
-                FinalResult = (float(Input1) - float(Input2))
+                FinalResult = (Decimal(Input1) - Decimal(Input2))
             elif Operator == "*":
-                FinalResult = (float(Input1) * float(Input2))
+                FinalResult = (Decimal(Input1) * Decimal(Input2))
             elif Operator == "/":
-                if float(Input2) == 0.0:
+                if Decimal(Input2) == Decimal("0.0"):
                     CustomDiv0()
                     clear()
                     return
                 else:
-                    FinalResult = (float(Input1) / float(Input2))
-            FinalResult = round(float(FinalResult), 12)
+                    FinalResult = (Decimal(Input1) / Decimal(Input2))
             if str(FinalResult).endswith(".0"):
                 FinalResult = int(str(FinalResult)[:-2])
             Output.config(text=str(FinalResult))
             historylist.append(f"{Input1} {Operator} {Input2} = {FinalResult}")
         elif Operator == "sqrt" :
-            if float(Input1) < 0:
+            if Decimal(Input1) < 0:
                 showError("Result is a complex number")
                 clear()
             else:
-                Input2 = float(Input1) ** 0.5
-                Input2 = round(float(Input2), 12)
+                Input2 = Decimal(Input1) ** Decimal("0.5")
                 if str(Input2).endswith(".0"):
                     Input2 = int(str(Input2)[:-2])
                 Output.config(text=str(Input2))
     if Operator == "sqrt" and Stage == 3:
-            if float(Input1) < 0:
+            if Decimal(Input1) < 0:
                 showError("Result is a complex number")
                 clear()
             else:
-                FinalResult = float(Input1) ** 0.5
-                FinalResult = round(float(FinalResult), 12)
+                FinalResult = Decimal(Input1) ** Decimal("0.5")
                 if str(FinalResult).endswith(".0"):
                     FinalResult = int(str(FinalResult)[:-2])
                 Output.config(text=str(FinalResult))
