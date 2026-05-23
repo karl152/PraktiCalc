@@ -603,8 +603,8 @@ class MainWindow(tk.Tk):
                 self.ScaleFactor = self.DPI/72
         else:
             self.ScaleFactor = self.DPI/72
-        print(self.DPI)
-        print(self.ScaleFactor)
+        #print(self.DPI)
+        #print(self.ScaleFactor)
         self.size = int(250*self.ScaleFactor)
         self.icon_mono = tk.BitmapImage(file=PraktiCalcIconMonoPath)
         self.icon = tk.PhotoImage(file=PraktiCalcIconPath)
@@ -1768,6 +1768,7 @@ function(<function>: executes a function in the program
 eval(<command>: executed a Python command within the program
 system(<command>: executes a system command and prints the output
 varget(<variable>: shows the value of the given variable
+confget(<key>: shows the value of the given key from the config
 
 Useful Tips:
 - don't close brackets
@@ -1800,6 +1801,11 @@ Useful Tips:
                 output = eval(command, globals())
             except Exception as error:
                 output = f"[!] Failed to execute command:\n{error}"
+        elif command.startswith("confget("):
+            command = command[8:]
+            output = self.ConfigurationStorage.get(command)
+            if output == None:
+                output = "[!] Unknown value, resetting configuration"
         else:
             output = "[X] Unknown command"
         return output
