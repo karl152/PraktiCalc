@@ -517,6 +517,13 @@ class WindowHelper:
                 if ClassicStyleEnabled == True:
                     if ctypes.windll.user32.GetSysColor(5) == 0:
                         DarkMode = True
+                if platform.release() in "110":
+                    try:
+                        with winreg.OpenKeyEx(winreg.HKEY_CURRENT_USER, r"Control Panel\Accessibility\HighContrast") as ContrastKey:
+                            if winreg.QueryValueEx(ContrastKey, "LastUpdatedThemeId")[0] in [1, 2, 3]:
+                                DarkMode = True
+                    except:
+                        pass
             if WingWebDings == True:
                 self.style.configure("Webdings.TButton", font=webdingsfont)
                 self.style.configure("Wingdings.TButton", font=wingdingsfont)
