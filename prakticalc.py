@@ -1630,6 +1630,8 @@ class PraktiGraph(ttk.Frame):
         self.ClearStatus = False
         height = self.Canvas.winfo_height()
         width = self.Canvas.winfo_width()
+
+        # Coordinate grid
         self.Canvas.create_line(0, height/2, width, height/2, fill="grey", width=2)
         self.Canvas.create_line(width/2, 0, width/2, height, fill="grey", width=2)
         for i in range(100):
@@ -1641,7 +1643,9 @@ class PraktiGraph(ttk.Frame):
             self.Canvas.create_text(width/2+self.TextOffset, height/2+i*self.Scale.get(), text=f"-{i}", fill=self.ForegroundColor) if i != 0 and self.Numbers.get() == True else self.doNothing()
             self.Canvas.create_line(0, height/2-i*self.Scale.get(), width, height/2-i*self.Scale.get(), fill="grey")
             self.Canvas.create_text(width/2+self.TextOffset, height/2-i*self.Scale.get(), text=str(i), fill=self.ForegroundColor) if i != 0 and self.Numbers.get() == True else self.doNothing()
+        # f(x)
         if self.fxEntry.get() != "":
+            # table
             values = []
             for col in self.cols:
                 try:
@@ -1649,6 +1653,7 @@ class PraktiGraph(ttk.Frame):
                 except:
                     values.append("")
             self.Table.item(self.FirstTableRow, values=values)
+            # graph
             values = []
             for i in range(-1000, 1000):
                 realI = i*0.1 # because range doesn't support floats
@@ -1657,8 +1662,11 @@ class PraktiGraph(ttk.Frame):
                 except:
                     pass
             for f in range(len(values)-1):
-                self.Canvas.create_line(self.XtoX(values[f][0]), self.YtoY(values[f][1]), self.XtoX(values[f+1][0]), self.YtoY(values[f+1][1]), fill=self.fxColor)
+                if not abs(float(values[f][1]) - float(values[f+1][1])) > 10:
+                    self.Canvas.create_line(self.XtoX(values[f][0]), self.YtoY(values[f][1]), self.XtoX(values[f+1][0]), self.YtoY(values[f+1][1]), fill=self.fxColor)
+        # g(x)
         if self.gxEntry.get() != "":
+            # table
             values = []
             for col in self.cols:
                 try:
@@ -1666,6 +1674,7 @@ class PraktiGraph(ttk.Frame):
                 except:
                     values.append("")
             self.Table.item(self.SecondTableRow, values=values)
+            # graph
             values = []
             for i in range(-1000, 1000):
                 realI = i*0.1 # because range doesn't support floats
