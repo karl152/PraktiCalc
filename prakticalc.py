@@ -213,6 +213,8 @@ def processNumber(number):
         Input1 = number
         Output.config(text=Input1)
         Stage = 1
+    if StatusBar == True:
+        Status.config(text="Ready")
 
 # processes an operator for calculation
 def processOperator(TheOneAndOnlyOperatorThatShouldBeProcessed):
@@ -232,6 +234,8 @@ def processOperator(TheOneAndOnlyOperatorThatShouldBeProcessed):
         Stage = 3
         Output.config(text="0")
         Input1 = FinalResult
+    if StatusBar == True:
+        Status.config(text="Ready")
 
 # processes the number zero, which is a special case and seperate
 def zero() :
@@ -291,6 +295,8 @@ def comma() :
 # does the actual calculation, used to include 171 if-statements
 def calc() :
     global historylist, Input1, Stage, Input2, Output, Operator, FinalResult, aFinalResult
+    if StatusBar == True:
+        Status.config(text="Ready")
     SimpleOperators = ["+", "-", "*", "/"]
     SpecifiedStages = [0, 1, 2, 3, 6]
     if len(historylist) >= 16:
@@ -308,9 +314,14 @@ def calc() :
                 FinalResult = FinalResult * Decimal(Input2)
             elif Operator == "/":
                 if Decimal(Input2) == Decimal("0.0"):
-                    CustomDiv0()
-                    clear()
-                    return
+                    if StatusBar == True:
+                        clear()
+                        Status.config(text="Error: division by zero")
+                        return
+                    else:
+                        CustomDiv0()
+                        clear()
+                        return
                 else:
                     FinalResult = FinalResult / Decimal(Input2)
             if str(FinalResult).endswith(".0"):
@@ -338,9 +349,14 @@ def calc() :
                 FinalResult = (Decimal(Input1) * Decimal(Input2))
             elif Operator == "/":
                 if Decimal(Input2) == Decimal("0.0"):
-                    CustomDiv0()
-                    clear()
-                    return
+                    if StatusBar == True:
+                        clear()
+                        Status.config(text="Error: division by zero")
+                        return
+                    else:
+                        CustomDiv0()
+                        clear()
+                        return
                 else:
                     FinalResult = (Decimal(Input1) / Decimal(Input2))
             if str(FinalResult).endswith(".0"):
@@ -601,7 +617,8 @@ def closeError():
 
 # LEGACY: used to change the font size of the calculator output dynamically
 def SizeReload() :
-    pass
+    if StatusBar == True:
+        Status.config(text="Ready")
 
 # LEGACY: informed the user about the former 15 character limit
 def CharacterStatus() :
