@@ -14,6 +14,7 @@
 
 echo "Cleaning"
 rm linux-pkg-builds/AppImage/PraktiCalc-$(uname -m).AppImage
+rm linux-pkg-builds/AppImage/PraktiCalc-$(uname -m).AppImage.zsync
 
 mkdir -p linux-pkg-builds/AppImage/de.karl_52.PraktiCalc.AppDir/usr/bin
 
@@ -62,7 +63,7 @@ mv ./appimagetool-$(uname -m).AppImage ./linux-pkg-builds/AppImage/
 
 echo "Building AppImage"
 cd ./linux-pkg-builds/AppImage
-./appimagetool-$(uname -m).AppImage de.karl_52.PraktiCalc.AppDir
+./appimagetool-$(uname -m).AppImage -u "zsync|https://karl-52.de/PraktiCalc/latest/PraktiCalc-$(uname -m).AppImage.zsync" de.karl_52.PraktiCalc.AppDir
 
 echo "Cleaning"
 rm appimagetool-$(uname -m).AppImage
