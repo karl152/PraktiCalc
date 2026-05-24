@@ -223,7 +223,7 @@ def pageReload():
                 widgets.destroy()
             FinishButton = ttk.Button(BottomFrame, text="Close", command=lambda: InstallWizardWindow.destroy())
             FinishButton.grid(row=0, column=0, columnspan=2, sticky="esw")
-            InstallWizardWindow.geometry("170x170")
+            InstallWizardWindow.geometry("200x200")
             if TTS == True:
                 speak("PraktiCalc was installed, you can close this window now")
 def actuallyInstall():
