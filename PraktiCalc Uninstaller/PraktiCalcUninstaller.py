@@ -31,7 +31,7 @@ class Uninstaller(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Uninstalling...")
-        self.Icon = tk.Label(self, text="6", font=("Wingdings", 32))
+        self.Icon = tk.Label(self, bitmap="hourglass")
         self.Desc = ttk.Label(self, text="Please wait...")
         self.Progress = ttk.Progressbar(self, mode="indeterminate", length=300)
         self.Progress.start()
