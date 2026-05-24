@@ -11,3 +11,4 @@ This is a checklist for me to make sure I don't forget anything.
 * build packages and test them
 * make new GitHub release and upload builds
 * make sure the repository’s social media preview is up-to-date
+* make sure [the SourceForge page](https://sourceforge.net/projects/prakticalc/) is fine
