@@ -23,8 +23,8 @@ You can download PraktiCalc on the right at the Releases section. There should b
 |-----------------------------------------|------------------------------------------------------------------|
 | prakticalc-x.x-win-amd64-installer.exe  | PraktiCalc Installer for Windows 11 on 64-Bit x86 Processors     |
 | prakticalc-x.x-win7-amd64-installer.exe | PraktiCalc Installer for Windows 7+ on 64-Bit x86 Processors     |
-| prakticalc-x.x-win-amd64-portable.exe   | PraktiCalc for Windows 11 on 64-Bit x86 Processors (Portable)    |
-| prakticalc-x.x-win7-amd64-portable.exe  | PraktiCalc for Windows 7+ on 64-Bit x86 Processors (Portable)    |
+| prakticalc-x.x-win-amd64-portable.zip   | PraktiCalc for Windows 11 on 64-Bit x86 Processors (Portable)    |
+| prakticalc-x.x-win7-amd64-portable.zip  | PraktiCalc for Windows 7+ on 64-Bit x86 Processors (Portable)    |
 | prakticalc-x.x.deb                      | installable PraktiCalc Debian Package                            |
 | prakticalc-x.x-amd64.AppImage           | portable AppImage file for Linux on 64-Bit x86 Processors        |
 | prakticalc-x.x-aarch64.AppImage         | portable AppImage file for Linux on 64-Bit ARM Processors        |
