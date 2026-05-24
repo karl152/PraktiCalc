@@ -816,8 +816,8 @@ class MainWindow(tk.Tk):
         else:
             Keys = {
                 "0": lambda: self.zero(calculator, cfg),
-                "equal": lambda: self.calculate(self, helper, calculator, dialog),
-                "Return": lambda: self.calculate(self, helper, calculator, dialog),
+                "equal": lambda: self.calculate(self, helper, calculator, dialog, cfg),
+                "Return": lambda: self.calculate(self, helper, calculator, dialog, cfg),
                 "h": lambda: HistoryWindow(self, calculator, helper),
                 "H": lambda: HistoryWindow(self, calculator, helper),
                 "i": lambda: dialog.info(self, helper),
