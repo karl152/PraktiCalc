@@ -56,7 +56,7 @@ echo "The script will now download appimagetool from https://github.com/AppImage
 echo "------------------------------------------------------------------------------------"
 sleep 10
 echo "Downloading appimagetool"
-wget2 https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -m).AppImage
+wget2 -c https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -m).AppImage
 chmod +x appimagetool-$(uname -m).AppImage
 mv ./appimagetool-$(uname -m).AppImage ./linux-pkg-builds/AppImage/
 
