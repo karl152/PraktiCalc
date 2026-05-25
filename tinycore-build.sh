@@ -35,11 +35,11 @@ echo "tk8.6.tcz" >> prakticalc.tcz.dep
 echo "created dependency file"
 echo "Title: 		PraktiCalc" > prakticalc.tcz.info
 echo "Description:	A Practical Calculator written in Python" >> prakticalc.tcz.info
-echo "Version:	1.5" >> prakticalc.tcz.info
+echo "Version:	1.5.1" >> prakticalc.tcz.info
 echo 'Author:		Karl "karl152"' >> prakticalc.tcz.info
 echo "License:	GPL-3.0" >> prakticalc.tcz.info
 echo "Dependencies:	python3.14.tcz tk8.6.tcz" >> prakticalc.tcz.info
 echo "created info file"
 md5sum prakticalc.tcz > prakticalc.tcz.md5.txt
 echo "created md5 checksum file"
-echo "Build complete! Make sure to correct the version number in prakticalc.tcz.info"
+echo "Build complete!"
