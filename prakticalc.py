@@ -37,7 +37,7 @@ elif platform.system() == "Darwin":
 # VARIABLES
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.5"
+PraktiCalcVersion = "1.5.1"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 allowWindowsShutdownDialog = "--allowShutdownDialog" in sys.argv
 MsgBoxStyles = ["Tkinter", "Alternative"]
