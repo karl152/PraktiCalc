@@ -395,6 +395,7 @@ class PraktiCalculator:
             self.CalculationString += "0"
     def clear(self): # resets the calculaton
         self.CalculationString = "0"
+        self.LastResult = "0"
     def append(self, char): # append a character to the calculation string
         char = char.replace("plus", "+")
         char = char.replace("minus", "-")
