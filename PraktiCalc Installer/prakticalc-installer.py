@@ -267,7 +267,7 @@ def actuallyInstall():
             with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", 0, winreg.KEY_WRITE) as UninstallKey:
                 with winreg.CreateKey(UninstallKey, "PraktiCalc") as PraktiKey:
                     winreg.SetValueEx(PraktiKey, "DisplayName", 0, winreg.REG_SZ, "PraktiCalc")
-                    winreg.SetValueEx(PraktiKey, "DisplayVersion", 0, winreg.REG_SZ, "1.5")
+                    winreg.SetValueEx(PraktiKey, "DisplayVersion", 0, winreg.REG_SZ, "1.5.1")
                     winreg.SetValueEx(PraktiKey, "UninstallString", 0, winreg.REG_SZ, r"C:\Program Files\PraktiCalc\PraktiCalcUninstaller\PraktiCalcUninstaller.exe")
                     winreg.SetValueEx(PraktiKey, "Publisher", 0, winreg.REG_SZ, "karl152")
                     winreg.SetValueEx(PraktiKey, "InstallLocation", 0, winreg.REG_SZ, r"C:\Program Files\PraktiCalc")
