@@ -1849,7 +1849,7 @@ class ConsoleWindow(tk.Toplevel):
         else:
             comoutput = console.execute(self.ConsoleInput.get())
             self.ConsoleOutput.insert(tk.END, str(comoutput) + "\n")
-            self.ConsoleOutput.see("end")
+            self.ConsoleOutput.see(tk.END)
         self.ConsoleInput.delete(0, tk.END)
     def ConsoleKey(self, event): # sets entry to previous input if UP pressed
         key = event.keysym
