@@ -37,7 +37,7 @@ elif platform.system() == "Darwin":
 # VARIABLES
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.5.1"
+PraktiCalcVersion = "1.5.2"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 allowWindowsShutdownDialog = "--allowShutdownDialog" in sys.argv
 MsgBoxStyles = ["Tkinter", "Alternative"]
@@ -425,6 +425,11 @@ class PraktiCalculator:
             self.CalculationString = self.Memory
         else:
             self.CalculationString += self.Memory
+    def appendToMemory(self): # appends the calculation string to memory
+        if self.CalculationString != "0":
+            if self.Memory == "0":
+                self.Memory = ""
+            self.Memory += self.CalculationString
     def clearMemory(self):
         self.Memory = "0"
     def clearHistory(self): # clears the history list
@@ -649,6 +654,7 @@ class MainWindow(tk.Tk):
         self.MemoryDisplay = tk.Menu(self.Menubar, tearoff=TheTearoff)
         self.MemoryDisplay.add_command(label="Set memory", command=lambda: self.setMemory(calculator))
         self.MemoryDisplay.add_command(label="Get memory", command=lambda: self.getMemory(calculator, cfg))
+        self.MemoryDisplay.add_command(label="Append to memory", command=lambda: self.appendToMemory(calculator))
         self.MemoryDisplay.add_command(label="Clear memory", command=lambda: self.clearMemory(calculator))
         self.Menubar.add_cascade(label="Calculator", menu=self.CalculatorMenu)
         self.Menubar.add_cascade(label="Tools", menu=self.ToolMenu)
@@ -749,6 +755,7 @@ class MainWindow(tk.Tk):
         MemoryMenu = tk.Menu(MemoryButton, tearoff=TheTearoff)
         MemoryMenu.add_command(label="Set", command=lambda: self.setMemory(calculator))
         MemoryMenu.add_command(label="Get", command=lambda: self.getMemory(calculator, cfg))
+        MemoryMenu.add_command(label="Append", command=lambda: self.appendToMemory(calculator))
         MemoryMenu.add_command(label="Clear", command=lambda: self.clearMemory(calculator))
         MemoryButton["menu"] = MemoryMenu
         LogButton = ttk.Menubutton(self.WindowFrame, text="log")
@@ -891,6 +898,11 @@ class MainWindow(tk.Tk):
     def getMemory(self, calculator, cfg):
         calculator.getMemory()
         self.updateDisplay(calculator, cfg)
+    def appendToMemory(self, calculator):
+        calculator.appendToMemory()
+        NewLabel = "M: " + calculator.Memory
+        self.CustomMemoryDisplay.config(text=NewLabel)
+        self.Menubar.entryconfig(4, label=NewLabel)
     def clearMemory(self, calculator):
         calculator.clearMemory()
         NewLabel = "M: " + calculator.Memory
