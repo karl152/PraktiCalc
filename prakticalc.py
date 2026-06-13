@@ -999,7 +999,9 @@ class Dialog:
     def __init__(self, cfg):
         self.ConfigurationStorage = cfg
     def info(self, parent, helper): # shows info dialogs
-        infotext = "PraktiCalc\nVersion " + PraktiCalcVersion + "\nrunning on Python "+ platform.python_version() + "\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/\nthemes provided by the ttkthemes library"
+        infotext = "PraktiCalc\nVersion " + PraktiCalcVersion + "\nrunning on Python "+ platform.python_version() + " / Tk " + str(tk.TkVersion) + "\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/"
+        if theming != 0:
+            infotext += "\nthemes provided by the ttkthemes library"
         if self.ConfigurationStorage.get("dialogStyle") == "Tkinter":
             messagebox.showinfo("About PraktiCalc", infotext)
         elif self.ConfigurationStorage.get("dialogStyle") == "Alternative":
