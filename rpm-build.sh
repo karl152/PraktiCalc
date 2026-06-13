@@ -5,6 +5,13 @@
 # See https://www.gnu.org/licenses/gpl-3.0.txt for details.
 # SPDX-License-Identifier: GPL-3.0
 
+# REQUIREMENTS
+# - Fedora
+# - rpm-build
+# - rpmdevtools
+# - python3-devel
+# - python3-tkinter
+
 # clean up from previous build
 rm -rf ~/rpmbuild/
 
