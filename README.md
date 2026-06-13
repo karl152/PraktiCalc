@@ -46,4 +46,5 @@ Buildung deb packages required the following dependencies installed via apt from
 PraktiXtensions are Python scripts that add a tab with a TkInter-GUI to the extension window. They can use any modules imported in the main file. For the graphical user interface, ttk-Widgets should be used. If that's not possible, consider using the value of the DarkMode parameter to set the background and foreground colors.
 A full extension has three files: the Python file with the code itself, a metadata file and a description. These metadata entries will be shown by the built-in extension manager. You can distribute your extensions as a single PXT file, which is basically a renamed ZIP archive.
 Consider using the [PXT Builder](https://github.com/user-attachments/files/27288923/PXTBuilder.zip) (which is an extension itself) for comfortably building PXT files from Python files.
-More documentation will be available at some point at https://github.com/karl152/PraktiXtensions
+
+More documentation is available at https://github.com/karl152/PraktiXtensions. Also check out the [extension gallery](https://praktixtensions.blogspot.com/)
