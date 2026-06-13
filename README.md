@@ -30,6 +30,7 @@ You can download PraktiCalc on the right at the Releases section. There should b
 | prakticalc-x.x-aarch64.AppImage         | portable AppImage file for Linux on 64-Bit ARM Processors        |
 | prakticalc-x.x-aarch64.app              | portable unsigned App file for macOS on Apple Silicon Processors |
 | prakticalc-x.x.tcz*                     | PraktiCalc TinyCore Extension, can be loaded on TinyCore 17+     |
+| peakticalc-x.x.rpm                      | installable PraktiCalc Fedora RPM package                        |
 | Source code (zip)                       | ZIP archive with the source code                                 |
 | Source code (tar.gz)                    | gzipped tar archive with the source code                         |
 
@@ -39,7 +40,7 @@ Please note that the macOS package is unsigned. Look up how to open unsigned App
 The build scripts will help you to build PraktiCalc into installable packages.
 For building on Windows 10 or newer, you need Python with tkinter and the following modules installed via pip: ```ttkthemes```, ```pyinstaller```
 For older versions of Windows, you need Python with the same modules and PowerShell 5 or 7-Zip installed. The lastest available Python version is recommended, that being Python 3.8.20 on Windows NT 6 (Windows 7/Vista). Windows Vista is unsupported by PraktiCalc, but should work in theory.
-Buildung deb packages required the following dependencies installed via apt from the Debian package sources: ```python3-tk```, ```python3-ttkthemes```. AppImages require the same packages and additionally ```python3-pyinstaller```. ```appimagetool``` will be downloaded automatically by the build script. AppImageUpdate is also supported, by the way.
+Buildung deb packages required the following dependencies installed via apt from the Debian package sources: ```python3-tk```, ```python3-ttkthemes```. AppImages require the same packages and additionally ```python3-pyinstaller```. ```appimagetool``` will be downloaded automatically by the build script. AppImageUpdate is also supported, by the way. RPMs need `rpm-build`, `rpmdevtools`, `python3-devel` and `python3-tkinter`.
 
 #### Extension system
 PraktiXtensions are Python scripts that add a tab with a TkInter-GUI to the extension window. They can use any modules imported in the main file. For the graphical user interface, ttk-Widgets should be used. If that's not possible, consider using the value of the DarkMode parameter to set the background and foreground colors.
