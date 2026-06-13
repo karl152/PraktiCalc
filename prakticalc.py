@@ -1024,6 +1024,15 @@ class Dialog:
             ExtendedInfoFrame.columnconfigure(0, weight=1)
             ExtInfoIcon = ttk.Label(ExtendedInfoFrame, image=parent.icon)
             ExtInfoText1 = ttk.Label(ExtendedInfoFrame, text=infotext, justify="left")
+            if "--debug" in sys.argv:
+                DebugIconFrame = ttk.Frame(ExtendedInfoFrame)
+                IconList = ["info", "question", "warning", "error", "hourglass", "gray75", "gray50", "gray25", "gray12"]
+                for icon in IconList:
+                    if DarkMode == True:
+                        tk.Label(DebugIconFrame, bitmap=icon, bg="black", fg="white").grid(row=0, column=IconList.index(icon), padx=(0, 10))
+                    else:
+                        tk.Label(DebugIconFrame, bitmap=icon).grid(row=0, column=IconList.index(icon), padx=(0, 10))
+                DebugIconFrame.grid(row=2, column=0, padx=10, pady=(0, 5), sticky="w")
             CustomInfoFrame.grid(row=0, column=0, sticky="nesw")
             CustomInfoExit.grid(row=1, column=1, padx=10, pady=10)
             if platform.system() == "Darwin" and self.ConfigurationStorage.get("nativeTheme") == 1:
