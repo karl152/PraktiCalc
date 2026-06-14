@@ -430,6 +430,17 @@ class PraktiCalculator:
             if self.Memory == "0":
                 self.Memory = ""
             self.Memory += self.CalculationString
+    def addToMemory(self): # adds the calculation string to memory
+        if self.CalculationString != "0":
+            if self.Memory != "0":
+                self.Memory += "+" + self.CalculationString
+            else:
+                self.Memory = self.CalculationString
+    def subtractFromMemory(self): # subtracts the calculation string from memory
+        if self.CalculationString != "0":
+            if self.Memory == "0":
+                self.Memory = ""
+            self.Memory += "-" + self.CalculationString
     def clearMemory(self):
         self.Memory = "0"
     def clearHistory(self): # clears the history list
@@ -654,6 +665,8 @@ class MainWindow(tk.Tk):
         self.MemoryDisplay = tk.Menu(self.Menubar, tearoff=TheTearoff)
         self.MemoryDisplay.add_command(label="Set memory", command=lambda: self.setMemory(calculator))
         self.MemoryDisplay.add_command(label="Get memory", command=lambda: self.getMemory(calculator, cfg))
+        self.MemoryDisplay.add_command(label="Add to memory", command=lambda: self.addToMemory(calculator))
+        self.MemoryDisplay.add_command(label="Subtract from memory", command=lambda: self.subtractFromMemory(calculator))
         self.MemoryDisplay.add_command(label="Append to memory", command=lambda: self.appendToMemory(calculator))
         self.MemoryDisplay.add_command(label="Clear memory", command=lambda: self.clearMemory(calculator))
         self.Menubar.add_cascade(label="Calculator", menu=self.CalculatorMenu)
@@ -755,6 +768,8 @@ class MainWindow(tk.Tk):
         MemoryMenu = tk.Menu(MemoryButton, tearoff=TheTearoff)
         MemoryMenu.add_command(label="Set", command=lambda: self.setMemory(calculator))
         MemoryMenu.add_command(label="Get", command=lambda: self.getMemory(calculator, cfg))
+        MemoryMenu.add_command(label="Add", command=lambda: self.addToMemory(calculator))
+        MemoryMenu.add_command(label="Subtract", command=lambda: self.subtractFromMemory(calculator))
         MemoryMenu.add_command(label="Append", command=lambda: self.appendToMemory(calculator))
         MemoryMenu.add_command(label="Clear", command=lambda: self.clearMemory(calculator))
         MemoryButton["menu"] = MemoryMenu
@@ -902,6 +917,16 @@ class MainWindow(tk.Tk):
         self.updateDisplay(calculator, cfg)
     def appendToMemory(self, calculator):
         calculator.appendToMemory()
+        NewLabel = "M: " + calculator.Memory
+        self.CustomMemoryDisplay.config(text=NewLabel)
+        self.Menubar.entryconfig(4, label=NewLabel)
+    def addToMemory(self, calculator):
+        calculator.addToMemory()
+        NewLabel = "M: " + calculator.Memory
+        self.CustomMemoryDisplay.config(text=NewLabel)
+        self.Menubar.entryconfig(4, label=NewLabel)
+    def subtractFromMemory(self, calculator):
+        calculator.subtractFromMemory()
         NewLabel = "M: " + calculator.Memory
         self.CustomMemoryDisplay.config(text=NewLabel)
         self.Menubar.entryconfig(4, label=NewLabel)
