@@ -909,29 +909,23 @@ class MainWindow(tk.Tk):
         self.updateDisplay(calculator, cfg)
     def setMemory(self, calculator):
         calculator.setMemory()
-        NewLabel = "M: " + calculator.Memory
-        self.CustomMemoryDisplay.config(text=NewLabel)
-        self.Menubar.entryconfig(4, label=NewLabel)
+        self.refreshMemoryDisplay(calculator)
     def getMemory(self, calculator, cfg):
         calculator.getMemory()
         self.updateDisplay(calculator, cfg)
     def appendToMemory(self, calculator):
         calculator.appendToMemory()
-        NewLabel = "M: " + calculator.Memory
-        self.CustomMemoryDisplay.config(text=NewLabel)
-        self.Menubar.entryconfig(4, label=NewLabel)
+        self.refreshMemoryDisplay(calculator)
     def addToMemory(self, calculator):
         calculator.addToMemory()
-        NewLabel = "M: " + calculator.Memory
-        self.CustomMemoryDisplay.config(text=NewLabel)
-        self.Menubar.entryconfig(4, label=NewLabel)
+        self.refreshMemoryDisplay(calculator)
     def subtractFromMemory(self, calculator):
         calculator.subtractFromMemory()
-        NewLabel = "M: " + calculator.Memory
-        self.CustomMemoryDisplay.config(text=NewLabel)
-        self.Menubar.entryconfig(4, label=NewLabel)
+        self.refreshMemoryDisplay(calculator)
     def clearMemory(self, calculator):
         calculator.clearMemory()
+        self.refreshMemoryDisplay(calculator)
+    def refreshMemoryDisplay(self, calculator):
         NewLabel = "M: " + calculator.Memory
         self.CustomMemoryDisplay.config(text=NewLabel)
         self.Menubar.entryconfig(4, label=NewLabel)
