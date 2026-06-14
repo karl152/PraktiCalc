@@ -831,6 +831,8 @@ class MainWindow(tk.Tk):
                 "i": lambda: dialog.info(self, helper),
                 "s": lambda: SettingsWindow(self, helper, calculator, cfg),
                 "S": lambda: SettingsWindow(self, helper, calculator, cfg),
+                "x": lambda: ExtensionWindow(self, helper, calculator, dialog),
+                "X": lambda: ExtensionWindow(self, helper, calculator, dialog),
                 "BackSpace": lambda: self.backspace(calculator, cfg),
                 }
             run = Keys.get(Key)
