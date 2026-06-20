@@ -1419,6 +1419,8 @@ class ExtensionManager(ttk.Frame):
         self.RemoveButton.grid(row=1, column=1, padx=10, pady=10, sticky="we")
         self.ResetButton = ttk.Button(self.LeftFrame, text="Reset Extension Folder", command=lambda: self.reset(parent, mainWin, helper))
         self.ResetButton.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="we")
+        ttk.Separator(self.LeftFrame, orient="horizontal").grid(row=3, column=0, columnspan=2, pady=7, sticky="ew")
+        ttk.Button(self.LeftFrame, text="PraktiXtension Gallery", command=lambda: webbrowser.open_new("https://praktixtensions.blogspot.com/p/browse.html")).grid(row=4, column=0, columnspan=2, padx=10, pady=10, sticky="we")
         self.LeftFrame.columnconfigure(0, weight=1)
         self.LeftFrame.columnconfigure(1, weight=1)
         self.RightFrame.columnconfigure(0, weight=1)
