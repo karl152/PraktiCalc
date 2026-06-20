@@ -21,12 +21,9 @@ from pathlib import Path
 from decimal import Decimal
 try:
     from ttkthemes import ThemedStyle
-    theming = 1
+    ttkthemesOK = True
 except:
-    theming = 0
-# 0 = no theming
-# 1 = theming from ttkthemes
-# 2 = manual theming
+    ttkthemesOK = False
 import platform, subprocess, sys, shutil, math, getpass, time, configparser, importlib.util, webbrowser, zipfile, tempfile, hashlib, re
 if platform.system() == "Windows":
     import winreg
@@ -72,9 +69,6 @@ else:
     for MsgBoxStyle in AdditionalLinuxMsgBoxStyles:
         if shutil.which(MsgBoxStyle):
             MsgBoxStyles.append(MsgBoxStyle)
-ThemingDisabled = "--notheming" in sys.argv
-if ThemingDisabled == True:
-    theming = 0
 if CLIHelp == True:
     if platform.system() == "Windows":
         messagebox.showinfo("PraktiCalc CLI Options", "PraktiCalc " + PraktiCalcVersion + """ CLI Options:
@@ -133,7 +127,6 @@ else:
     VBSInfoPath = "info.vbs"
     VBSErrorPath = "error.vbs"
 
-DarkMode = False
 debug = "--debug" in sys.argv
 
 # CLASSES
@@ -505,94 +498,121 @@ class WindowHelper:
     def __init__(self, cfg):
         self.WindowList = []
         self.ConfigurationStorage = cfg
+        self.refreshTheming()
+        self.availableThemes = ["error loading list"]
+    def refreshTheming(self):
+        self.theming = 0
+        if ttkthemesOK == True and bool(self.ConfigurationStorage.get("nativeTheme")) == False and "--notheming" not in sys.argv:
+            self.theming = 1
+        # 0 = theming from ttk
+        # 1 = theming from ttkthemes
+        # 2 = manual theming
     def changeTheme(self, WindowName): # sets the theme for a given window
-        global theming, DarkMode
-        if bool(cfg.get("nativeTheme")) == False and cfg.get("theme") == "black" or cfg.get("theme") == "equilux":
-            DarkMode = True
+        self.refreshTheming()
+        if self.theming != 0 and cfg.get("theme") == "black" or cfg.get("theme") == "equilux":
+            self.DarkMode = True
         else:
-            DarkMode = False
+            self.DarkMode = False
         if platform.system() == "Darwin":
-            if bool(self.ConfigurationStorage.get("nativeTheme")) == False:
-                self.style = ThemedStyle(WindowName)
-                self.style.theme_use(self.ConfigurationStorage.get("theme"))
-            else:
+            if self.theming == 0:
                 self.style = ttk.Style(WindowName)
-                self.style.theme_use(NativeTheme)
-                if subprocess.getoutput("defaults read -g AppleInterfaceStyle") == "Dark":
-                    DarkMode = True
+                if bool(cfg.get("nativeTheme")) == True or self.ConfigurationStorage.get("theme") not in self.style.theme_names():
+                    self.style.theme_use(NativeTheme)
+                    if subprocess.getoutput("defaults read -g AppleInterfaceStyle") == "Dark":
+                        self.DarkMode = True
+                    else:
+                        self.DarkMode = False
                 else:
-                    DarkMode = False
+                    self.style.theme_use(self.ConfigurationStorage.get("theme"))
+            else:
+                self.style = ThemedStyle(WindowName)
+                if self.ConfigurationStorage.get("theme") in self.style.theme_names():
+                    self.style.theme_use(self.ConfigurationStorage.get("theme"))
+                else:
+                    if messagebox.askyesno("Theming Error", "The specified theme couldn't be loaded!\nDo you want to reset the settings?") == True:
+                        self.ConfigurationStorage.reset()
+                    return
         elif platform.system() == "Windows":
             self.ajustTitleBars()
-            if bool(self.ConfigurationStorage.get("nativeTheme")) == False:
-                self.style = ThemedStyle(WindowName)
-                self.style.theme_use(self.ConfigurationStorage.get("theme"))
-            else:
+            if self.theming == 0:
                 self.style = ttk.Style(WindowName)
-                self.style.theme_use(NativeTheme)
-                try:
-                    ClassicStyleEnabled = ctypes.c_bool()
-                    ctypes.windll.dwmapi.DwmIsCompositionEnabled(ctypes.byref(ClassicStyleEnabled))
-                    ClassicStyleEnabled = not ClassicStyleEnabled.value
-                except Exception:
-                    ClassicStyleEnabled = True
-                if ClassicStyleEnabled == True:
-                    if ctypes.windll.user32.GetSysColor(5) == 0:
-                        DarkMode = True
-                if platform.release() in "110":
+                if bool(cfg.get("nativeTheme")) == True or self.ConfigurationStorage.get("theme") not in self.style.theme_names():
+                    self.style.theme_use(NativeTheme)
                     try:
-                        with winreg.OpenKeyEx(winreg.HKEY_CURRENT_USER, r"Control Panel\Accessibility\HighContrast") as ContrastKey:
-                            if winreg.QueryValueEx(ContrastKey, "LastUpdatedThemeId")[0] in [1, 2, 3]:
-                                DarkMode = True
-                    except:
-                        pass
+                        ClassicStyleEnabled = ctypes.c_bool()
+                        ctypes.windll.dwmapi.DwmIsCompositionEnabled(ctypes.byref(ClassicStyleEnabled))
+                        ClassicStyleEnabled = not ClassicStyleEnabled.value
+                    except Exception:
+                        ClassicStyleEnabled = True
+                    if ClassicStyleEnabled == True:
+                        if ctypes.windll.user32.GetSysColor(5) == 0:
+                            self.DarkMode = True
+                    if platform.release() in "110":
+                        try:
+                            with winreg.OpenKeyEx(winreg.HKEY_CURRENT_USER, r"Control Panel\Accessibility\HighContrast") as ContrastKey:
+                                if winreg.QueryValueEx(ContrastKey, "LastUpdatedThemeId")[0] in [1, 2, 3]:
+                                    self.DarkMode = True
+                        except:
+                            pass
+            else:
+                self.style = ThemedStyle(WindowName)
+                if self.ConfigurationStorage.get("theme") in self.style.theme_names():
+                    self.style.theme_use(self.ConfigurationStorage.get("theme"))
+                else:
+                    if messagebox.askyesno("Theming Error", "The specified theme couldn't be loaded!\nDo you want to reset the settings?") == True:
+                        self.ConfigurationStorage.reset()
+                    return
             if WingWebDings == True:
                 self.style.configure("Webdings.TButton", font=webdingsfont)
                 self.style.configure("Wingdings.TButton", font=wingdingsfont)
             else:
                 self.style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
-            self.style.configure("Treeview", rowheight=40)
-        elif theming == 1 or theming == 2:
+        elif self.theming == 0:
+            self.style = ttk.Style(WindowName)
+            if bool(cfg.get("nativeTheme")) == True or self.ConfigurationStorage.get("theme") not in self.style.theme_names():
+                self.style.theme_use(NativeTheme)
+            else:
+                self.style.theme_use(self.ConfigurationStorage.get("theme"))
+        else:
             try:
-                if bool(self.ConfigurationStorage.get("nativeTheme")) == False:
-                    self.style = ThemedStyle(WindowName)
+                self.style = ThemedStyle(WindowName)
+                if self.ConfigurationStorage.get("theme") in self.style.theme_names():
                     self.style.theme_use(self.ConfigurationStorage.get("theme"))
                 else:
-                    self.style = ttk.Style(WindowName)
-                    self.style.theme_use(NativeTheme)
-                    self.style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
-                    self.style.configure("Treeview", rowheight=40)
+                    if messagebox.askyesno("Theming Error", "The specified theme couldn't be loaded!\nDo you want to reset the settings?") == True:
+                        self.ConfigurationStorage.reset()
+                    return
             except:
-                theming = 2
-                if bool(self.ConfigurationStorage.get("nativeTheme")) == True:
-                    self.style = ttk.Style(WindowName)
-                    self.style.theme_use(NativeTheme)
-                else:
-                    theme_base = Path(sys._MEIPASS).joinpath("ttkthemes", "themes")
-                    theme_path = Path(theme_base).joinpath(self.ConfigurationStorage.get("theme"))
-                    WindowName.tk.call("lappend", "auto_path", theme_base)
-                    try:
-                        WindowName.tk.call("package", "require", f"ttk::theme::{self.ConfigurationStorage.get('theme')}")
-                    except:
-                        theme_tcl = Path(theme_path).joinpath(self.ConfigurationStorage.get("theme") + ".tcl")
-                        if Path(theme_tcl).exists():
-                            WindowName.tk.call("source", theme_tcl)
-                        else:
-                            print(f"Couldn't find theme {theme_tcl}")
-                    self.style = ttk.Style()
-                    try:
-                        self.style.theme_use(self.ConfigurationStorage.get("theme"))
-                    except:
-                        print("Using default ttk theme")
+                self.theming = 2
+                theme_base = Path(sys._MEIPASS).joinpath("ttkthemes", "themes")
+                theme_path = Path(theme_base).joinpath(self.ConfigurationStorage.get("theme"))
+                WindowName.tk.call("lappend", "auto_path", theme_base)
+                try:
+                    WindowName.tk.call("package", "require", f"ttk::theme::{self.ConfigurationStorage.get('theme')}")
+                except:
+                    theme_tcl = Path(theme_path).joinpath(self.ConfigurationStorage.get("theme") + ".tcl")
+                    if Path(theme_tcl).exists():
+                        WindowName.tk.call("source", theme_tcl)
+                    else:
+                        print(f"Couldn't find theme {theme_tcl}")
+                self.style = ttk.Style()
+                try:
+                    self.style.theme_use(self.ConfigurationStorage.get("theme"))
+                except:
+                    print("Using default ttk theme")
             try:
                 self.style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
-                self.style.configure("Treeview", rowheight=40)
             except:
-                print("Unable to increase font size of some buttons and row height in the history window")
+                print("Unable to increase font size of some buttons")
+        try:
+            self.style.configure("Treeview", rowheight=40)
+            self.availableThemes = self.style.theme_names()
+        except:
+            print("Unable to increase row height of Treeview tables")
     def ajustTitleBar(self, hwnd): # changes the appearance of the Windows title bar
         if platform.system() == "Windows":
             try:
-                value = wintypes.BOOL(DarkMode)
+                value = wintypes.BOOL(self.DarkMode)
                 dwmapi.DwmSetWindowAttribute(wintypes.HWND(hwnd), wintypes.DWORD(DWMWA_USE_IMMERSIVE_DARK_MODE), ctypes.byref(value), ctypes.sizeof(value))
             except:
                 pass
@@ -933,7 +953,7 @@ class MainWindow(tk.Tk):
 # settings window
 class SettingsWindow(tk.Toplevel):
     def __init__(self, parent, helper, calculator, cfg):
-        global MsgBoxStyles, theming
+        global MsgBoxStyles
         super().__init__(parent)
         self.title("Settings")
         self.config(width=250, height=152)
@@ -956,12 +976,15 @@ class SettingsWindow(tk.Toplevel):
         SettingsTabs.add(BehaviorFrame, text="Behavior")
         ThemeFrame = ttk.LabelFrame(AppearanceFrame, text="Theme")
         ThemeFrame.columnconfigure(0, weight=1)
-        self.ThemeSelector = ttk.Combobox(ThemeFrame, values=["plastik", "keramik", "breeze", "yaru", "black", "clam", "alt", "classic"])
+        if helper.theming == 0:
+            self.ThemeSelector = ttk.Combobox(ThemeFrame, values=helper.availableThemes)
+        else:
+            self.ThemeSelector = ttk.Combobox(ThemeFrame, values=["plastik", "keramik", "breeze", "yaru", "black", "clam", "alt", "classic"])
         self.ThemeSelector.set(cfg.get("theme"))
-        NativeThemeToggle = ttk.Checkbutton(ThemeFrame, text="Native theme", variable=parent.UseNativeThemeTkVar)
+        self.NativeThemeToggle = ttk.Checkbutton(ThemeFrame, text="Native theme", variable=parent.UseNativeThemeTkVar, command=lambda: self.updateThemeComboBoxState(parent))
         ThemeFrame.grid(row=0, column=0, sticky="news", padx=10)
         self.ThemeSelector.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
-        NativeThemeToggle.grid(row=1, column=0, sticky="w")
+        self.NativeThemeToggle.grid(row=1, column=0, sticky="w")
         BorderDisplayToggle = ttk.Checkbutton(AppearanceFrame, text="Border display", variable=parent.BorderDisplayTkVar)
         NativeMenubarToggle = ttk.Checkbutton(AppearanceFrame, text="Native menubar", variable=parent.NativeMenubarTkVar)
         if platform.system() != "Darwin":
@@ -979,9 +1002,11 @@ class SettingsWindow(tk.Toplevel):
         SettingsOKButton = ttk.Button(SettingsWindowFrame, text="OK", command=lambda: self.loadTheme(parent, helper, cfg, calculator))
         SettingsResetButton = ttk.Button(SettingsWindowFrame, text="Reset", command=lambda: self.reset(parent, helper, cfg))
         SettingsWindowFrame.grid(row=0, column=0, sticky="nesw")
-        if theming == 0:
+        if bool(cfg.get("nativeTheme")) == True:
             self.ThemeSelector.config(state="disabled")
-            NativeThemeToggle.config(state="disabled")
+        if "--notheming" in sys.argv:
+            self.NativeThemeToggle.config(state="disabled")
+            self.ThemeSelector.config(state="disabled")
         BorderDisplayToggle.grid(row=1, column=0, sticky="w", padx=10)
         NativeMenubarToggle.grid(row=2, column=0, sticky="w", padx=10)
         if platform.system() != "Darwin":
@@ -994,6 +1019,11 @@ class SettingsWindow(tk.Toplevel):
         self.update_idletasks()
         helper.WindowList.append(self)
         helper.changeTheme(self)
+    def updateThemeComboBoxState(self, parent):
+        if parent.UseNativeThemeTkVar.get() == True:
+            self.ThemeSelector.config(state="disabled")
+        else:
+            self.ThemeSelector.config(state="normal")
     def loadTheme(self, parent, helper, cfg, calculator): # saves the selected theme choice in the settigns window
         cfg.set("theme", self.ThemeSelector.get())
         cfg.set("nativeTheme", parent.UseNativeThemeTkVar.get())
@@ -1021,7 +1051,7 @@ class Dialog:
         self.ConfigurationStorage = cfg
     def info(self, parent, helper): # shows info dialogs
         infotext = "PraktiCalc\nVersion " + PraktiCalcVersion + "\nrunning on Python "+ platform.python_version() + " / Tk " + str(tk.TkVersion) + "\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/"
-        if theming != 0:
+        if helper.theming != 0:
             infotext += "\nthemes provided by the ttkthemes library"
         if self.ConfigurationStorage.get("dialogStyle") == "Tkinter":
             messagebox.showinfo("About PraktiCalc", infotext)
@@ -1049,7 +1079,7 @@ class Dialog:
                 DebugIconFrame = ttk.Frame(ExtendedInfoFrame)
                 IconList = ["info", "question", "warning", "error", "hourglass", "gray75", "gray50", "gray25", "gray12"]
                 for icon in IconList:
-                    if DarkMode == True:
+                    if helper.DarkMode == True:
                         tk.Label(DebugIconFrame, bitmap=icon, bg="black", fg="white").grid(row=0, column=IconList.index(icon), padx=(0, 10))
                     else:
                         tk.Label(DebugIconFrame, bitmap=icon).grid(row=0, column=IconList.index(icon), padx=(0, 10))
@@ -1177,7 +1207,7 @@ class HelpWindow(tk.Toplevel):
         HelpFrame.grid(row=0, column=0, sticky="nesw")
         HelpTabs = ttk.Notebook(HelpFrame)
         Content1 = tk.Text(HelpTabs)
-        if DarkMode == True:
+        if helper.DarkMode == True:
             Content1.config(fg="white", bg="black")
         Content1.pack(fill="both", expand=True)
         HelpTabs.add(Content1, text="Placeholder")
@@ -1247,7 +1277,6 @@ class ExtensionWindow(tk.Toplevel):
         helper.changeTheme(self)
         self.after(250, lambda: self.loadExtensions(parent, helper, calculator, dialog))
     def loadExtensions(self, parent, helper, calculator, dialog): # loads extensions from the folder, writes default extensions to folder if folder doesn't exist
-        global DarkMode
         if not self.FolderPath.exists():
             self.FolderPath.mkdir(parents=True)
             self.updateDecimalConverter()
@@ -1288,7 +1317,7 @@ class ExtensionWindow(tk.Toplevel):
                         module = importlib.util.module_from_spec(spec)
                         spec.loader.exec_module(module)
                         classs = getattr(module, file.stem)
-                        instance = classs(self.Tabs, self, parent, helper, calculator, dialog, DarkMode)
+                        instance = classs(self.Tabs, self, parent, helper, calculator, dialog, helper.DarkMode)
                         self.Tabs.add(instance, text=meta["PraktiXtension"]["name"])
                         print("loaded extension " + meta["PraktiXtension"]["name"])
                     else:
@@ -1298,7 +1327,7 @@ class ExtensionWindow(tk.Toplevel):
                     module = importlib.util.module_from_spec(spec)
                     spec.loader.exec_module(module)
                     classs = getattr(module, file.stem)
-                    instance = classs(self.Tabs, self, parent, helper, calculator, dialog, DarkMode)
+                    instance = classs(self.Tabs, self, parent, helper, calculator, dialog, helper.DarkMode)
                     self.Tabs.add(instance, text=file.stem)
                     print("loaded extension " + file.stem)
     def updateDecimalConverter(self): # updates decimal converter extension to the version embedded here
