@@ -1336,7 +1336,7 @@ class ExtensionWindow(tk.Toplevel):
             Path(self.FolderPath / "DecimalConverter.ini").unlink(missing_ok=True)
             Path(self.FolderPath / "DecimalConverter.txt").unlink(missing_ok=True)
         if not Path(self.FolderPath / "DecimalConverter.py").exists():
-            DecimalConverterCode = """import tkinter as tk
+            DecimalConverterCode = r"""import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 import platform
@@ -1414,7 +1414,7 @@ class DecimalConverter(ttk.Frame):
             Path(self.FolderPath / "ExtensionManager.ini").unlink(missing_ok=True)
             Path(self.FolderPath / "ExtensionManager.txt").unlink(missing_ok=True)
         if not Path(self.FolderPath / "ExtensionManager.py").exists():
-            ExtensionManagerCode = """# PraktiCalc Extension Manager
+            ExtensionManagerCode = r"""# PraktiCalc Extension Manager
 # Copyright (C) 2026 Karl "karl152"
 # SPDX-License-Identifier: GPL-3.0
 
@@ -1654,7 +1654,7 @@ class ExtensionManager(ttk.Frame):
             Path(self.FolderPath / "PraktiGraph.ini").unlink(missing_ok=True)
             Path(self.FolderPath / "PraktiGraph.txt").unlink(missing_ok=True)
         if not Path(self.FolderPath / "PraktiGraph.py").exists():
-            PraktiGraphCode = """# PraktiGraph
+            PraktiGraphCode = r"""# PraktiGraph
 # Copyright (C) 2026 Karl "karl152"
 # SPDX-License-Identifier: GPL-3.0
 
