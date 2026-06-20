@@ -1266,7 +1266,7 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "PraktiGraph.ini").exists():
             PraktiGraphMeta = configparser.ConfigParser()
             PraktiGraphMeta.read(self.FolderPath / "PraktiGraph.ini", encoding="utf-8")
-            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.5":
+            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.6":
                 self.updatePraktiGraph()
         for file in self.FolderPath.iterdir():
             if file.suffix == ".py":
@@ -1677,6 +1677,8 @@ class PraktiGraph(ttk.Frame):
         self.ScaleSlider.grid(row=5, column=3, padx=(0, 10), sticky="e")
         self.bind("<Configure>", lambda event: self.after(200, lambda: self.redraw(calculator)) if self.ClearStatus == False else self.clear())
     def redraw(self, calculator):
+        fxFunction = self.convert(self.fxEntry.get())
+        gxFunction = self.convert(self.gxEntry.get())
         self.clear()
         self.ClearStatus = False
         height = self.Canvas.winfo_height()
@@ -1707,12 +1709,12 @@ class PraktiGraph(ttk.Frame):
             self.Canvas.create_text(width/2+self.TextOffset, height/2-i*self.Scale.get(), text=str(i), fill=self.ForegroundColor) if i != 0 and self.Numbers.get() == True else self.doNothing()
 
         # f(x)
-        if self.fxEntry.get() != "":
+        if fxFunction != "":
             # table
             values = []
             for col in self.cols:
                 try:
-                    values.append(calculator.quickCalc(self.fxEntry.get().replace("x", f"({col})")))
+                    values.append(calculator.quickCalc(fxFunction.replace("x", f"({col})")))
                 except:
                     values.append("")
             self.Table.item(self.FirstTableRow, values=values)
@@ -1720,19 +1722,19 @@ class PraktiGraph(ttk.Frame):
             values = []
             for i in XvaluesConverted:
                 try:
-                    values.append((i, calculator.quickCalc(self.fxEntry.get().replace("x", f"({i})"))))
+                    values.append((i, calculator.quickCalc(fxFunction.replace("x", f"({i})"))))
                 except:
                     pass
             for f in range(len(values)-1):
                 if not abs(float(values[f][1]) - float(values[f+1][1])) > 10:
                     self.Canvas.create_line(self.XtoX(values[f][0]), self.YtoY(values[f][1]), self.XtoX(values[f+1][0]), self.YtoY(values[f+1][1]), fill=self.fxColor)
         # g(x)
-        if self.gxEntry.get() != "":
+        if gxFunction != "":
             # table
             values = []
             for col in self.cols:
                 try:
-                    values.append(calculator.quickCalc(self.gxEntry.get().replace("x", f"({col})")))
+                    values.append(calculator.quickCalc(gxFunction.replace("x", f"({col})")))
                 except:
                     values.append("")
             self.Table.item(self.SecondTableRow, values=values)
@@ -1740,7 +1742,7 @@ class PraktiGraph(ttk.Frame):
             values = []
             for i in XvaluesConverted:
                 try:
-                    values.append((i, calculator.quickCalc(self.gxEntry.get().replace("x", f"({i})"))))
+                    values.append((i, calculator.quickCalc(gxFunction.replace("x", f"({i})"))))
                 except:
                     pass
             for f in range(len(values)-1):
@@ -1773,11 +1775,34 @@ class PraktiGraph(ttk.Frame):
         return float(y) / self.Scale.get() - (float(self.Canvas.winfo_height())/2.0) / self.Scale.get()
     def XbacktoX(self, x):
         return float(x) / self.Scale.get() - (float(self.Canvas.winfo_width())/2.0) / self.Scale.get()
+    def convert(self, func):
+        newfunc = ""
+        SuperScriptDict = {"\u2070": "0",
+                           "\u00b9": "1",
+                           "\u00b2": "2",
+                           "\u00b3": "3",
+                           "\u2074": "4",
+                           "\u2075": "5",
+                           "\u2076": "6",
+                           "\u2077": "7",
+                           "\u2078": "8",
+                           "\u2079": "9"}
+        SuperScript = False
+        for char in reversed(func):
+            if char in SuperScriptDict:
+                SuperScript = True
+                newfunc += char.translate(str.maketrans(SuperScriptDict))
+            else:
+                if SuperScript == True:
+                    newfunc += "^"
+                SuperScript = False
+                newfunc += char
+        return newfunc[::-1]
     def doNothing(self):
         pass"""
             PraktiGraphMetadata = configparser.ConfigParser()
             PraktiGraphMetadata["PraktiXtension"] = {"name": "PraktiGraph",
-                                                          "version": "1.5",
+                                                          "version": "1.6",
                                                           "filename": "PraktiGraph.py",
                                                           "description": "The PraktiCalc Graph Thing",
                                                           "website": "",
