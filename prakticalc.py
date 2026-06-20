@@ -1295,7 +1295,7 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "PraktiGraph.ini").exists():
             PraktiGraphMeta = configparser.ConfigParser()
             PraktiGraphMeta.read(self.FolderPath / "PraktiGraph.ini", encoding="utf-8")
-            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.6":
+            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.7":
                 self.updatePraktiGraph()
         for file in self.FolderPath.iterdir():
             if file.suffix == ".py":
@@ -1660,6 +1660,7 @@ class ExtensionManager(ttk.Frame):
 
 import tkinter as tk
 from tkinter import ttk, messagebox, colorchooser
+from decimal import Decimal
 import platform
 
 class PraktiGraph(ttk.Frame):
@@ -1675,7 +1676,7 @@ class PraktiGraph(ttk.Frame):
             self.BackgroundColor = "#000000"
             self.fxColor = "#ffffff"
             self.gxColor = "#5d00ff"
-        self.Scale = tk.IntVar(value=100)
+        self.Scale = tk.IntVar(value=int(50*mainWin.ScaleFactor))
         self.ClearStatus = True
         self.TextOffset = 15
         self.Numbers = tk.BooleanVar(value=True)
@@ -1713,7 +1714,7 @@ class PraktiGraph(ttk.Frame):
         ttk.Button(self, text="Clear", command=self.clear).grid(row=5, column=1, pady=10, padx=20, sticky="e")
         ttk.Button(self, text="Draw", command=lambda: self.redraw(calculator)).grid(row=5, column=2, pady=10, padx=20, sticky="w")
         ttk.Checkbutton(self, text="Draw numbers", variable=self.Numbers, command=lambda: self.redraw(calculator) if self.ClearStatus == False else self.doNothing()).grid(row=5, column=0, padx=(10, 0), sticky="w")
-        self.ScaleSlider = ttk.Scale(self, from_=50, to=500, orient="horizontal", variable=self.Scale, command=lambda _: self.redraw(calculator) if self.ClearStatus == False else self.doNothing())
+        self.ScaleSlider = ttk.Scale(self, from_=int(25*mainWin.ScaleFactor), to=int(250*mainWin.ScaleFactor), orient="horizontal", variable=self.Scale, command=lambda _: self.redraw(calculator) if self.ClearStatus == False else self.doNothing())
         self.ScaleSlider.grid(row=5, column=3, padx=(0, 10), sticky="e")
         self.bind("<Configure>", lambda event: self.after(200, lambda: self.redraw(calculator)) if self.ClearStatus == False else self.clear())
     def redraw(self, calculator):
@@ -1808,13 +1809,13 @@ class PraktiGraph(ttk.Frame):
         if self.ClearStatus == False:
             self.redraw(calculator)
     def YtoY(self, y):
-        return float(self.Canvas.winfo_height())/2.0-float(y) * self.Scale.get()
+        return Decimal(self.Canvas.winfo_height())/Decimal(2)-Decimal(y) * Decimal(self.Scale.get())
     def XtoX(self, x):
-        return float(self.Canvas.winfo_width())/2.0+float(x) * self.Scale.get()
+        return Decimal(self.Canvas.winfo_width())/Decimal(2)+Decimal(x) * Decimal(self.Scale.get())
     def YbacktoY(self, y):
-        return float(y) / self.Scale.get() - (float(self.Canvas.winfo_height())/2.0) / self.Scale.get()
+        return Decimal(y) / Decimal(self.Scale.get()) - (Decimal(self.Canvas.winfo_height())/Decimal(2)) / Decimal(self.Scale.get())
     def XbacktoX(self, x):
-        return float(x) / self.Scale.get() - (float(self.Canvas.winfo_width())/2.0) / self.Scale.get()
+        return Decimal(x) / Decimal(self.Scale.get()) - (Decimal(self.Canvas.winfo_width())/Decimal(2)) / Decimal(self.Scale.get())
     def convert(self, func):
         newfunc = ""
         SuperScriptDict = {"\u2070": "0",
@@ -1842,7 +1843,7 @@ class PraktiGraph(ttk.Frame):
         pass"""
             PraktiGraphMetadata = configparser.ConfigParser()
             PraktiGraphMetadata["PraktiXtension"] = {"name": "PraktiGraph",
-                                                          "version": "1.6",
+                                                          "version": "1.7",
                                                           "filename": "PraktiGraph.py",
                                                           "description": "The PraktiCalc Graph Thing",
                                                           "website": "",
