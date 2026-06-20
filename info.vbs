@@ -4,7 +4,18 @@
 ' SPDX-License-Identifier: GPL-3.0
 
 Option Explicit
-Dim PraktiCalcVersion, pyver
+Dim PraktiCalcVersion, pyver, TkVersion, theming, ttkthemesText, VBSversionText
 PraktiCalcVersion = WScript.Arguments(0)
 pyver = WScript.Arguments(1)
-MsgBox "PraktiCalc" & vbCrLf & "Version " & PraktiCalcVersion & vbCrLf & "running on Python " & pyver & vbCrLf & "Licensed under GPLv3" & vbCrLf & "read more at https://www.gnu.org/licenses/" & vbCrLf & "themes provided by the ttkthemes library", 64, "About PraktiCalc"
+TkVersion = WScript.Arguments(2)
+theming = WScript.Arguments(3)
+
+VBSversionText = ScriptEngine & " " & ScriptEngineMajorVersion & "." & ScriptEngineMinorVersion & "." & ScriptEngineBuildVersion
+
+If theming <> "0" Then
+    ttkthemesText = vbCrLf & "themes provided by the ttkthemes library"
+Else
+    ttkthemesText = ""
+End If
+
+MsgBox "PraktiCalc" & vbCrLf & "Version " & PraktiCalcVersion & vbCrLf & "running on Python " & pyver & " / Tk " & TkVersion & " / " & VBSversionText & vbCrLf & "Licensed under GPLv3" & vbCrLf & "read more at https://www.gnu.org/licenses/" & ttkthemesText, 64, "About PraktiCalc"

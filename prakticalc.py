@@ -1104,7 +1104,7 @@ class Dialog:
             if platform.system() == "Windows":
                 pyver = platform.python_version()
                 styles = {
-                    "VBScript": lambda: subprocess.Popen(["wscript", VBSInfoPath, PraktiCalcVersion, pyver]),
+                    "VBScript": lambda: subprocess.Popen(["wscript", VBSInfoPath, PraktiCalcVersion, pyver, str(tk.TkVersion), str(helper.theming)]),
                     "Windows Messaging Service": lambda: subprocess.Popen(["msg", getpass.getuser(), infotext]),
                     }
                 opendialog = styles.get(self.ConfigurationStorage.get("dialogStyle"))
