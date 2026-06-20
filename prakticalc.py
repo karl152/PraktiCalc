@@ -219,6 +219,9 @@ class Configuration:
         for value in DefaultConfiguration:
             self.backend.set(value[0], value[1])
             print("set " + value[0] + " to " + str(value[1]))
+        if platform.system() != "Windows" and platform.system() != "Darwin" and ttkthemesOK == False:
+            self.set("theme", "default")
+            print("changed the theme to default because ttkthemes isn't present")
     def reset(self): # deletes local configuration storage
         self.backend.reset()
     def remove(self, key): # deletes a value from configuration
