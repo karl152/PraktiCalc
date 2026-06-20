@@ -1261,7 +1261,7 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "ExtensionManager.ini").exists():
             ExtensionManagerMeta = configparser.ConfigParser()
             ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini", encoding="utf-8")
-            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.9":
+            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.10":
                 self.updateExtensionManager()
         if Path(self.FolderPath / "PraktiGraph.ini").exists():
             PraktiGraphMeta = configparser.ConfigParser()
@@ -1447,8 +1447,13 @@ class ExtensionManager(ttk.Frame):
         self.DescriptionFrame.rowconfigure(0, weight=1)
         self.DescriptionFrame.columnconfigure(0, weight=1)
         self.DescriptionFrame.grid(row=11, column=0, columnspan=2, sticky="news", padx=5, pady=5)
-        self.DescriptionText = ttk.Label(self.DescriptionFrame, text="")
-        self.DescriptionText.grid(row=0, column=0, sticky="news", padx=5, pady=5)
+        self.DescriptionText = tk.Text(self.DescriptionFrame, font="TkFixedFont", height=15, state="disabled")
+        self.DescriptionScrollbar = ttk.Scrollbar(self.DescriptionFrame, orient="vertical", command=self.DescriptionText.yview)
+        self.DescriptionText.config(yscrollcommand=self.DescriptionScrollbar.set)
+        self.DescriptionScrollbar.grid(row=0, column=1, padx=(0, 5), pady=5, sticky="sn")
+        if DarkMode == True:
+            self.DescriptionText.config(bg="black", fg="white")
+        self.DescriptionText.grid(row=0, column=0, sticky="news", padx=(5, 0), pady=5)
         self.LeftFrame.rowconfigure(0, weight=1)
         self.RightFrame.columnconfigure(1, weight=1)
         self.RightFrame.rowconfigure(11, weight=1)
@@ -1503,8 +1508,8 @@ class ExtensionManager(ttk.Frame):
             for display in displays:
                 display.config(state="readonly")
         else:
-            for label in labels:
-                label.config(text="")
+            self.TitleLabel.config(text=ext)
+            self.DescriptionLabel.config(text="no metadata found :(")
             for display in displays:
                 display.config(state="normal")
                 display.delete(0, tk.END)
@@ -1520,11 +1525,15 @@ class ExtensionManager(ttk.Frame):
                 pass
             if ext == "":
                 self.RemoveButton.config(state="disabled")
+                self.DescriptionLabel.config(text="")
+        self.DescriptionText.config(state="normal")
         if Path(parent.FolderPath / f"{ext}.txt").exists():
             with open(Path(parent.FolderPath / f"{ext}.txt"), "r", encoding="utf-8") as txt:
-                self.DescriptionText.config(text=txt.read())
+                self.DescriptionText.delete("1.0", tk.END)
+                self.DescriptionText.insert(tk.END, txt.read())
         else:
-            self.DescriptionText.config(text="")
+            self.DescriptionText.delete("1.0", tk.END)
+        self.DescriptionText.config(state="disabled")
     def removeExtension(self, parent):
         ext = self.ExtensionTree.item(self.ExtensionTree.selection(), "text")
         Path(parent.FolderPath / f"{ext}.py").unlink()
@@ -1594,7 +1603,7 @@ class ExtensionManager(ttk.Frame):
         helper.close(parent)"""
             ExtensionManagerMetadata = configparser.ConfigParser()
             ExtensionManagerMetadata["PraktiXtension"] = {"name": "Extension Manager",
-                                                          "version": "1.9",
+                                                          "version": "1.10",
                                                           "filename": "ExtensionManager.py",
                                                           "description": "The PraktiCalc Extension Manager",
                                                           "website": "",
