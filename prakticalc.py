@@ -979,7 +979,7 @@ class SettingsWindow(tk.Toplevel):
         SettingsTabs.add(BehaviorFrame, text="Behavior")
         ThemeFrame = ttk.LabelFrame(AppearanceFrame, text="Theme")
         ThemeFrame.columnconfigure(0, weight=1)
-        if helper.theming == 0:
+        if ttkthemesOK == False:
             self.ThemeSelector = ttk.Combobox(ThemeFrame, values=helper.availableThemes)
         else:
             self.ThemeSelector = ttk.Combobox(ThemeFrame, values=["plastik", "keramik", "breeze", "yaru", "black", "clam", "alt", "classic"])
