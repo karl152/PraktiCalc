@@ -1124,7 +1124,7 @@ class Dialog:
                     "yad": lambda: subprocess.Popen(["yad", "--title=About PraktiCalc", "--info", "--image=" + PraktiCalcIconPath, "--button=OK", "--text=" + infotext]),
                     "kdialog": lambda: subprocess.Popen(["kdialog", "--title=About PraktiCalc", "--msgbox", infotext]),
                     "zenity": lambda: subprocess.Popen(["zenity", "--title=About PraktiCalc", "--info", "--icon=" + PraktiCalcIconPath, "--text=" + infotext]),
-                    "AppleScript": lambda: subprocess.run(["osascript", "-e", f'display dialog "{infotext}" with icon POSIX file "{PraktiCalcIconPath}"']),
+                    "AppleScript": lambda: subprocess.run(["osascript", "-e", f'display dialog "{infotext}" with icon POSIX file "{PraktiCalcIconPath}" with title "About PraktiCalc"']),
                     "Xdialog": lambda: subprocess.Popen(["Xdialog", "--title=About PraktiCalc", "--msgbox", infotext, "10", "40"]),
                     "notify-send": lambda: subprocess.Popen(["notify-send", "About PraktiCalc", infotext]),
                     }
@@ -1184,7 +1184,7 @@ class Dialog:
                     "yad": lambda: subprocess.Popen(["yad", "--title=Error", "--error", "--image=dialog-error", "--button=OK", "--no-markup", "--text", message]),
                     "kdialog": lambda: subprocess.Popen(["kdialog", "--title=Error", "--error", message]),
                     "zenity": lambda: subprocess.Popen(["zenity", "--title=Error", "--error", "--no-markup", "--text", message]),
-                    "AppleScript": lambda: subprocess.run(["osascript", "-e", f'display dialog "{message}" with icon stop']),
+                    "AppleScript": lambda: subprocess.run(["osascript", "-e", f'display dialog "{message}" with icon stop with title "Error"']),
                     "Xdialog": lambda: subprocess.Popen(["Xdialog", "--title=Error", "--msgbox", message, "10", "40"]),
                     "notify-send": lambda: subprocess.Popen(["notify-send", "Error", message]),
                     }
