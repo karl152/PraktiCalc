@@ -8,11 +8,11 @@
 PraktiCalcDir=$(pwd)
 
 setupDebDir() {
-    mkdir debian
+    mkdir -p debian/source
     cp linux-pkg-builds/debian/prakticalc/usr/share/doc/prakticalc/copyright debian/
     gunzip -v linux-pkg-builds/debian/prakticalc/usr/share/man/man1/prakticalc.1.gz
     gunzip -vc linux-pkg-builds/debian/prakticalc/usr/share/doc/prakticalc/changelog.gz > debian/changelog
-    
+    echo "3.0 (native)" > debian/source/format
     echo "linux-pkg-builds/debian/prakticalc/usr/share/man/man1/prakticalc.1" > debian/prakticalc.manpages
     
 cat > debian/control <<EOF
