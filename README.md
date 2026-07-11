@@ -18,7 +18,7 @@ A practical calculator with GUI featuring a calculating history, an extension sy
 * many more
 
 ### Get PraktiCalc
-You can download PraktiCalc on the right at the Releases section. There should be a few files for each release there:
+You can download PraktiCalc at the [Releases page](https://github.com/karl152/PraktiCalc/releases) on GitHub. There should be a few files for each release there:
 | file name example                       | description                                                      |
 |-----------------------------------------|------------------------------------------------------------------|
 | prakticalc-x.x-win-amd64-installer.exe  | PraktiCalc Installer for Windows 11 on 64-Bit x86 Processors     |
