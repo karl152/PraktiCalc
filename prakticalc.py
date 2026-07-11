@@ -1434,10 +1434,10 @@ class ExtensionManager(ttk.Frame):
         self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
         ttk.Label(self, text="The Extension Manager allows you to easily manage your installed extensions and even install new ones in the PraktiXtension (.pxt) format.").grid(row=0, column=0, sticky="w")
-        self.Splitter = ttk.PanedWindow(self, orient="horizontal")
+        self.Splitter = ttk.PanedWindow(self, orient=tk.HORIZONTAL)
         self.LeftFrame = ttk.Frame(self.Splitter)
         self.RightFrame = ttk.LabelFrame(self.Splitter, text="Metadata")
-        self.ExtensionTree = ttk.Treeview(self.LeftFrame, selectmode="browse")
+        self.ExtensionTree = ttk.Treeview(self.LeftFrame, selectmode=tk.BROWSE)
         self.ExtensionTree.bind("<<TreeviewSelect>>", lambda event: self.updateMetadataDisplay(parent))
         self.ExtensionTree.heading("#0", text="Extensions")
         for file in parent.FolderPath.iterdir():
@@ -1447,11 +1447,11 @@ class ExtensionManager(ttk.Frame):
         self.ExtensionTree.grid(row=0, column=0, columnspan=2, sticky="news")
         self.AddButton = ttk.Button(self.LeftFrame, text="Add", command=lambda: self.addExtension(parent, helper, dialog))
         self.AddButton.grid(row=1, column=0, padx=10, pady=10, sticky="we")
-        self.RemoveButton = ttk.Button(self.LeftFrame, text="Remove", state="disabled", command=lambda: self.removeExtension(parent))
+        self.RemoveButton = ttk.Button(self.LeftFrame, text="Remove", state=tk.DISABLED, command=lambda: self.removeExtension(parent))
         self.RemoveButton.grid(row=1, column=1, padx=10, pady=10, sticky="we")
         self.ResetButton = ttk.Button(self.LeftFrame, text="Reset Extension Folder", command=lambda: self.reset(parent, mainWin, helper))
         self.ResetButton.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="we")
-        ttk.Separator(self.LeftFrame, orient="horizontal").grid(row=3, column=0, columnspan=2, pady=7, sticky="ew")
+        ttk.Separator(self.LeftFrame, orient=tk.HORIZONTAL).grid(row=3, column=0, columnspan=2, pady=7, sticky="ew")
         ttk.Button(self.LeftFrame, text="PraktiXtension Gallery", command=lambda: webbrowser.open_new("https://praktixtensions.blogspot.com/p/browse.html")).grid(row=4, column=0, columnspan=2, padx=10, pady=10, sticky="we")
         self.LeftFrame.columnconfigure(0, weight=1)
         self.LeftFrame.columnconfigure(1, weight=1)
@@ -1469,7 +1469,7 @@ class ExtensionManager(ttk.Frame):
         self.ChecksumDisplay = ttk.Entry(self.RightFrame, state="readonly")
         self.TitleLabel.grid(row=0, column=0, columnspan=2, sticky="new")
         self.DescriptionLabel.grid(row=1, column=0, columnspan=2, sticky="ew")
-        ttk.Separator(self.RightFrame, orient="horizontal").grid(row=3, column=0, columnspan=2, sticky="ew")
+        ttk.Separator(self.RightFrame, orient=tk.HORIZONTAL).grid(row=3, column=0, columnspan=2, sticky="ew")
         Labels = ["Version", "File name", "License", "Website", "Minimal Python version", "Maximal Python version", "SHA256 checksum"]
         Entrys = [self.VersionDisplay, self.FileNameDisplay, self.LicenseDisplay, self.WebLinkDisplay, self.minPyVerDisplay, self.maxPyVerDisplay, self.ChecksumDisplay]
         for i in range(7):
@@ -1479,8 +1479,8 @@ class ExtensionManager(ttk.Frame):
         self.DescriptionFrame.rowconfigure(0, weight=1)
         self.DescriptionFrame.columnconfigure(0, weight=1)
         self.DescriptionFrame.grid(row=11, column=0, columnspan=2, sticky="news", padx=5, pady=5)
-        self.DescriptionText = tk.Text(self.DescriptionFrame, font="TkFixedFont", height=15, state="disabled")
-        self.DescriptionScrollbar = ttk.Scrollbar(self.DescriptionFrame, orient="vertical", command=self.DescriptionText.yview)
+        self.DescriptionText = tk.Text(self.DescriptionFrame, font="TkFixedFont", height=15, state=tk.DISABLED)
+        self.DescriptionScrollbar = ttk.Scrollbar(self.DescriptionFrame, orient=tk.VERTICAL, command=self.DescriptionText.yview)
         self.DescriptionText.config(yscrollcommand=self.DescriptionScrollbar.set)
         self.DescriptionScrollbar.grid(row=0, column=1, padx=(0, 5), pady=5, sticky="sn")
         if DarkMode == True:
@@ -1493,7 +1493,7 @@ class ExtensionManager(ttk.Frame):
         self.Splitter.add(self.RightFrame)
         self.Splitter.grid(row=1, column=0, sticky="news")
     def updateMetadataDisplay(self, parent):
-        self.RemoveButton.config(state="normal")
+        self.RemoveButton.config(state=tk.NORMAL)
         ext = self.ExtensionTree.item(self.ExtensionTree.selection(), "text")
         labels = [self.TitleLabel, self.DescriptionLabel]
         displays = [self.VersionDisplay, self.FileNameDisplay, self.LicenseDisplay, self.WebLinkDisplay, self.minPyVerDisplay, self.maxPyVerDisplay, self.ChecksumDisplay]
@@ -1543,7 +1543,7 @@ class ExtensionManager(ttk.Frame):
             self.TitleLabel.config(text=ext)
             self.DescriptionLabel.config(text="no metadata found :(")
             for display in displays:
-                display.config(state="normal")
+                display.config(state=tk.NORMAL)
                 display.delete(0, tk.END)
                 display.config(state="readonly")
             try:
@@ -1556,16 +1556,16 @@ class ExtensionManager(ttk.Frame):
             except:
                 pass
             if ext == "":
-                self.RemoveButton.config(state="disabled")
+                self.RemoveButton.config(state=tk.DISABLED)
                 self.DescriptionLabel.config(text="")
-        self.DescriptionText.config(state="normal")
+        self.DescriptionText.config(state=tk.NORMAL)
         if Path(parent.FolderPath / f"{ext}.txt").exists():
             with open(Path(parent.FolderPath / f"{ext}.txt"), "r", encoding="utf-8") as txt:
                 self.DescriptionText.delete("1.0", tk.END)
                 self.DescriptionText.insert(tk.END, txt.read())
         else:
             self.DescriptionText.delete("1.0", tk.END)
-        self.DescriptionText.config(state="disabled")
+        self.DescriptionText.config(state=tk.DISABLED)
     def removeExtension(self, parent):
         ext = self.ExtensionTree.item(self.ExtensionTree.selection(), "text")
         Path(parent.FolderPath / f"{ext}.py").unlink()
