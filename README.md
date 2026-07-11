@@ -10,7 +10,7 @@ Back to the features, you can also use your keyboard to type numbers into the ca
 Windows XP is basically confirmed to be incompatible, at least because of f-Strings. Building on there won't work.
 
 #### Get PraktiCalc
-You can download PraktiCalc on the right at the Releases section. There should be a few files for each release there:
+You can download PraktiCalc at the [Releases section on GitHub](https://github.com/karl152/PraktiCalc/releases). There should be a few files for each release there:
 | file name example                       | description                                                   |
 |-----------------------------------------|---------------------------------------------------------------|
 | prakticalc-x.x-win-amd64-installer.exe  | PraktiCalc Installer for Windows 11 on 64-Bit x86 Processors  |
