@@ -1573,7 +1573,7 @@ class ExtensionManager(ttk.Frame):
         Path(parent.FolderPath / f"{ext}.txt").unlink(missing_ok=True)
         self.ExtensionTree.delete(self.ExtensionTree.selection()[0])
     def addExtension(self, parent, helper, dialog):
-        file = filedialog.askopenfilename(parent=parent, filetypes=[("PraktiXtension", "*.pxt")])
+        file = filedialog.askopenfilename(parent=parent, initialdir=Path.home(), filetypes=[("PraktiXtension", "*.pxt")])
         if file == () or file == "":
             return
         with tempfile.TemporaryDirectory() as tempdir:
