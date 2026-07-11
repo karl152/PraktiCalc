@@ -1293,7 +1293,7 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "ExtensionManager.ini").exists():
             ExtensionManagerMeta = configparser.ConfigParser()
             ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini", encoding="utf-8")
-            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.10":
+            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.11":
                 self.updateExtensionManager()
         if Path(self.FolderPath / "PraktiGraph.ini").exists():
             PraktiGraphMeta = configparser.ConfigParser()
@@ -1635,7 +1635,7 @@ class ExtensionManager(ttk.Frame):
         helper.close(parent)"""
             ExtensionManagerMetadata = configparser.ConfigParser()
             ExtensionManagerMetadata["PraktiXtension"] = {"name": "Extension Manager",
-                                                          "version": "1.10",
+                                                          "version": "1.11",
                                                           "filename": "ExtensionManager.py",
                                                           "description": "The PraktiCalc Extension Manager",
                                                           "website": "",
