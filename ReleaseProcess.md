@@ -6,6 +6,7 @@ This is a checklist for me to make sure I don't forget anything.
 * update README and AppStream metadata (both) to show current screenshot
 * make sure the README is fine
 * write changelog
+* update Fedora RPM changelog
 * build Debian package with the new changelog
 * update Debian manpage
 * build packages and test them
