@@ -859,7 +859,7 @@ class MainWindow(tk.Tk):
         helper.changeTheme(self)
     def KeyPress(self, event, calculator, helper, dialog): # processes keyboard input
         Key = event.keysym
-        if Key in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "plus", "minus", "asterisk", "slash", "comma", "parenleft", "parenright"]:
+        if Key in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "plus", "minus", "asterisk", "slash", "comma", "parenleft", "parenright", "e"]:
             self.append(Key, calculator, cfg)
         else:
             Keys = {
