@@ -1,7 +1,7 @@
 Package: prakticalc
 Version: 1.5.2
 Architecture: all
-Maintainer: Karl <karldpbkz@gmail.com>
+Maintainer: Karl Wesseler <karldpbkz@gmail.com>
 Depends: python3 (>= 3.8), python3-tk
 Recommends: python3-ttkthemes
 Suggests: x11-utils, gxmessage, yad, kdialog, zenity

@@ -2,7 +2,7 @@
 <component type="desktop-application">
 	<id>de.karl_52.PraktiCalc</id>
 	<metadata_license>CC0-1.0</metadata_license>
-	<project_license>GPL-3.0</project_license>
+	<project_license>GPL-3.0-only</project_license>
 	<name>PraktiCalc</name>
 	<summary>A practical calculator written in Python</summary>
 	<description>
@@ -17,7 +17,7 @@
 	</screenshots>
     <content_rating type="oars-1.1"/>
     <developer id="de.karl_52">
-        <name>Karl "karl152"</name>
+        <name>Karl Wesseler</name>
     </developer>
 </component>
 

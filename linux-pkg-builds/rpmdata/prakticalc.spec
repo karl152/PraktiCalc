@@ -3,7 +3,7 @@ Version:		1.5.2
 Release:		1%{?dist}
 Summary:	practical calculator written in Python
 
-License:		GPL-3
+License:		GPL-3.0-only
 Source0:		%{name}.tar.gz
 
 BuildArch:	noarch

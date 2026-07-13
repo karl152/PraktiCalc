@@ -1,5 +1,7 @@
+#!/usr/bin/env python3
+
 # PraktiCalc - a practical calculator written in Python
-# Copyright (C) 2024-2026 Karl "karl152"
+# Copyright (C) 2024-2026 Karl Wesseler
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,7 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
-# SPDX-License-Identifier: GPL-3.0
+# SPDX-License-Identifier: GPL-3.0-only
 
 import tkinter as tk
 from tkinter import ttk
