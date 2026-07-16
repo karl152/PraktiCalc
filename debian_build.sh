@@ -11,6 +11,9 @@
 # - python3-tk
 # - python3-ttkthemes
 
+# set version variable
+read -p "PraktiCalc Version: " PraktiCalcVersion
+
 # clean up last build
 rm linux-pkg-builds/debian/prakticalc.deb
 
@@ -49,3 +52,6 @@ rm -rf ./prakticalc/usr/share/prakticalc
 
 # show errors if lintian is installed
 lintian prakticalc.deb
+
+# rename file
+mv prakticalc.deb prakticalc-$PraktiCalcVersion.deb
