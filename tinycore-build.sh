@@ -32,15 +32,23 @@ echo "deleting build folder..."
 rm -rf tce/
 mv prakticalc-$PraktiCalcVersion.tcz ../
 cd ..
-echo "python3.14.tcz" > prakticalc-$PraktiCalcVersion.tcz.dep
-echo "tk8.6.tcz" >> prakticalc-$PraktiCalcVersion.tcz.dep
+
+cat > prakticalc-$PraktiCalcVersion.tcz.dep <<EOF
+python3.14.tcz
+tk8.6.tcz
+EOF
+
 echo "created dependency file"
-echo "Title: 		PraktiCalc" > prakticalc-$PraktiCalcVersion.tcz.info
-echo "Description:	A Practical Calculator written in Python" >> prakticalc-$PraktiCalcVersion.tcz.info
-echo "Version:	$PraktiCalcVersion" >> prakticalc-$PraktiCalcVersion.tcz.info
-echo 'Author:		Karl Wesseler' >> prakticalc-$PraktiCalcVersion.tcz.info
-echo "License:	GPL-3.0" >> prakticalc-$PraktiCalcVersion.tcz.info
-echo "Dependencies:	python3.14.tcz tk8.6.tcz" >> prakticalc-$PraktiCalcVersion.tcz.info
+
+cat > prakticalc-$PraktiCalcVersion.tcz.info <<EOF
+Title:          PraktiCalc
+Description:	A Practical Calculator written in Python
+Version:        $PraktiCalcVersion
+Author:         Karl Wesseler
+License:        GPL-3.0-only
+Dependencies:	python3.14.tcz tk8.6.tcz
+EOF
+
 echo "created info file"
 md5sum prakticalc-$PraktiCalcVersion.tcz > prakticalc-$PraktiCalcVersion.tcz.md5.txt
 echo "created md5 checksum file"
