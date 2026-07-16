@@ -1,13 +1,13 @@
-﻿# PraktiCalc © 2024-2026 Karl "karl152"
+# PraktiCalc © 2024-2026 Karl Wesseler
 # Licensed under the GNU General Public License v3.0.
 # See https://www.gnu.org/licenses/gpl-3.0.txt for details.
-# SPDX-License-Identifier: GPL-3.0
+# SPDX-License-Identifier: GPL-3.0-only
 
 # REQUIREMENTS
 # - Windows 7 or newer
 # - PowerShell 2+ with 7-Zip or PowerShell 5/7
 # - Python 3.8 or newer with tkinter and pip
-# - PIP Modules: ttkthemes, simpleeval, pyinstaller
+# - PIP Modules: ttkthemes, pyinstaller
 
 $mode = $args[0]
 
@@ -27,6 +27,7 @@ elseif ($mode -eq "installer"){
 Write-Host "Building installer for PraktiCalc..."
 Write-Host "[1/3] Building PraktiCalc..."
 Remove-Item .\prakticalc-installer.exe -ErrorAction SilentlyContinue
+Copy-Item .\LICENSE '.\PraktiCalc Installer\content' -Verbose
 python.exe -m PyInstaller .\prakticalc.py --onedir --clean --windowed --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data python-powered.png:. --add-data info.vbs:. --add-data error.vbs:. --icon PraktiCalculator.ico
 Copy-Item .\dist\prakticalc\* '.\PraktiCalc Installer\content' -Recurse -Verbose
 Remove-Item .\dist -Recurse -Force
@@ -52,6 +53,7 @@ Remove-Item .\PraktiCalcProgramContent.zip
 Remove-Item .\content\prakticalc.exe
 Remove-Item .\content\PraktiCalcUninstaller -Recurse -Force
 Remove-Item .\content\_internal -Recurse -Force
+Remove-Item .\content\LICENSE
 Write-Host "Done!"
 }
 else{Write-Host "No valid build mode selected. Available modes: portable, installer"}
