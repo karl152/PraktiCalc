@@ -15,7 +15,7 @@
 read -p "PraktiCalc Version: " PraktiCalcVersion
 
 # clean up last build
-rm linux-pkg-builds/debian/prakticalc.deb
+rm linux-pkg-builds/debian/prakticalc-$PraktiCalcVersion.deb
 
 mkdir linux-pkg-builds/debian/prakticalc/usr/share/prakticalc
 
