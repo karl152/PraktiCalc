@@ -30,7 +30,7 @@ You can download PraktiCalc at the [Releases page](https://github.com/karl152/Pr
 | PraktiCalc-aarch64.AppImage             | portable AppImage file for Linux on 64-Bit ARM Processors        |
 | prakticalc-x.x-aarch64.app              | portable unsigned App file for macOS on Apple Silicon Processors |
 | prakticalc-x.x.tcz*                     | PraktiCalc TinyCore Extension, can be loaded on TinyCore 17+     |
-| prakticalc-x.x.rpm                      | installable PraktiCalc Fedora RPM package                        |
+| prakticalc-x.x-x.fcxx.noarch.rpm        | installable PraktiCalc Fedora RPM package                        |
 | Source code (zip)                       | ZIP archive with the source code                                 |
 | Source code (tar.gz)                    | gzipped tar archive with the source code                         |
 
