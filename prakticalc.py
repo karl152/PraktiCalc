@@ -1048,6 +1048,7 @@ class SettingsWindow(tk.Toplevel):
         helper.close(self)
     def reset(self, parent, helper, cfg): # resets the settings
         cfg.reset()
+        messagebox.showinfo(parent=self, title="Resetting settings", message="The settings have been reset and PraktiCalc will now close. Default settings will be loaded when opening it again.")
         helper.close(parent)
 
 # info and error dialogs
