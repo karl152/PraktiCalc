@@ -1,13 +1,13 @@
-# PraktiCalc © 2024-2026 Karl Wesseler
+﻿# PraktiCalc © 2024-2026 Karl "karl152"
 # Licensed under the GNU General Public License v3.0.
 # See https://www.gnu.org/licenses/gpl-3.0.txt for details.
-# SPDX-License-Identifier: GPL-3.0-only
+# SPDX-License-Identifier: GPL-3.0
 
 # REQUIREMENTS
 # - Windows 7 or newer
 # - PowerShell 2+ with 7-Zip or PowerShell 5/7
 # - Python 3.8 or newer with tkinter and pip
-# - PIP Modules: ttkthemes, pyinstaller
+# - PIP Modules: ttkthemes, simpleeval, pyinstaller
 
 $mode = $args[0]
 
