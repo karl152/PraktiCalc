@@ -26,8 +26,8 @@ You can download PraktiCalc at the [Releases page](https://github.com/karl152/Pr
 | prakticalc-x.x-win-amd64-portable.zip   | PraktiCalc for Windows 11 on 64-Bit x86 Processors (Portable)    |
 | prakticalc-x.x-win7-amd64-portable.zip  | PraktiCalc for Windows 7+ on 64-Bit x86 Processors (Portable)    |
 | prakticalc-x.x.deb                      | installable PraktiCalc Debian Package                            |
-| prakticalc-x.x-amd64.AppImage           | portable AppImage file for Linux on 64-Bit x86 Processors        |
-| prakticalc-x.x-aarch64.AppImage         | portable AppImage file for Linux on 64-Bit ARM Processors        |
+| PraktiCalc-x86_64.AppImage              | portable AppImage file for Linux on 64-Bit x86 Processors        |
+| PraktiCalc-aarch64.AppImage             | portable AppImage file for Linux on 64-Bit ARM Processors        |
 | prakticalc-x.x-aarch64.app              | portable unsigned App file for macOS on Apple Silicon Processors |
 | prakticalc-x.x.tcz*                     | PraktiCalc TinyCore Extension, can be loaded on TinyCore 17+     |
 | prakticalc-x.x.rpm                      | installable PraktiCalc Fedora RPM package                        |
