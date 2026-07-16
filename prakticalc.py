@@ -1121,15 +1121,15 @@ class Dialog:
                     print("ERROR: Unknown Message Box Style")
             else:
                 styles = {
-                    "xmessage": lambda: subprocess.Popen(["xmessage", "-title", "About PraktiCalc", infotext]),
-                    "gxmessage": lambda: subprocess.Popen(["gxmessage", "-title", "About PraktiCalc", infotext]),
-                    "wmessage": lambda: subprocess.Popen(["wmessage", "-title", "About PraktiCalc", infotext]),
+                    "xmessage": lambda: subprocess.Popen(["xmessage", "-title", "About PraktiCalc", "-buttons", "OK", "-default", "OK", infotext]),
+                    "gxmessage": lambda: subprocess.Popen(["gxmessage", "-title", "About PraktiCalc", "-buttons", "OK", "-default", "OK", infotext]),
+                    "wmessage": lambda: subprocess.Popen(["wmessage", "-title", "About PraktiCalc", "-buttons", "OK", "-default", "OK", infotext]),
                     "yad": lambda: subprocess.Popen(["yad", "--title=About PraktiCalc", "--info", "--image=" + PraktiCalcIconPath, "--button=OK", "--text=" + infotext]),
                     "kdialog": lambda: subprocess.Popen(["kdialog", "--title=About PraktiCalc", "--msgbox", infotext]),
                     "zenity": lambda: subprocess.Popen(["zenity", "--title=About PraktiCalc", "--info", "--icon=" + PraktiCalcIconPath, "--text=" + infotext]),
                     "AppleScript": lambda: subprocess.run(["osascript", "-e", f'display dialog "{infotext}" with icon POSIX file "{PraktiCalcIconPath}" with title "About PraktiCalc"']),
                     "Xdialog": lambda: subprocess.Popen(["Xdialog", "--title=About PraktiCalc", "--msgbox", infotext, "10", "40"]),
-                    "notify-send": lambda: subprocess.Popen(["notify-send", "About PraktiCalc", infotext]),
+                    "notify-send": lambda: subprocess.Popen(["notify-send", "About PraktiCalc", "--icon=de.karl_52.PraktiCalc", "--action=OK", infotext]),
                     }
                 opendialog = styles.get(self.ConfigurationStorage.get("dialogStyle"))
                 if opendialog:
@@ -1181,15 +1181,15 @@ class Dialog:
                     print("ERROR: Unknown Message Box Style")
             else:
                 styles = {
-                    "xmessage": lambda: subprocess.Popen(["xmessage", "-title", "Error", "[X] " + message]),
-                    "gxmessage": lambda: subprocess.Popen(["gxmessage", "-title", "Error", "[X] " + message]),
-                    "wmessage": lambda: subprocess.Popen(["wmessage", "-title", "Error", "[X] " + message]),
+                    "xmessage": lambda: subprocess.Popen(["xmessage", "-title", "Error", "-buttons", "OK", "-default", "OK", "[X] " + message]),
+                    "gxmessage": lambda: subprocess.Popen(["gxmessage", "-title", "Error", "-buttons", "OK", "-default", "OK", "[X] " + message]),
+                    "wmessage": lambda: subprocess.Popen(["wmessage", "-title", "Error", "-buttons", "OK", "-default", "OK", "[X] " + message]),
                     "yad": lambda: subprocess.Popen(["yad", "--title=Error", "--error", "--image=dialog-error", "--button=OK", "--no-markup", "--text", message]),
                     "kdialog": lambda: subprocess.Popen(["kdialog", "--title=Error", "--error", message]),
                     "zenity": lambda: subprocess.Popen(["zenity", "--title=Error", "--error", "--no-markup", "--text", message]),
                     "AppleScript": lambda: subprocess.run(["osascript", "-e", f'display dialog "{message}" with icon stop with title "Error"']),
                     "Xdialog": lambda: subprocess.Popen(["Xdialog", "--title=Error", "--msgbox", message, "10", "40"]),
-                    "notify-send": lambda: subprocess.Popen(["notify-send", "Error", message]),
+                    "notify-send": lambda: subprocess.Popen(["notify-send", "Error", "--icon=dialog-error", "--action=OK", message]),
                     }
                 opendialog = styles.get(self.ConfigurationStorage.get("dialogStyle"))
                 if opendialog:
