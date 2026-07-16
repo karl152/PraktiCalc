@@ -682,7 +682,7 @@ class MainWindow(tk.Tk):
         self.CalculatorMenu.add_command(label="Quit", command=lambda: helper.close(self))
         self.ToolMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
         self.ToolMenu.add_command(label="History", command=lambda: HistoryWindow(self, calculator, helper))
-        self.ToolMenu.add_command(label="Extensions", command=lambda: ExtensionWindow(self, helper, calculator, dialog))
+        self.ToolMenu.add_command(label="Extensions", command=lambda: ExtensionWindow(self, helper, calculator, dialog, cfg))
         self.ToolMenu.add_separator()
         self.ToolMenu.add_command(label="Settings", command=lambda: SettingsWindow(self, helper, calculator, cfg))
         self.HelpMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
@@ -706,7 +706,7 @@ class MainWindow(tk.Tk):
         self.ToolMenuButton = ttk.Menubutton(self.MenuBarFrame, text="Tools")
         self.ToolCustomMenu = tk.Menu(self.ToolMenuButton, tearoff=TheTearoff)
         self.ToolCustomMenu.add_command(label="History", command=lambda: HistoryWindow(self, calculator, helper))
-        self.ToolCustomMenu.add_command(label="Extensions", command=lambda: ExtensionWindow(self, helper, calculator, dialog))
+        self.ToolCustomMenu.add_command(label="Extensions", command=lambda: ExtensionWindow(self, helper, calculator, dialog, cfg))
         self.ToolCustomMenu.add_separator()
         self.ToolCustomMenu.add_command(label="Settings", command=lambda: SettingsWindow(self, helper, calculator, cfg))
         self.ToolMenuButton["menu"] = self.ToolCustomMenu
@@ -871,8 +871,8 @@ class MainWindow(tk.Tk):
                 "i": lambda: dialog.info(self, helper),
                 "s": lambda: SettingsWindow(self, helper, calculator, cfg),
                 "S": lambda: SettingsWindow(self, helper, calculator, cfg),
-                "x": lambda: ExtensionWindow(self, helper, calculator, dialog),
-                "X": lambda: ExtensionWindow(self, helper, calculator, dialog),
+                "x": lambda: ExtensionWindow(self, helper, calculator, dialog, cfg),
+                "X": lambda: ExtensionWindow(self, helper, calculator, dialog, cfg),
                 "BackSpace": lambda: self.backspace(calculator, cfg),
                 }
             run = Keys.get(Key)
@@ -1256,7 +1256,7 @@ class HistoryWindow(tk.Toplevel):
 
 # extension window
 class ExtensionWindow(tk.Toplevel):
-    def __init__(self, parent, helper, calculator, dialog):
+    def __init__(self, parent, helper, calculator, dialog, cfg):
         super().__init__(parent)
         self.title("Extensions")
         self.rowconfigure(0, weight=1)
@@ -1287,6 +1287,27 @@ class ExtensionWindow(tk.Toplevel):
             self.updateDecimalConverter()
             self.updateExtensionManager()
             self.updatePraktiGraph()
+        ContentIsThere = False
+        for f in self.FolderPath.iterdir():
+            if not str(f).endswith("__pycache__"):
+                ContentIsThere = True
+        if ContentIsThere == False:
+            dialog.error(f"There are no extensions installed. You can install some manually in {self.FolderPath},\nor delete that folder to reset the extension system, which reinstalls the extension manager.", self, helper)
+            if cfg.get("dialogStyle") == "Alternative":
+                CloseInfoFrame = ttk.Frame(self.Tabs)
+                CloseInfoFrameRight = tk.Frame(CloseInfoFrame)
+                if helper.DarkMode == True:
+                    CloseInfoFrameRight.config(bg="black")
+                    tk.Label(CloseInfoFrameRight, bitmap="info", bg="black", fg="white").grid(row=0, column=0, padx=30*parent.ScaleFactor, pady=30*parent.ScaleFactor)
+                else:
+                    tk.Label(CloseInfoFrameRight, bitmap="info").grid(row=0, column=0, padx=30*parent.ScaleFactor, pady=30*parent.ScaleFactor)
+                ttk.Label(CloseInfoFrame, text="Feel free to close this window.").grid(row=0, column=1, padx=30*parent.ScaleFactor)
+                CloseInfoFrameRight.grid(row=0, column=0)
+                CloseInfoFrame.grid(row=0, column=0, sticky=tk.NSEW)
+                self.resizable(False, False)
+            else:
+                helper.close(self)
+            return
         if Path(self.FolderPath / "DecimalConverter.ini").exists():
             DecimalConverterMeta = configparser.ConfigParser()
             DecimalConverterMeta.read(self.FolderPath / "DecimalConverter.ini", encoding="utf-8")
