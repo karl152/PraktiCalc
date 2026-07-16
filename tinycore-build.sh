@@ -10,7 +10,7 @@
 
 read -p "PraktiCalc Version: " PraktiCalcVersion
 echo "Cleaning up from last build..."
-rm prakticalc-$PraktiCalcVersion.tcz*
+rm build/prakticalc-$PraktiCalcVersion.tcz*
 echo "Creating directories..."
 mkdir -p linux-pkg-builds/tce/usr/share/prakticalc
 mkdir -p linux-pkg-builds/tce/usr/bin
@@ -52,4 +52,8 @@ EOF
 echo "created info file"
 md5sum prakticalc-$PraktiCalcVersion.tcz > prakticalc-$PraktiCalcVersion.tcz.md5.txt
 echo "created md5 checksum file"
-echo "Build complete!"
+
+mkdir build
+mv -v prakticalc-$PraktiCalcVersion.tcz* build/
+
+echo "Done!"

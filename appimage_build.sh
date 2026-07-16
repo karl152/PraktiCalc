@@ -13,8 +13,8 @@
 # - python3-pyinstaller
 
 echo "Cleaning"
-rm linux-pkg-builds/AppImage/PraktiCalc-$(uname -m).AppImage
-rm linux-pkg-builds/AppImage/PraktiCalc-$(uname -m).AppImage.zsync
+rm build/PraktiCalc-$(uname -m).AppImage
+rm build/PraktiCalc-$(uname -m).AppImage.zsync
 
 mkdir -p linux-pkg-builds/AppImage/de.karl_52.PraktiCalc.AppDir/usr/bin
 
@@ -48,3 +48,10 @@ rm -rf ./linux-pkg-builds/AppImage/de.karl_52.PraktiCalc.AppDir/usr/bin
 rm -rf dist/
 rm -rf build/
 rm prakticalc.spec
+
+echo "Moving to build folder"
+mkdir build
+mv linux-pkg-builds/AppImage/PraktiCalc-$(uname -m).AppImage build/
+mv linux-pkg-builds/AppImage/PraktiCalc-$(uname -m).AppImage.zsync build/
+
+echo "Done!"

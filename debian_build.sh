@@ -15,7 +15,7 @@
 read -p "PraktiCalc Version: " PraktiCalcVersion
 
 # clean up last build
-rm linux-pkg-builds/debian/prakticalc-$PraktiCalcVersion.deb
+rm build/prakticalc-$PraktiCalcVersion.deb
 
 mkdir linux-pkg-builds/debian/prakticalc/usr/share/prakticalc
 
@@ -50,8 +50,12 @@ dpkg-deb --build --root-owner-group prakticalc/
 # clean up
 rm -rf ./prakticalc/usr/share/prakticalc
 
-# show errors if lintian is installed
-lintian prakticalc.deb
-
 # rename file
-mv prakticalc.deb prakticalc-$PraktiCalcVersion.deb
+cd ../..
+mkdir build
+mv -v linux-pkg-builds/debian/prakticalc.deb build/prakticalc-$PraktiCalcVersion.deb
+
+# show errors if lintian is installed
+lintian build/prakticalc-$PraktiCalcVersion.deb
+
+echo "Done!"
