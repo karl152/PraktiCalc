@@ -8,8 +8,9 @@
 # required TinyCore extensions to build: squashfs-tools.tcz
 # required TinyCore extensions to run: python3.14, tk8.6
 
+read -p "PraktiCalc Version: " PraktiCalcVersion
 echo "Cleaning up from last build..."
-rm prakticalc.tcz*
+rm prakticalc-$PraktiCalcVersion.tcz*
 echo "Creating directories..."
 mkdir -p linux-pkg-builds/tce/usr/share/prakticalc
 mkdir -p linux-pkg-builds/tce/usr/bin
@@ -26,21 +27,21 @@ cp LICENSE linux-pkg-builds/tce/usr/share/prakticalc/
 chmod +x linux-pkg-builds/tce/usr/bin/prakticalc
 echo "creating prakticalc.tcz..."
 cd linux-pkg-builds
-mksquashfs tce/ prakticalc.tcz
+mksquashfs tce/ prakticalc-$PraktiCalcVersion.tcz
 echo "deleting build folder..."
 rm -rf tce/
-mv prakticalc.tcz ../
+mv prakticalc-$PraktiCalcVersion.tcz ../
 cd ..
-echo "python3.14.tcz" > prakticalc.tcz.dep
-echo "tk8.6.tcz" >> prakticalc.tcz.dep
+echo "python3.14.tcz" > prakticalc-$PraktiCalcVersion.tcz.dep
+echo "tk8.6.tcz" >> prakticalc-$PraktiCalcVersion.tcz.dep
 echo "created dependency file"
-echo "Title: 		PraktiCalc" > prakticalc.tcz.info
-echo "Description:	A Practical Calculator written in Python" >> prakticalc.tcz.info
-echo "Version:	1.5.2" >> prakticalc.tcz.info
-echo 'Author:		Karl "karl152"' >> prakticalc.tcz.info
-echo "License:	GPL-3.0" >> prakticalc.tcz.info
-echo "Dependencies:	python3.14.tcz tk8.6.tcz" >> prakticalc.tcz.info
+echo "Title: 		PraktiCalc" > prakticalc-$PraktiCalcVersion.tcz.info
+echo "Description:	A Practical Calculator written in Python" >> prakticalc-$PraktiCalcVersion.tcz.info
+echo "Version:	$PraktiCalcVersion" >> prakticalc-$PraktiCalcVersion.tcz.info
+echo 'Author:		Karl Wesseler' >> prakticalc-$PraktiCalcVersion.tcz.info
+echo "License:	GPL-3.0" >> prakticalc-$PraktiCalcVersion.tcz.info
+echo "Dependencies:	python3.14.tcz tk8.6.tcz" >> prakticalc-$PraktiCalcVersion.tcz.info
 echo "created info file"
-md5sum prakticalc.tcz > prakticalc.tcz.md5.txt
+md5sum prakticalc-$PraktiCalcVersion.tcz > prakticalc-$PraktiCalcVersion.tcz.md5.txt
 echo "created md5 checksum file"
 echo "Build complete!"
