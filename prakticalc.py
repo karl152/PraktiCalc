@@ -429,16 +429,9 @@ class PraktiCalculator:
                 self.Memory = ""
             self.Memory += self.CalculationString
     def addToMemory(self): # adds the calculation string to memory
-        if self.CalculationString != "0":
-            if self.Memory != "0":
-                self.Memory += "+" + self.CalculationString
-            else:
-                self.Memory = self.CalculationString
+        self.Memory = self.quickCalc(f"({self.Memory})+({self.CalculationString})")
     def subtractFromMemory(self): # subtracts the calculation string from memory
-        if self.CalculationString != "0":
-            if self.Memory == "0":
-                self.Memory = ""
-            self.Memory += "-" + self.CalculationString
+        self.Memory = self.quickCalc(f"({self.Memory})-({self.CalculationString})")
     def clearMemory(self):
         self.Memory = "0"
     def clearHistory(self): # clears the history list
@@ -447,6 +440,7 @@ class PraktiCalculator:
         return self.CalculationString, self.Memory, self.LastResult, self.HistoryList, self.operators
     def quickCalc(self, expression): # calculates an entire calculation string and returns the result
         PreviousResult = self.LastResult
+        PreviousCalculationString = self.CalculationString
         self.clear()
         self.setOperators("rad")
         self.append(expression)
@@ -454,6 +448,7 @@ class PraktiCalculator:
         self.clear()
         self.HistoryList.pop()
         self.LastResult = PreviousResult
+        self.CalculationString = PreviousCalculationString
         self.setOperators(self.TrigMode)
         return result
     def setOperators(self, TrigMode): # defines all the additional operators
