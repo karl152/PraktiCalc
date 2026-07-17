@@ -21,10 +21,15 @@ from tkinter import ttk
 from tkinter import messagebox
 import threading, subprocess, platform, ctypes, sys, zipfile, shutil, winreg
 from pathlib import Path
+from packaging.version import Version
 try:
     ctypes.windll.shcore.SetProcessDpiAwareness(1)
 except:
     pass
+
+#---------------------------
+PraktiCalcVersion = "1.5.3"
+#---------------------------
 
 def speak(string):
     subprocess.Popen(["wscript", narrator, string])
@@ -243,6 +248,11 @@ def actuallyInstall():
                 InstallProgressText.config(text=ProgressText)
                 with winreg.OpenKeyEx(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc") as PraktiKey:
                     PrevInstallPath = winreg.QueryValueEx(PraktiKey, "InstallLocation")[0]
+                    PreviousVersion = winreg.QueryValueEx(PraktiKey, "DisplayVersion")[0]
+                    if Version(PraktiCalcVersion) < Version(PreviousVersion):
+                        InstallWizardWindow.destroy()
+                        messagebox.showerror("Error", "You already have a newer version of PraktiCalc installed!")
+                        exit()
                 subprocess.getoutput(r'reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /f')
                 shutil.rmtree(PrevInstallPath)
                 Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc.url").unlink(missing_ok=True)
@@ -269,7 +279,7 @@ def actuallyInstall():
             with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", 0, winreg.KEY_WRITE) as UninstallKey:
                 with winreg.CreateKey(UninstallKey, "PraktiCalc") as PraktiKey:
                     winreg.SetValueEx(PraktiKey, "DisplayName", 0, winreg.REG_SZ, "PraktiCalc")
-                    winreg.SetValueEx(PraktiKey, "DisplayVersion", 0, winreg.REG_SZ, "1.5.3")
+                    winreg.SetValueEx(PraktiKey, "DisplayVersion", 0, winreg.REG_SZ, PraktiCalcVersion)
                     winreg.SetValueEx(PraktiKey, "UninstallString", 0, winreg.REG_SZ, r"C:\Program Files\PraktiCalc\PraktiCalcUninstaller\PraktiCalcUninstaller.exe")
                     winreg.SetValueEx(PraktiKey, "Publisher", 0, winreg.REG_SZ, "Karl Wesseler")
                     winreg.SetValueEx(PraktiKey, "InstallLocation", 0, winreg.REG_SZ, r"C:\Program Files\PraktiCalc")
