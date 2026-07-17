@@ -250,8 +250,8 @@ def actuallyInstall():
                     PrevInstallPath = winreg.QueryValueEx(PraktiKey, "InstallLocation")[0]
                     PreviousVersion = winreg.QueryValueEx(PraktiKey, "DisplayVersion")[0]
                     if Version(PraktiCalcVersion) < Version(PreviousVersion):
+                        messagebox.showerror(parent=InstallWizardWindow, title="Error", message="You already have a newer version of PraktiCalc installed!")
                         InstallWizardWindow.destroy()
-                        messagebox.showerror("Error", "You already have a newer version of PraktiCalc installed!")
                         exit()
                 subprocess.getoutput(r'reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /f')
                 shutil.rmtree(PrevInstallPath)
