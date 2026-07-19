@@ -1352,6 +1352,7 @@ class ExtensionWindow(tk.Toplevel):
                     instance = classs(self.Tabs, self, parent, helper, calculator, dialog, helper.DarkMode)
                     self.Tabs.add(instance, text=file.stem)
                     print("loaded extension " + file.stem)
+        self.geometry(f"{int(700*parent.ScaleFactor)}x{int(500*parent.ScaleFactor)}")
     def updateDecimalConverter(self): # updates decimal converter extension to the version embedded here
         if Path(self.FolderPath / "DecimalConverter.py").exists():
             Path(self.FolderPath / "DecimalConverter.py").unlink()
