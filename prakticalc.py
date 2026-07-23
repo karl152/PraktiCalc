@@ -1438,8 +1438,8 @@ class DecimalConverter(ttk.Frame):
             Path(self.FolderPath / "ExtensionManager.txt").unlink(missing_ok=True)
         if not Path(self.FolderPath / "ExtensionManager.py").exists():
             ExtensionManagerCode = r"""# PraktiCalc Extension Manager
-# Copyright (C) 2026 Karl "karl152"
-# SPDX-License-Identifier: GPL-3.0
+# Copyright (C) 2026 Karl Wesseler
+# SPDX-License-Identifier: GPL-3.0-only
 
 import tkinter as tk
 from tkinter import ttk, font, messagebox, filedialog
@@ -1458,6 +1458,8 @@ class ExtensionManager(ttk.Frame):
         self.LeftFrame = ttk.Frame(self.Splitter)
         self.RightFrame = ttk.LabelFrame(self.Splitter, text="Metadata")
         self.ExtensionTree = ttk.Treeview(self.LeftFrame, selectmode=tk.BROWSE)
+        self.ExtensionTreeScrollbar = ttk.Scrollbar(self.LeftFrame, orient=tk.VERTICAL, command=self.ExtensionTree.yview)
+        self.ExtensionTree.config(yscrollcommand=self.ExtensionTreeScrollbar.set)
         self.ExtensionTree.bind("<<TreeviewSelect>>", lambda event: self.updateMetadataDisplay(parent))
         self.ExtensionTree.heading("#0", text="Extensions")
         for file in parent.FolderPath.iterdir():
@@ -1465,6 +1467,7 @@ class ExtensionManager(ttk.Frame):
                 self.ExtensionTree.insert("", tk.END, text=file.stem)
         ttk.Label(self.RightFrame).grid(row=0, column=0)
         self.ExtensionTree.grid(row=0, column=0, columnspan=2, sticky="news")
+        self.ExtensionTreeScrollbar.grid(row=0, column=2, sticky=tk.NS)
         self.AddButton = ttk.Button(self.LeftFrame, text="Add", command=lambda: self.addExtension(parent, helper, dialog))
         self.AddButton.grid(row=1, column=0, padx=10, pady=10, sticky="we")
         self.RemoveButton = ttk.Button(self.LeftFrame, text="Remove", state=tk.DISABLED, command=lambda: self.removeExtension(parent))
