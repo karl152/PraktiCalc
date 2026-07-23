@@ -1648,6 +1648,7 @@ class ExtensionManager(ttk.Frame):
                     shutil.move(Path(tempdir) / "description.txt", parent.FolderPath / f"{ExtensionName[:-3]}.txt")
                     shutil.move(Path(tempdir) / ExtensionName, parent.FolderPath / ExtensionName)
                     self.ExtensionTree.insert("", tk.END, text=ExtensionName[:-3])
+                    messagebox.showinfo(parent=parent, title="PraktiXtension installed", message="Extension installed successfully, reopen the extension window to load it")
                 except FileNotFoundError:
                     dialog.error("Extension not found in file", parent, helper)
                     return
