@@ -5,7 +5,7 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from pathlib import Path
-import hashlib, configparser, tempfile, shutil, zipfile
+import hashlib, configparser, tempfile, shutil, zipfile, time
 
 class PXTBuilder(ttk.Frame):
     def __init__(self, tabs, parent, mainWin, helper, calculator, dialog, DarkMode):
@@ -27,7 +27,8 @@ class PXTBuilder(ttk.Frame):
         self.WebsiteEntry.grid(row=3, column=1, padx=10, pady=10, sticky=tk.EW)
         self.VersionEntry.grid(row=1, column=1, padx=10, pady=10, sticky=tk.EW)
         self.PyVerFrame = ttk.LabelFrame(self, text="Python version")
-        self.PythonVersions = ["default", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
+        self.PythonVersions = ["default", "3.7", "3.8"]
+        self.addRecentPythonVersions()
         self.minPySelect = ttk.OptionMenu(self.PyVerFrame, self.minPyTkVar, self.minPyTkVar.get(), *self.PythonVersions)
         self.maxPySelect = ttk.OptionMenu(self.PyVerFrame, self.maxPyTkVar, self.maxPyTkVar.get(), *self.PythonVersions)
         self.minPySelect.grid(row=0, column=1, pady=10)
@@ -53,6 +54,12 @@ class PXTBuilder(ttk.Frame):
         self.SizeLabel.grid(row=3, column=2, sticky=tk.W, padx=(25, 0))
         self.ExportButton = ttk.Button(self, text="Export PXT", command=lambda: self.EXPORT(parent, helper, dialog))
         self.ExportButton.grid(row=6, column=2)
+    def addRecentPythonVersions(self):
+        year = time.localtime().tm_year
+        VersionToAdd = 9
+        for i in range(year-2019):
+            self.PythonVersions.append(f"3.{VersionToAdd}")
+            VersionToAdd += 1
     def choosePyFile(self, parent):
         self.file = filedialog.askopenfilename(parent=parent, filetypes=[("Python Script", "*.py")])
         if not self.file == "" or self.file == ():
