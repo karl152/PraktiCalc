@@ -1581,6 +1581,13 @@ class ExtensionManager(ttk.Frame):
             if ext == "":
                 self.RemoveButton.config(state=tk.DISABLED)
                 self.DescriptionLabel.config(text="")
+            elif Path(parent.FolderPath / f"{ext}.py").exists():
+                with open(Path(parent.FolderPath / f"{ext}.py"), "r", encoding="utf-8") as extensionfile:
+                    extensioncontent = extensionfile.read()
+                if "SPDX-License-Identifier: " in extensioncontent:
+                    self.LicenseDisplay.config(state=tk.NORMAL)
+                    self.LicenseDisplay.insert(0, extensioncontent.split("SPDX-License-Identifier: ")[1].split()[0])
+                    self.LicenseDisplay.config(state="readonly")
         self.DescriptionText.config(state=tk.NORMAL)
         if Path(parent.FolderPath / f"{ext}.txt").exists():
             with open(Path(parent.FolderPath / f"{ext}.txt"), "r", encoding="utf-8") as txt:
