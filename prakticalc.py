@@ -1453,7 +1453,7 @@ class ExtensionManager(ttk.Frame):
         self.style.configure("ExtensionTitle.TLabel", font=font.Font(family="TkDefaultFont", size=15))
         self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
-        ttk.Label(self, text="The Extension Manager allows you to easily manage your installed extensions and even install new ones in the PraktiXtension (.pxt) format.").grid(row=0, column=0, sticky="w")
+        ttk.Label(self, text="The Extension Manager allows you to manage extensions in the PraktiXtension (.pxt) format.").grid(row=0, column=0, sticky="w")
         self.Splitter = ttk.PanedWindow(self, orient=tk.HORIZONTAL)
         self.LeftFrame = ttk.Frame(self.Splitter)
         self.RightFrame = ttk.LabelFrame(self.Splitter, text="Metadata")
