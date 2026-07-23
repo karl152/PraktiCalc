@@ -42,7 +42,10 @@ class PXTBuilder(ttk.Frame):
         self.LongDescriptionFrame.rowconfigure(0, weight=1)
         self.LongDescriptionFrame.columnconfigure(0, weight=1)
         self.LongDescriptionText = tk.Text(self.LongDescriptionFrame, font="TkFixedFont", wrap=tk.WORD)
-        self.LongDescriptionText.grid(row=0, column=0, padx=10, pady=10, sticky=tk.NSEW)
+        self.LongDescriptionScrollbar = ttk.Scrollbar(self.LongDescriptionFrame, orient=tk.VERTICAL, command=self.LongDescriptionText.yview)
+        self.LongDescriptionText.config(yscrollcommand=self.LongDescriptionScrollbar.set)
+        self.LongDescriptionText.grid(row=0, column=0, pady=10, sticky=tk.NSEW)
+        self.LongDescriptionScrollbar.grid(row=0, column=1, padx=(0, 10), pady=10, sticky=tk.NS)
         if DarkMode == True:
             self.LongDescriptionText.config(bg="black", fg="white")
         self.LongDescriptionFrame.grid(row=6, column=0, columnspan=2, padx=10, pady=10, sticky=tk.NSEW)
@@ -107,3 +110,4 @@ class PXTBuilder(ttk.Frame):
             with zipfile.ZipFile(TheZip, "w", compression=zipfile.ZIP_LZMA) as zf:
                 for x in ["info.ini", "description.txt", Path(self.file).name]:
                     zf.write(Path(tempdir) / x, arcname=x)
+        messagebox.showinfo(parent=parent, title="Export successful", message="PraktiXtension exported!")
