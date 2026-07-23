@@ -1312,7 +1312,7 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "ExtensionManager.ini").exists():
             ExtensionManagerMeta = configparser.ConfigParser()
             ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini", encoding="utf-8")
-            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.11":
+            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.12":
                 self.updateExtensionManager()
         if Path(self.FolderPath / "PraktiGraph.ini").exists():
             PraktiGraphMeta = configparser.ConfigParser()
@@ -1453,7 +1453,7 @@ class ExtensionManager(ttk.Frame):
         self.style.configure("ExtensionTitle.TLabel", font=font.Font(family="TkDefaultFont", size=15))
         self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
-        ttk.Label(self, text="The Extension Manager allows you to manage extensions in the PraktiXtension (.pxt) format.").grid(row=0, column=0, sticky="w")
+        ttk.Label(self, text="The Extension Manager allows you to manage extensions in the PraktiXtension (.pxt) format.").grid(row=0, column=0, sticky=tk.W)
         self.Splitter = ttk.PanedWindow(self, orient=tk.HORIZONTAL)
         self.LeftFrame = ttk.Frame(self.Splitter)
         self.RightFrame = ttk.LabelFrame(self.Splitter, text="Metadata")
@@ -1466,21 +1466,21 @@ class ExtensionManager(ttk.Frame):
             if file.suffix == ".py":
                 self.ExtensionTree.insert("", tk.END, text=file.stem)
         ttk.Label(self.RightFrame).grid(row=0, column=0)
-        self.ExtensionTree.grid(row=0, column=0, columnspan=2, sticky="news")
+        self.ExtensionTree.grid(row=0, column=0, columnspan=2, sticky=tk.NSEW)
         self.ExtensionTreeScrollbar.grid(row=0, column=2, sticky=tk.NS)
         self.AddButton = ttk.Button(self.LeftFrame, text="Add", command=lambda: self.addExtension(parent, helper, dialog))
-        self.AddButton.grid(row=1, column=0, padx=10, pady=10, sticky="we")
+        self.AddButton.grid(row=1, column=0, padx=10, pady=10, sticky=tk.EW)
         self.RemoveButton = ttk.Button(self.LeftFrame, text="Remove", state=tk.DISABLED, command=lambda: self.removeExtension(parent))
-        self.RemoveButton.grid(row=1, column=1, padx=10, pady=10, sticky="we")
+        self.RemoveButton.grid(row=1, column=1, padx=10, pady=10, sticky=tk.EW)
         self.OpenFolderButton = ttk.Button(self.LeftFrame, text="Open Extension Folder", command=lambda: self.openFolder(parent))
         if platform.system() not in ("Windows", "Darwin"):
             if not shutil.which("xdg-open"):
                 self.OpenFolderButton.config(state=tk.DISABLED)
-        self.OpenFolderButton.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="we")
+        self.OpenFolderButton.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky=tk.EW)
         self.ResetButton = ttk.Button(self.LeftFrame, text="Reset Extension Folder", command=lambda: self.reset(parent, mainWin, helper))
-        self.ResetButton.grid(row=3, column=0, columnspan=2, padx=10, pady=10, sticky="we")
-        ttk.Separator(self.LeftFrame, orient=tk.HORIZONTAL).grid(row=4, column=0, columnspan=2, pady=7, sticky="ew")
-        ttk.Button(self.LeftFrame, text="PraktiXtension Gallery", command=lambda: webbrowser.open_new("https://praktixtensions.blogspot.com/p/browse.html")).grid(row=5, column=0, columnspan=2, padx=10, pady=10, sticky="we")
+        self.ResetButton.grid(row=3, column=0, columnspan=2, padx=10, pady=10, sticky=tk.EW)
+        ttk.Separator(self.LeftFrame, orient=tk.HORIZONTAL).grid(row=4, column=0, columnspan=2, pady=7, sticky=tk.EW)
+        ttk.Button(self.LeftFrame, text="PraktiXtension Gallery", command=lambda: webbrowser.open_new("https://praktixtensions.blogspot.com/p/browse.html")).grid(row=5, column=0, columnspan=2, padx=10, pady=10, sticky=tk.EW)
         self.LeftFrame.columnconfigure(0, weight=1)
         self.LeftFrame.columnconfigure(1, weight=1)
         self.RightFrame.columnconfigure(0, weight=1)
@@ -1495,31 +1495,31 @@ class ExtensionManager(ttk.Frame):
         self.FileNameDisplay = ttk.Entry(self.RightFrame, state="readonly")
         self.WebLinkDisplay = ttk.Entry(self.RightFrame, state="readonly")
         self.ChecksumDisplay = ttk.Entry(self.RightFrame, state="readonly")
-        self.TitleLabel.grid(row=0, column=0, columnspan=2, sticky="new")
-        self.DescriptionLabel.grid(row=1, column=0, columnspan=2, sticky="ew")
-        ttk.Separator(self.RightFrame, orient=tk.HORIZONTAL).grid(row=3, column=0, columnspan=2, sticky="ew")
+        self.TitleLabel.grid(row=0, column=0, columnspan=2, sticky=tk.NE + tk.W)
+        self.DescriptionLabel.grid(row=1, column=0, columnspan=2, sticky=tk.EW)
+        ttk.Separator(self.RightFrame, orient=tk.HORIZONTAL).grid(row=3, column=0, columnspan=2, sticky=tk.EW)
         Labels = ["Version", "File name", "License", "Website", "Minimal Python version", "Maximal Python version", "SHA256 checksum"]
         Entrys = [self.VersionDisplay, self.FileNameDisplay, self.LicenseDisplay, self.WebLinkDisplay, self.minPyVerDisplay, self.maxPyVerDisplay, self.ChecksumDisplay]
         for i in range(7):
-            ttk.Label(self.RightFrame, text=Labels[i]).grid(row=i+4, column=0, sticky="ew", padx=10)
-            Entrys[i].grid(row=i+4, column=1, sticky="we", padx=10, pady=5)
+            ttk.Label(self.RightFrame, text=Labels[i]).grid(row=i+4, column=0, sticky=tk.EW, padx=10)
+            Entrys[i].grid(row=i+4, column=1, sticky=tk.EW, padx=10, pady=5)
         self.DescriptionFrame = ttk.LabelFrame(self.RightFrame, text="Description")
         self.DescriptionFrame.rowconfigure(0, weight=1)
         self.DescriptionFrame.columnconfigure(0, weight=1)
-        self.DescriptionFrame.grid(row=11, column=0, columnspan=2, sticky="news", padx=5, pady=5)
+        self.DescriptionFrame.grid(row=11, column=0, columnspan=2, sticky=tk.NSEW, padx=5, pady=5)
         self.DescriptionText = tk.Text(self.DescriptionFrame, font="TkFixedFont", height=15, state=tk.DISABLED, wrap=tk.WORD)
         self.DescriptionScrollbar = ttk.Scrollbar(self.DescriptionFrame, orient=tk.VERTICAL, command=self.DescriptionText.yview)
         self.DescriptionText.config(yscrollcommand=self.DescriptionScrollbar.set)
-        self.DescriptionScrollbar.grid(row=0, column=1, padx=(0, 5), pady=5, sticky="sn")
+        self.DescriptionScrollbar.grid(row=0, column=1, padx=(0, 5), pady=5, sticky=tk.NS)
         if DarkMode == True:
             self.DescriptionText.config(bg="black", fg="white")
-        self.DescriptionText.grid(row=0, column=0, sticky="news", padx=(5, 0), pady=5)
+        self.DescriptionText.grid(row=0, column=0, sticky=tk.NSEW, padx=(5, 0), pady=5)
         self.LeftFrame.rowconfigure(0, weight=1)
         self.RightFrame.columnconfigure(1, weight=1)
         self.RightFrame.rowconfigure(11, weight=1)
         self.Splitter.add(self.LeftFrame)
         self.Splitter.add(self.RightFrame)
-        self.Splitter.grid(row=1, column=0, sticky="news")
+        self.Splitter.grid(row=1, column=0, sticky=tk.NSEW)
     def updateMetadataDisplay(self, parent):
         self.RemoveButton.config(state=tk.NORMAL)
         ext = self.ExtensionTree.item(self.ExtensionTree.selection(), "text")
@@ -1533,7 +1533,7 @@ class ExtensionManager(ttk.Frame):
             if metadata["PraktiXtension"]["website"] != "":
                 try:
                     self.WebsiteButton.config(command=lambda: webbrowser.open_new(metadata["PraktiXtension"]["website"]))
-                    self.WebsiteButton.grid(row=2, column=1, sticky="e", padx=5, pady=5)
+                    self.WebsiteButton.grid(row=2, column=1, sticky=tk.E, padx=5, pady=5)
                 except:
                     pass
             else:
@@ -1544,7 +1544,7 @@ class ExtensionManager(ttk.Frame):
                     pass
             if metadata["PraktiXtension"]["requiresinternet"] == "true":
                 try:
-                    self.InternetLabel.grid(row=2, column=0, sticky="ew")
+                    self.InternetLabel.grid(row=2, column=0, sticky=tk.EW)
                 except:
                     pass
             else:
@@ -1553,7 +1553,7 @@ class ExtensionManager(ttk.Frame):
                 except:
                     pass
             for display in displays:
-                display.config(state="normal")
+                display.config(state=tk.NORMAL)
                 display.delete(0, tk.END)
             self.VersionDisplay.insert(0, metadata["PraktiXtension"]["version"])
             self.FileNameDisplay.insert(0, metadata["PraktiXtension"]["filename"])
@@ -1678,7 +1678,7 @@ class ExtensionManager(ttk.Frame):
         helper.close(parent)"""
             ExtensionManagerMetadata = configparser.ConfigParser()
             ExtensionManagerMetadata["PraktiXtension"] = {"name": "Extension Manager",
-                                                          "version": "1.11",
+                                                          "version": "1.12",
                                                           "filename": "ExtensionManager.py",
                                                           "description": "The PraktiCalc Extension Manager",
                                                           "website": "",
