@@ -1444,7 +1444,7 @@ class DecimalConverter(ttk.Frame):
 import tkinter as tk
 from tkinter import ttk, font, messagebox, filedialog
 from pathlib import Path
-import webbrowser, configparser, zipfile, tempfile, hashlib, shutil
+import webbrowser, configparser, zipfile, tempfile, hashlib, shutil, platform, subprocess
 
 class ExtensionManager(ttk.Frame):
     def __init__(self, tabs, parent, mainWin, helper, calculator, dialog, DarkMode):
@@ -1472,10 +1472,15 @@ class ExtensionManager(ttk.Frame):
         self.AddButton.grid(row=1, column=0, padx=10, pady=10, sticky="we")
         self.RemoveButton = ttk.Button(self.LeftFrame, text="Remove", state=tk.DISABLED, command=lambda: self.removeExtension(parent))
         self.RemoveButton.grid(row=1, column=1, padx=10, pady=10, sticky="we")
+        self.OpenFolderButton = ttk.Button(self.LeftFrame, text="Open Extension Folder", command=lambda: self.openFolder(parent))
+        if platform.system() not in ("Windows", "Darwin"):
+            if not shutil.which("xdg-open"):
+                self.OpenFolderButton.config(state=tk.DISABLED)
+        self.OpenFolderButton.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="we")
         self.ResetButton = ttk.Button(self.LeftFrame, text="Reset Extension Folder", command=lambda: self.reset(parent, mainWin, helper))
-        self.ResetButton.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="we")
-        ttk.Separator(self.LeftFrame, orient=tk.HORIZONTAL).grid(row=3, column=0, columnspan=2, pady=7, sticky="ew")
-        ttk.Button(self.LeftFrame, text="PraktiXtension Gallery", command=lambda: webbrowser.open_new("https://praktixtensions.blogspot.com/p/browse.html")).grid(row=4, column=0, columnspan=2, padx=10, pady=10, sticky="we")
+        self.ResetButton.grid(row=3, column=0, columnspan=2, padx=10, pady=10, sticky="we")
+        ttk.Separator(self.LeftFrame, orient=tk.HORIZONTAL).grid(row=4, column=0, columnspan=2, pady=7, sticky="ew")
+        ttk.Button(self.LeftFrame, text="PraktiXtension Gallery", command=lambda: webbrowser.open_new("https://praktixtensions.blogspot.com/p/browse.html")).grid(row=5, column=0, columnspan=2, padx=10, pady=10, sticky="we")
         self.LeftFrame.columnconfigure(0, weight=1)
         self.LeftFrame.columnconfigure(1, weight=1)
         self.RightFrame.columnconfigure(0, weight=1)
@@ -1661,6 +1666,13 @@ class ExtensionManager(ttk.Frame):
                 except Exception as e:
                     dialog.error(str(e), parent, helper)
                     return
+    def openFolder(self, parent):
+        if platform.system() == "Windows":
+            subprocess.Popen(["explorer", str(parent.FolderPath)])
+        elif platform.system() == "Darwin":
+            subprocess.Popen(["open", str(parent.FolderPath)])
+        else:
+            subprocess.Popen(["xdg-open", str(parent.FolderPath)])
     def reset(self, parent, mainWin, helper):
         shutil.rmtree(parent.FolderPath)
         helper.close(parent)"""
