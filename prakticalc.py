@@ -1502,7 +1502,7 @@ class ExtensionManager(ttk.Frame):
         self.DescriptionFrame.rowconfigure(0, weight=1)
         self.DescriptionFrame.columnconfigure(0, weight=1)
         self.DescriptionFrame.grid(row=11, column=0, columnspan=2, sticky="news", padx=5, pady=5)
-        self.DescriptionText = tk.Text(self.DescriptionFrame, font="TkFixedFont", height=15, state=tk.DISABLED)
+        self.DescriptionText = tk.Text(self.DescriptionFrame, font="TkFixedFont", height=15, state=tk.DISABLED, wrap=tk.WORD)
         self.DescriptionScrollbar = ttk.Scrollbar(self.DescriptionFrame, orient=tk.VERTICAL, command=self.DescriptionText.yview)
         self.DescriptionText.config(yscrollcommand=self.DescriptionScrollbar.set)
         self.DescriptionScrollbar.grid(row=0, column=1, padx=(0, 5), pady=5, sticky="sn")
