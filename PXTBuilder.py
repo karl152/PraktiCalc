@@ -1,6 +1,6 @@
 # PraktiXtension Builder
-# Copyright (C) 2026 Karl "karl152"
-# SPDX-License-Identifier: GPL-3.0
+# Copyright (C) 2026 Karl Wesseler
+# SPDX-License-Identifier: GPL-3.0-only
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
@@ -40,7 +40,7 @@ class PXTBuilder(ttk.Frame):
         self.LongDescriptionFrame = ttk.LabelFrame(self, text="Long Description")
         self.LongDescriptionFrame.rowconfigure(0, weight=1)
         self.LongDescriptionFrame.columnconfigure(0, weight=1)
-        self.LongDescriptionText = tk.Text(self.LongDescriptionFrame)
+        self.LongDescriptionText = tk.Text(self.LongDescriptionFrame, font="TkFixedFont", wrap=tk.WORD)
         self.LongDescriptionText.grid(row=0, column=0, padx=10, pady=10, sticky="news")
         if DarkMode == True:
             self.LongDescriptionText.config(bg="black", fg="white")
@@ -100,4 +100,3 @@ class PXTBuilder(ttk.Frame):
             with zipfile.ZipFile(TheZip, "w", compression=zipfile.ZIP_LZMA) as zf:
                 for x in ["info.ini", "description.txt", Path(self.file).name]:
                     zf.write(Path(tempdir) / x, arcname=x)
-                
