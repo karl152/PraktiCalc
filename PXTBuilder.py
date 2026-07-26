@@ -44,7 +44,7 @@ class PXTBuilder(ttk.Frame):
         self.LongDescriptionText = tk.Text(self.LongDescriptionFrame, font="TkFixedFont", wrap=tk.WORD)
         self.LongDescriptionScrollbar = ttk.Scrollbar(self.LongDescriptionFrame, orient=tk.VERTICAL, command=self.LongDescriptionText.yview)
         self.LongDescriptionText.config(yscrollcommand=self.LongDescriptionScrollbar.set)
-        self.LongDescriptionText.grid(row=0, column=0, pady=10, sticky=tk.NSEW)
+        self.LongDescriptionText.grid(row=0, column=0, padx=(10, 0), pady=10, sticky=tk.NSEW)
         self.LongDescriptionScrollbar.grid(row=0, column=1, padx=(0, 10), pady=10, sticky=tk.NS)
         if DarkMode == True:
             self.LongDescriptionText.config(bg="black", fg="white")
