@@ -685,7 +685,7 @@ class MainWindow(tk.Tk):
         self.MemoryDisplay = tk.Menu(self.Menubar, tearoff=TheTearoff)
         self.MemoryDisplay.add_command(label="Set memory", command=lambda: self.setMemory(calculator))
         self.MemoryDisplay.add_command(label="Get memory", command=lambda: self.getMemory(calculator, cfg))
-        self.MemoryDisplay.add_command(label="Add to memory", command=lambda: self.addToMemory(calculator))
+        self.MemoryDisplay.add_command(label="Add to memory", command=lambda: self.addToMemory(calculator, helper, dialog))
         self.MemoryDisplay.add_command(label="Subtract from memory", command=lambda: self.subtractFromMemory(calculator))
         self.MemoryDisplay.add_command(label="Append to memory", command=lambda: self.appendToMemory(calculator))
         self.MemoryDisplay.add_command(label="Clear memory", command=lambda: self.clearMemory(calculator))
@@ -788,7 +788,7 @@ class MainWindow(tk.Tk):
         MemoryMenu = tk.Menu(MemoryButton, tearoff=TheTearoff)
         MemoryMenu.add_command(label="Set", command=lambda: self.setMemory(calculator))
         MemoryMenu.add_command(label="Get", command=lambda: self.getMemory(calculator, cfg))
-        MemoryMenu.add_command(label="Add", command=lambda: self.addToMemory(calculator))
+        MemoryMenu.add_command(label="Add", command=lambda: self.addToMemory(calculator, helper, dialog))
         MemoryMenu.add_command(label="Subtract", command=lambda: self.subtractFromMemory(calculator))
         MemoryMenu.add_command(label="Append", command=lambda: self.appendToMemory(calculator))
         MemoryMenu.add_command(label="Clear", command=lambda: self.clearMemory(calculator))
@@ -936,8 +936,11 @@ class MainWindow(tk.Tk):
     def appendToMemory(self, calculator):
         calculator.appendToMemory()
         self.refreshMemoryDisplay(calculator)
-    def addToMemory(self, calculator):
-        calculator.addToMemory()
+    def addToMemory(self, calculator, helper, dialog):
+        try:
+            calculator.addToMemory()
+        except Exception as e:
+            dialog.error(str(e), self, helper)
         self.refreshMemoryDisplay(calculator)
     def subtractFromMemory(self, calculator):
         calculator.subtractFromMemory()
