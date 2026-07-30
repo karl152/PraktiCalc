@@ -6,7 +6,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 # REQUIREMENTS FOR DEBIAN
-# - wget2
+# - wget2/wget/curl
 # - python3
 # - python3-tk
 # - python3-ttkthemes
@@ -33,7 +33,7 @@ echo "The script will now download appimagetool from https://github.com/AppImage
 echo "------------------------------------------------------------------------------------"
 sleep 10
 echo "Downloading appimagetool"
-wget2 -c https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -m).AppImage
+wget2 -c https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -m).AppImage || wget -c https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -m).AppImage || curl -# -L https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -m).AppImage -o appimagetool-$(uname -m).AppImage
 chmod +x appimagetool-$(uname -m).AppImage
 mv ./appimagetool-$(uname -m).AppImage ./linux-pkg-builds/AppImage/
 
