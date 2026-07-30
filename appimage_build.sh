@@ -12,9 +12,56 @@
 # - python3-ttkthemes
 # - python3-pyinstaller
 
+set -eu
+
+# check for Python 3 and PyInstaller
+if command -v python3
+then
+    echo "found Python 3"
+else
+    echo "ERROR: Python 3 seems to be missing"
+    false
+fi
+if python3 -m PyInstaller --version >/dev/null 2>&1
+then
+    echo "found PyInstaller"
+else
+    echo "ERROR: PyInstaller is missing"
+    false
+fi
+
+# check for download tools
+dltcount=3
+for dlt in curl wget wget2
+do
+    if command -v "$dlt"; then
+        echo "FOUND: $dlt"
+    else
+        echo "didn't find $dlt"
+        dltcount="$((dltcount-1))"
+    fi
+done
+if [ $dltcount -le 0 ]; then
+    echo "ERROR: wget2, wget and curl weren't found, but one of them is required for this script to work"
+    false
+fi
+
+# check for tkinter, ttkthemes
+echo "checking for Python modules"
+for PythonModule in tkinter ttkthemes
+do
+    if python3 -c "import $PythonModule" >/dev/null 2>&1
+    then
+        echo "FOUND: $PythonModule"
+    else
+        echo "ERROR: $PythonModule appears to be missing!"
+        false
+    fi
+done
+
 echo "Cleaning"
-rm build/PraktiCalc-$(uname -m).AppImage
-rm build/PraktiCalc-$(uname -m).AppImage.zsync
+rm build/PraktiCalc-$(uname -m).AppImage || echo "no previous AppImage to remove"
+rm build/PraktiCalc-$(uname -m).AppImage.zsync || true
 
 mkdir -p linux-pkg-builds/AppImage/de.karl_52.PraktiCalc.AppDir/usr/bin
 
@@ -22,7 +69,7 @@ echo "Building Executable"
 python3 -m PyInstaller prakticalc.py --onedir --strip --clean --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data python-powered.png:. --add-data /usr/share/tcltk/ttkthemes:ttkthemes --icon PraktiCalculator.ico
 cd ./dist/prakticalc/_internal/
 echo "Cleaning libraries..."
-rm -v libX11.so.6 libXext.so.6 libXft.so.2 libXrender.so.1 libXau.so.6 libXdmcp.so.6 libfontconfig.so.1 libfreetype.so.6 libbz2.so.1.0 libbrotlicommon.so.1 libbrotlidec.so.1 libbrotlienc.so.1 libzstd.so.1 libz.so.1 libyaml-0.so.2 libtiff.so.6 libjpeg.so.62 libpng16.so.16 libsharpyuv.so.0 libwebp.so.7 libwebpmux.so.3 libwebpdemux.so.2 libimagequant.so.0 liblcms2.so.2 libopenjp2.so.7
+rm -v libX11.so.6 libXext.so.6 libXft.so.2 libXrender.so.1 libXau.so.6 libXdmcp.so.6 libfontconfig.so.1 libfreetype.so.6 libbz2.so.1.0 libbrotlicommon.so.1 libbrotlidec.so.1 libbrotlienc.so.1 libzstd.so.1 libz.so.1 libyaml-0.so.2 libtiff.so.6 libjpeg.so.62 libpng16.so.16 libsharpyuv.so.0 libwebp.so.7 libwebpmux.so.3 libwebpdemux.so.2 libimagequant.so.0 liblcms2.so.2 libopenjp2.so.7 || true
 cd ../../../
 mv ./dist/prakticalc/* ./linux-pkg-builds/AppImage/de.karl_52.PraktiCalc.AppDir/usr/bin/
 chmod +x ./linux-pkg-builds/AppImage/de.karl_52.PraktiCalc.AppDir/AppRun

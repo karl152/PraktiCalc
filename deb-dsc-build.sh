@@ -5,6 +5,20 @@
 # See https://www.gnu.org/licenses/gpl-3.0.txt for details.
 # SPDX-License-Identifier: GPL-3.0-only
 
+set -eu
+
+echo "checking for dependencies"
+for dep in gzip dh dpkg-buildpackage
+do
+    if command -v "$dep" >/dev/null 2>&1
+    then
+        echo "FOUND: $dep"
+    else
+        echo "ERROR: $dep appears to be missing!"
+        false
+    fi
+done
+
 PraktiCalcDir=$(pwd)
 
 setupDebDir() {
@@ -14,7 +28,7 @@ setupDebDir() {
     gunzip -vc linux-pkg-builds/debian/prakticalc/usr/share/doc/prakticalc/changelog.gz > debian/changelog
     echo "3.0 (native)" > debian/source/format
     echo "linux-pkg-builds/debian/prakticalc/usr/share/man/man1/prakticalc.1" > debian/prakticalc.manpages
-    
+
 cat > debian/control <<EOF
 Source: prakticalc
 Maintainer: Karl <karldpbkz@gmail.com>
@@ -65,6 +79,11 @@ cat > debian/rules <<"EOF"
 EOF
 chmod +x debian/rules
 }
+
+if [ "$#" -lt 1 ]; then
+    echo "Please specify a build mode (deb or dsc)."
+    false
+fi
 
 if [ "$1" = "deb" ]; then
     setupDebDir

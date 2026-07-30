@@ -6,16 +6,31 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 # REQUIREMENTS
-# - Debian stable
-# - python3
-# - python3-tk
-# - python3-ttkthemes
+# - dash
+# - gzip
+# - nano
+# - dpkg-deb
+
+set -eu
+
+# check for gzip, nano, dpkg-deb
+echo "checking for dependencies"
+for dep in gzip nano dpkg-deb
+do
+    if command -v "$dep" >/dev/null 2>&1
+    then
+        echo "FOUND: $dep"
+    else
+        echo "ERROR: $dep appears to be missing!"
+        false
+    fi
+done
 
 # set version variable
 read -p "PraktiCalc Version: " PraktiCalcVersion
 
 # clean up last build
-rm build/prakticalc-$PraktiCalcVersion.deb
+rm build/prakticalc-$PraktiCalcVersion.deb || echo "no previous package to remove"
 
 mkdir linux-pkg-builds/debian/prakticalc/usr/share/prakticalc
 
@@ -56,6 +71,6 @@ mkdir build
 mv -v linux-pkg-builds/debian/prakticalc.deb build/prakticalc-$PraktiCalcVersion.deb
 
 # show errors if lintian is installed
-lintian build/prakticalc-$PraktiCalcVersion.deb
+lintian build/prakticalc-$PraktiCalcVersion.deb || true
 
 echo "Done!"
