@@ -12,15 +12,37 @@
 # - python3-devel
 # - python3-tkinter
 
+set -eu
+
+# check for dependencies
+for cmd in python3 rpmdev-setuptree rpmbuild
+do
+    if command -v "$cmd"; then
+        echo "FOUND: $cmd"
+    else
+        echo "didn't find $cmd"
+        false
+    fi
+done
+
+# check for tkinter
+if python3 -c "import tkinter" >/dev/null 2>&1
+then
+    echo "FOUND: tkinter"
+else
+    echo "ERROR: tkinter appears to be missing!"
+    false
+fi
+
 # clean up from previous build
-rm -rf ~/rpmbuild/
+rm -rf ~/rpmbuild/ || echo "no previous build to clean up"
 
 # copy Debian directory
 cd linux-pkg-builds/
 cp -r debian/ rpm/
 rm -rf rpm/prakticalc/DEBIAN/
 rm -rf rpm/prakticalc/usr/share/doc/
-sed -i "s/dash/sh/g"  rpm/prakticalc/usr/bin/prakticalc || exit 1
+sed -i "s/dash/sh/g"  rpm/prakticalc/usr/bin/prakticalc
 
 # copy files
 cd ..
