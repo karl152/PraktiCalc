@@ -64,6 +64,7 @@ dpkg-deb --build --root-owner-group prakticalc/
 
 # clean up
 rm -rf ./prakticalc/usr/share/prakticalc
+chmod -x ./prakticalc/usr/bin/prakticalc
 
 # rename file
 cd ../..
