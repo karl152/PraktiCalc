@@ -34,6 +34,22 @@ cp -r * %{buildroot}/
 %license usr/share/prakticalc/LICENSE
 
 %changelog
+* Sat Aug 01 2026 Karl Wesseler <karldpbkz@gmail.com> - 1.5.3
+- Added a button to open the extension folder from extension manager
+- Added a scrollbar to the extension manager
+- The "E" key now types e (euler's number)
+- Decreased installation size on Windows by about 30%
+- Enabled word wrapping for long descriptions in extension manager
+- Made header text in the extension manager shorter
+- Removed downgrading support in Windows installer
+- Improved memory system
+- Improved error dialogs: xmessage, gxmessage, wmessage, notify-send
+- More user feedback when installing extensions or resetting the settings
+- Better error handling in the extension window
+- Improved the build system
+- Disabled Modify and Repair in Programs and Features on Windows
+- Fixed licenses not shown in extension manager in metadata is missing
+- Fixed extension window size on Fedora
 * Sun Jul 12 2026 Karl Wesseler <karldpbkz@gmail.com> - 1.5.2
 - Added Fedora RPM builds
 - Added new Debian package build system with source package support
