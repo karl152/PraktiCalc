@@ -8,9 +8,20 @@
 # required TinyCore extensions to build: squashfs-tools.tcz
 # required TinyCore extensions to run: python3.14, tk8.6
 
+set -eu
+
+# check for squashfs-tools
+if command -v mksquashfs
+then
+    echo "found squashfs-tools"
+else
+    echo "ERROR: squashfs-tools seems to be missing"
+    false
+fi
+
 read -p "PraktiCalc Version: " PraktiCalcVersion
 echo "Cleaning up from last build..."
-rm build/prakticalc-$PraktiCalcVersion.tcz*
+rm build/prakticalc-$PraktiCalcVersion.tcz*  || echo "no previous extensions to remove"
 echo "Creating directories..."
 mkdir -p linux-pkg-builds/tce/usr/share/prakticalc
 mkdir -p linux-pkg-builds/tce/usr/bin
