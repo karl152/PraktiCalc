@@ -68,7 +68,7 @@ chmod -x ./prakticalc/usr/bin/prakticalc
 
 # rename file
 cd ../..
-mkdir build
+mkdir build || true
 mv -v linux-pkg-builds/debian/prakticalc.deb build/prakticalc-$PraktiCalcVersion.deb
 
 # show errors if lintian is installed

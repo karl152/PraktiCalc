@@ -64,7 +64,7 @@ echo "created info file"
 md5sum prakticalc-$PraktiCalcVersion.tcz > prakticalc-$PraktiCalcVersion.tcz.md5.txt
 echo "created md5 checksum file"
 
-mkdir build
+mkdir build || true
 mv -v prakticalc-$PraktiCalcVersion.tcz* build/
 
 echo "Done!"
