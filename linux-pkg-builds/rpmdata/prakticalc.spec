@@ -1,5 +1,5 @@
 Name:		prakticalc
-Version:		1.5.2
+Version:		1.5.3
 Release:		1%{?dist}
 Summary:	practical calculator written in Python
 
