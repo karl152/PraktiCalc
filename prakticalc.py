@@ -1097,6 +1097,7 @@ Licensed under the GPLv3"""
                 DebugIconFrame.grid(row=2, column=0, padx=10, pady=(0, 5), sticky=tk.W)
             CustomInfoFrame.grid(row=0, column=0, sticky=tk.NSEW)
             CustomInfoExit.grid(row=1, column=1, padx=10, pady=10)
+            CustomInfoExit.focus_set()
             if platform.system() == "Darwin" and self.ConfigurationStorage.get("nativeTheme") == 1:
                 tk.Button(CustomInfoFrame, font=("Tk.DefaultFont", 11), image=self.PythonPower, command=lambda: webbrowser.open_new_tab("https://www.python.org/")).grid(row=1, column=0, padx=10, pady=10, sticky=tk.SW)
                 if hasattr(self, "TclTkPower"):
@@ -1167,6 +1168,7 @@ Licensed under the GPLv3"""
             ErrorTextLabel = ttk.Label(ExtendedErrorFrame, text=message)
             ErrorWindowFrame.grid(row=0, column=0, sticky=tk.NSEW)
             ErrorExitButton.grid(row=1, column=1, padx=10, pady=10)
+            ErrorExitButton.focus_set()
             ExtendedErrorFrame.grid(row=0, column=0, padx=20, pady=10, sticky=tk.NSEW)
             ErrorTextLabel.grid(row=0, column=0)
             ErrorWindow.protocol("WM_DELETE_WINDOW", lambda: helper.close(ErrorWindow))
