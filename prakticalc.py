@@ -36,7 +36,7 @@ elif platform.system() == "Darwin":
 # VARIABLES
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.5.3"
+PraktiCalcVersion = "1.5.4"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 allowWindowsShutdownDialog = "--allowShutdownDialog" in sys.argv
 MsgBoxStyles = ["Tkinter", "Alternative"]
@@ -1054,14 +1054,21 @@ class Dialog:
     def __init__(self, cfg):
         self.ConfigurationStorage = cfg
     def info(self, parent, helper): # shows info dialogs
-        infotext = "PraktiCalc\nVersion " + PraktiCalcVersion + "\nrunning on Python "+ platform.python_version() + " / Tk " + str(tk.TkVersion) + "\nLicensed under GPLv3\nread more at https://www.gnu.org/licenses/"
+        infotext = f"""PraktiCalc - a practical calculator
+Version {PraktiCalcVersion}
+Copyright \u00a9 2024-2026 Karl Wesseler
+Running on Python {platform.python_version()} / Tk {tk.TkVersion}
+Licensed under the GPLv3"""
         if helper.theming != 0:
-            infotext += "\nthemes provided by the ttkthemes library"
+            infotext += "\nThemes provided by the ttkthemes library"
         if self.ConfigurationStorage.get("dialogStyle") == "Tkinter":
             messagebox.showinfo("About PraktiCalc", infotext)
         elif self.ConfigurationStorage.get("dialogStyle") == "Alternative":
             CustomInfox = tk.Toplevel(parent)
             self.PythonPower = tk.PhotoImage(file=PythonPowerPath)
+            TclTkPowerPath = Path(CustomInfox.tk.call("info", "library")) / ".." / f"tk{tk.TkVersion}" / "images" / "pwrdLogo150.gif"
+            if TclTkPowerPath.exists():
+                self.TclTkPower = tk.PhotoImage(file=TclTkPowerPath)
             CustomInfox.title("About PraktiCalc")
             CustomInfox.bind("<Return>", lambda event: self.close(helper, CustomInfox))
             CustomInfox.rowconfigure(0, weight=1)
@@ -1092,8 +1099,12 @@ class Dialog:
             CustomInfoExit.grid(row=1, column=1, padx=10, pady=10)
             if platform.system() == "Darwin" and self.ConfigurationStorage.get("nativeTheme") == 1:
                 tk.Button(CustomInfoFrame, font=("Tk.DefaultFont", 11), image=self.PythonPower, command=lambda: webbrowser.open_new_tab("https://www.python.org/")).grid(row=1, column=0, padx=10, pady=10, sticky=tk.SW)
+                if hasattr(self, "TclTkPower"):
+                    tk.Button(CustomInfoFrame, font=("Tk.DefaultFont", 11), image=self.TclTkPower, command=lambda: webbrowser.open_new_tab("https://www.tcl-lang.org/")).grid(row=0, column=1, padx=10, pady=10, sticky=tk.N)
             else:
                 ttk.Button(CustomInfoFrame, image=self.PythonPower, command=lambda: webbrowser.open_new_tab("https://www.python.org/")).grid(row=1, column=0, padx=10, pady=10, sticky=tk.SW)
+                if hasattr(self, "TclTkPower"):
+                    ttk.Button(CustomInfoFrame, image=self.TclTkPower, command=lambda: webbrowser.open_new_tab("https://www.tcl-lang.org/")).grid(row=0, column=1, padx=10, pady=10, sticky=tk.N)
             ExtendedInfoFrame.grid(row=0, column=0, padx=20, pady=10, sticky=tk.NSEW)
             ExtInfoIcon.grid(row=0, column=0)
             ExtInfoText1.grid(row=1, column=0, padx=10, pady=(0, 5))
@@ -1119,7 +1130,7 @@ class Dialog:
                     print("ERROR: Unknown Message Box Style")
             else:
                 styles = {
-                    "xmessage": lambda: subprocess.Popen(["xmessage", "-title", "About PraktiCalc", "-buttons", "OK", "-default", "OK", infotext]),
+                    "xmessage": lambda: subprocess.Popen(["xmessage", "-title", "About PraktiCalc", "-buttons", "OK", "-default", "OK", infotext.replace("\u00a9", "(C)")]),
                     "gxmessage": lambda: subprocess.Popen(["gxmessage", "-title", "About PraktiCalc", "-buttons", "OK", "-default", "OK", infotext]),
                     "wmessage": lambda: subprocess.Popen(["wmessage", "-title", "About PraktiCalc", "-buttons", "OK", "-default", "OK", infotext]),
                     "yad": lambda: subprocess.Popen(["yad", "--title=About PraktiCalc", "--info", "--image=" + PraktiCalcIconPath, "--button=OK", "--text=" + infotext]),
