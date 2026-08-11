@@ -1070,7 +1070,7 @@ Licensed under the GPLv3"""
             if TclTkPowerPath.exists():
                 self.TclTkPower = tk.PhotoImage(file=TclTkPowerPath)
             CustomInfox.title("About PraktiCalc")
-            CustomInfox.bind("<Return>", lambda event: self.close(helper, CustomInfox))
+            CustomInfox.bind("<Return>", lambda event: helper.close(CustomInfox))
             CustomInfox.rowconfigure(0, weight=1)
             CustomInfox.columnconfigure(0, weight=1)
             if platform.system() == "Windows":
