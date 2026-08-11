@@ -1137,7 +1137,7 @@ Licensed under the GPLv3"""
                     "kdialog": lambda: subprocess.Popen(["kdialog", "--title=About PraktiCalc", "--msgbox", infotext]),
                     "zenity": lambda: subprocess.Popen(["zenity", "--title=About PraktiCalc", "--info", "--icon=" + PraktiCalcIconPath, "--text=" + infotext]),
                     "AppleScript": lambda: subprocess.run(["osascript", "-e", f'display dialog "{infotext}" with icon POSIX file "{PraktiCalcIconPath}" with title "About PraktiCalc"']),
-                    "Xdialog": lambda: subprocess.Popen(["Xdialog", "--title=About PraktiCalc", "--msgbox", infotext, "10", "40"]),
+                    "Xdialog": lambda: subprocess.Popen(["Xdialog", "--title=About PraktiCalc", "--msgbox", infotext.replace("\u00a9", "(C)"), "10", "40"]),
                     "notify-send": lambda: subprocess.Popen(["notify-send", "About PraktiCalc", "--icon=de.karl_52.PraktiCalc", "--action=OK", infotext]),
                     }
                 opendialog = styles.get(self.ConfigurationStorage.get("dialogStyle"))
