@@ -1308,21 +1308,8 @@ class ExtensionWindow(tk.Toplevel):
             if not str(f).endswith("__pycache__"):
                 ContentIsThere = True
         if ContentIsThere == False:
-            dialog.error(f"There are no extensions installed. You can install some manually in {self.FolderPath},\nor delete that folder to reset the extension system, which reinstalls the extension manager.", self, helper)
-            if cfg.get("dialogStyle") == "Alternative":
-                CloseInfoFrame = ttk.Frame(self.Tabs)
-                CloseInfoFrameRight = tk.Frame(CloseInfoFrame)
-                if helper.DarkMode == True:
-                    CloseInfoFrameRight.config(bg="black")
-                    tk.Label(CloseInfoFrameRight, bitmap="info", bg="black", fg="white").grid(row=0, column=0, padx=30*parent.ScaleFactor, pady=30*parent.ScaleFactor)
-                else:
-                    tk.Label(CloseInfoFrameRight, bitmap="info").grid(row=0, column=0, padx=30*parent.ScaleFactor, pady=30*parent.ScaleFactor)
-                ttk.Label(CloseInfoFrame, text="Feel free to close this window.").grid(row=0, column=1, padx=30*parent.ScaleFactor)
-                CloseInfoFrameRight.grid(row=0, column=0)
-                CloseInfoFrame.grid(row=0, column=0, sticky=tk.NSEW)
-                self.resizable(False, False)
-            else:
-                helper.close(self)
+            dialog.error(f"There are no extensions installed. You can install some manually in {self.FolderPath},\nor delete that folder to reset the extension system, which reinstalls the extension manager.", parent, helper)
+            helper.close(self)
             return
         if Path(self.FolderPath / "DecimalConverter.ini").exists():
             DecimalConverterMeta = configparser.ConfigParser()
