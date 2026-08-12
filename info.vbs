@@ -13,9 +13,9 @@ theming = WScript.Arguments(3)
 VBSversionText = ScriptEngine & " " & ScriptEngineMajorVersion & "." & ScriptEngineMinorVersion & "." & ScriptEngineBuildVersion
 
 If theming <> "0" Then
-    ttkthemesText = vbCrLf & "themes provided by the ttkthemes library"
+    ttkthemesText = vbCrLf & "Themes provided by the ttkthemes library"
 Else
     ttkthemesText = ""
 End If
 
-MsgBox "PraktiCalc" & vbCrLf & "Version " & PraktiCalcVersion & vbCrLf & "running on Python " & pyver & " / Tk " & TkVersion & " / " & VBSversionText & vbCrLf & "Licensed under GPLv3" & vbCrLf & "read more at https://www.gnu.org/licenses/" & ttkthemesText, 64, "About PraktiCalc"
+MsgBox "PraktiCalc - a practical calculator" & vbCrLf & "Version " & PraktiCalcVersion & vbCrLf & "Copyright (C) 2024-2026 Karl Wesseler" & vbCrLf & "Running on Python " & pyver & " / Tk " & TkVersion & " / " & VBSversionText & vbCrLf & "Licensed under the GPLv3" & ttkthemesText, 64, "About PraktiCalc"
