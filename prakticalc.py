@@ -1070,9 +1070,10 @@ Licensed under the GPLv3"""
         elif self.ConfigurationStorage.get("dialogStyle") == "Alternative":
             CustomInfox = tk.Toplevel(parent)
             self.PythonPower = tk.PhotoImage(file=PythonPowerPath)
-            TclTkPowerPath = Path(CustomInfox.tk.call("info", "library")) / ".." / f"tk{tk.TkVersion}" / "images" / "pwrdLogo150.gif"
-            if TclTkPowerPath.exists():
-                self.TclTkPower = tk.PhotoImage(file=TclTkPowerPath)
+            try:
+                self.TclTkPower = tk.PhotoImage(file=str(CustomInfox.tk.globalgetvar("tk_library")) + "/images/pwrdLogo150.gif")
+            except:
+                pass
             CustomInfox.title("About PraktiCalc")
             CustomInfox.bind("<Return>", lambda event: helper.close(CustomInfox))
             CustomInfox.rowconfigure(0, weight=1)
