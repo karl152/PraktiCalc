@@ -554,6 +554,8 @@ class WindowHelper:
                                     self.DarkMode = True
                         except:
                             pass
+                else:
+                    self.style.theme_use(self.ConfigurationStorage.get("theme"))
             else:
                 self.style = ThemedStyle(WindowName)
                 if self.ConfigurationStorage.get("theme") in self.style.theme_names():
