@@ -873,6 +873,7 @@ class MainWindow(tk.Tk):
             Keys = {
                 "0": lambda: self.zero(calculator, cfg),
                 "equal": lambda: self.calculate(self, helper, calculator, dialog, cfg),
+                "=": lambda: self.calculate(self, helper, calculator, dialog, cfg),
                 "Return": lambda: self.calculate(self, helper, calculator, dialog, cfg),
                 "h": lambda: HistoryWindow(self, calculator, helper),
                 "H": lambda: HistoryWindow(self, calculator, helper),
