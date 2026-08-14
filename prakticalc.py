@@ -35,7 +35,7 @@ from decimal import Decimal
 # variables
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.3.5"
+PraktiCalcVersion = "1.3.6"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 if platform.system() == "Windows":
     MsgBoxStyles = ["Tkinter", "Alternative", "VBS"]
@@ -409,7 +409,7 @@ def KeyPress(event):
         info()
     if Key == "s" or Key == "S":
         Settings()
-    if Key == "comma" :
+    if Key in ["comma", "period"]:
         comma()
     if Key == "BackSpace" :
         Backspace()
