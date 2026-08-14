@@ -408,7 +408,7 @@ class PraktiCalculator:
             self.CalculationString = char
         else:
             self.CalculationString += char
-            self.LastResult = "0"
+        self.LastResult = "0"
     def backspace(self): # backspace button
         if self.CalculationString == "0":
             pass
