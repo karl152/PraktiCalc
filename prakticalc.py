@@ -39,6 +39,8 @@ PraktiCalcVersion = "1.3.5"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 if platform.system() == "Windows":
     MsgBoxStyles = ["Tkinter", "Alternative", "VBS"]
+    if not shutil.which("wscript"):
+        MsgBoxStyles.pop()
     if BypassWindowsDPIFix == False:
         import ctypes
         try:
