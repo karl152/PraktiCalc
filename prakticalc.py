@@ -215,6 +215,11 @@ def processNumber(number):
         Input1 = number
         Output.config(text=Input1)
         Stage = 1
+    if Stage == 6:
+        clear()
+        Input1 = number
+        Output.config(text=Input1)
+        Stage = 1
     if StatusBar == True:
         Status.config(text="Ready")
 
@@ -253,6 +258,8 @@ def zero() :
         Output.config(text=Input1)
     if Stage == 0 :
         pass
+    if Stage == 6:
+        clear()
     SizeReload()
 
 # resets the calculator main window
