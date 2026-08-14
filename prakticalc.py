@@ -389,7 +389,9 @@ class PraktiCalculator:
         self.LastResult = Result
         return Result
     def zero(self): # processes the number zero, which is a special case and seperate
-        if self.CalculationString != "0":
+        if self.LastResult != "0":
+            self.CalculationString = "0"
+        elif self.CalculationString != "0":
             self.CalculationString += "0"
     def clear(self): # resets the calculaton
         self.CalculationString = "0"
