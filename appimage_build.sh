@@ -91,6 +91,8 @@ cd ./linux-pkg-builds/AppImage
 echo "Cleaning"
 rm appimagetool-$(uname -m).AppImage
 cd ../..
+rm linux-pkg-builds/AppImage/de.karl_52.PraktiCalc.AppDir/.DirIcon || true
+chmod -x linux-pkg-builds/AppImage/de.karl_52.PraktiCalc.AppDir/AppRun
 rm -rf ./linux-pkg-builds/AppImage/de.karl_52.PraktiCalc.AppDir/usr/bin
 rm -rf dist/
 rm -rf build/
