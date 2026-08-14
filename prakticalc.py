@@ -389,9 +389,11 @@ def KeyPress(event):
     NumberKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
     if Key in NumberKeys:
         processNumber(Key)
+    if Key in ["+", "-", "*", "/"]:
+        processOperator(Key)
     if Key == "0" :
         zero()
-    if Key == "equal" or Key == "Return":
+    if Key in ["equal", "Return", "="]:
         calc()
     if Key == "plus" :
         processOperator("+")
@@ -409,7 +411,7 @@ def KeyPress(event):
         info()
     if Key == "s" or Key == "S":
         Settings()
-    if Key in ["comma", "period"]:
+    if Key in ["comma", "period", ",", "."]:
         comma()
     if Key == "BackSpace" :
         Backspace()
