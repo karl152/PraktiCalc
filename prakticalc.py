@@ -397,18 +397,22 @@ class PraktiCalculator:
         self.CalculationString = "0"
         self.LastResult = "0"
     def append(self, char): # append a character to the calculation string
-        char = char.replace("plus", "+")
-        char = char.replace("minus", "-")
-        char = char.replace("asterisk", "*")
-        char = char.replace("slash", "/")
-        char = char.replace("period", ".")
-        char = char.replace(",", ".")
-        char = char.replace("comma", ".")
-        char = char.replace("parenleft", "(")
-        char = char.replace("parenright", ")")
-        char = char.replace("percent", "%")
-        char = char.replace("exclam", "fact(")
-        char = char.replace("!", "fact(")
+        replacements = {
+            "plus": "+",
+            "minus": "-",
+            "asterisk": "*",
+            "slash": "/",
+            "period": ".",
+            "comma": ".",
+            ",": ".",
+            "parenleft": "(",
+            "parenright": ")",
+            "percent": "%",
+            "exclam": "fact(",
+            "!": "fact("
+            }
+        for val in replacements:
+            char = char.replace(val, replacements.get(val))
         if self.CalculationString == "0" and char != ".":
             self.CalculationString = char
         elif self.LastResult != "0" and char not in "+-*/%":
