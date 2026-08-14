@@ -404,9 +404,10 @@ class PraktiCalculator:
         char = char.replace("comma", ".")
         char = char.replace("parenleft", "(")
         char = char.replace("parenright", ")")
+        char = char.replace("percent", "%")
         if self.CalculationString == "0" and char != ".":
             self.CalculationString = char
-        elif self.LastResult != "0" and char not in "+-*/":
+        elif self.LastResult != "0" and char not in "+-*/%":
             self.CalculationString = char
         else:
             self.CalculationString += char
@@ -858,7 +859,7 @@ class MainWindow(tk.Tk):
         helper.changeTheme(self)
     def KeyPress(self, event, calculator, helper, dialog): # processes keyboard input
         Key = event.keysym
-        if Key in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "plus", "minus", "asterisk", "slash", "comma", "parenleft", "parenright", "e", "+", "-", "*", "/", "(", ")", ".", ",", "period"]:
+        if Key in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "plus", "minus", "asterisk", "slash", "comma", "parenleft", "parenright", "e", "+", "-", "*", "/", "(", ")", ".", ",", "period", "percent", "%"]:
             self.append(Key, calculator, cfg)
         else:
             Keys = {
