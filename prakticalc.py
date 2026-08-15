@@ -1379,7 +1379,11 @@ class ExtensionWindow(tk.Toplevel):
             Path(self.FolderPath / "DecimalConverter.ini").unlink(missing_ok=True)
             Path(self.FolderPath / "DecimalConverter.txt").unlink(missing_ok=True)
         if not Path(self.FolderPath / "DecimalConverter.py").exists():
-            DecimalConverterCode = r"""import tkinter as tk
+            DecimalConverterCode = r"""# PraktiCalc Decimal Converter
+# Copyright (C) 2024-2026 Karl Wesseler
+# SPDX-License-Identifier: GPL-3.0-only
+
+import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 import platform
