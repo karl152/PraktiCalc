@@ -1400,8 +1400,10 @@ class DecimalConverter(ttk.Frame):
         binFrame.columnconfigure(0, weight=1)
         hexFrame.rowconfigure(0, weight=1)
         hexFrame.columnconfigure(0, weight=1)
-        self.BinaryLabel = ttk.Label(binFrame, text="")
-        self.HexLabel = ttk.Label(hexFrame, text="")
+        self.BinDisplay = ttk.Entry(binFrame)
+        self.HexDisplay = ttk.Entry(hexFrame)
+        self.BinDisplay.config(state="readonly")
+        self.HexDisplay.config(state="readonly")
         BinCopyButton = ttk.Button(binFrame, text="Copy", command=lambda: self.copybin(mainWin))
         HexCopyButton = ttk.Button(hexFrame, text="Copy", command=lambda: self.copyhex(mainWin))
         DecimalFrame.grid(row=0, column=0, columnspan=2, sticky="nesw", padx=5)
@@ -1409,8 +1411,8 @@ class DecimalConverter(ttk.Frame):
         InsertButton.grid(row=0, column=1, padx=5, pady=5)
         binFrame.grid(row=1, column=0, sticky="nesw", padx=5, pady=(0, 5))
         hexFrame.grid(row=1, column=1, sticky="nesw", padx=5, pady=(0, 5))
-        self.BinaryLabel.grid(row=0, column=0)
-        self.HexLabel.grid(row=0, column=0)
+        self.BinDisplay.grid(row=0, column=0, sticky=tk.EW)
+        self.HexDisplay.grid(row=0, column=0, sticky=tk.EW)
         BinCopyButton.grid(row=1, column=0, pady=(0, 5))
         HexCopyButton.grid(row=1, column=0, pady=(0, 5))
         if platform.system() != "Windows":
@@ -1418,20 +1420,26 @@ class DecimalConverter(ttk.Frame):
     def convert(self, parent, helper, dialog): # converts decimal numbers into binary and hexadecimal
         cp = str(self.DecimalInput.get())
         try:
+            displays = [self.BinDisplay, self.HexDisplay]
             DecimalNumber = int(cp)
             BinaryNumber = bin(DecimalNumber)[2:]
             HexadecimalNumber = hex(DecimalNumber)
-            self.BinaryLabel.config(text=str(BinaryNumber))
-            self.HexLabel.config(text=str(HexadecimalNumber))
+            for display in displays:
+                display.config(state=tk.NORMAL)
+                display.delete(0, tk.END)
+            self.BinDisplay.insert(0, str(BinaryNumber))
+            self.HexDisplay.insert(0, str(HexadecimalNumber))
+            for display in displays:
+                display.config(state="readonly")
         except:
             dialog.error("Please enter a real number!", parent, helper)
     def copybin(self, mainWin): # copies the binary output
         mainWin.clipboard_clear()
-        mainWin.clipboard_append(self.BinaryLabel.cget("text"))
+        mainWin.clipboard_append(self.BinDisplay.get())
         mainWin.update()
     def copyhex(self, mainWin): # copies the hexadecimal output
         mainWin.clipboard_clear()
-        mainWin.clipboard_append(self.HexLabel.cget("text"))
+        mainWin.clipboard_append(self.HexDisplay.get())
         mainWin.update()"""
             DecimalConverterMetadata = configparser.ConfigParser()
             DecimalConverterMetadata["PraktiXtension"] = {"name": "Decimal Converter",
