@@ -28,7 +28,7 @@ except:
     pass
 
 #---------------------------
-PraktiCalcVersion = "1.5.3"
+PraktiCalcVersion = "1.5.4"
 #---------------------------
 
 def speak(string):
@@ -274,6 +274,8 @@ def actuallyInstall():
                 for index, file in enumerate(files, 1):
                     ZipRef.extract(file, ExtractTo)
                     Progress.config(value=index)
+                    if tk.TkVersion >= 9:
+                        Progress.config(text=str(index) + "/" + str(len(files)))
             ProgressText += "\nregistering program..."
             InstallProgressText.config(text=ProgressText)
             with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", 0, winreg.KEY_WRITE) as UninstallKey:
