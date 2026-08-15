@@ -1428,12 +1428,12 @@ class DecimalConverter(ttk.Frame):
             displays = [self.BinDisplay, self.HexDisplay]
             DecimalNumber = int(cp)
             BinaryNumber = bin(DecimalNumber)[2:]
-            HexadecimalNumber = hex(DecimalNumber)
+            HexadecimalNumber = hex(DecimalNumber)[2:]
             for display in displays:
                 display.config(state=tk.NORMAL)
                 display.delete(0, tk.END)
             self.BinDisplay.insert(0, str(BinaryNumber))
-            self.HexDisplay.insert(0, str(HexadecimalNumber))
+            self.HexDisplay.insert(0, str(HexadecimalNumber).upper())
             for display in displays:
                 display.config(state="readonly")
         except:
