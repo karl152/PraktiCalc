@@ -1424,8 +1424,7 @@ class DecimalConverter(ttk.Frame):
         self.HexScrollbar.grid(row=1, column=0, sticky=tk.EW + tk.N)
         BinCopyButton.grid(row=2, column=0, pady=(0, 5))
         HexCopyButton.grid(row=2, column=0, pady=(0, 5))
-        if platform.system() != "Windows":
-            self.DecimalInput.focus_set()
+        self.DecimalInput.focus_set()
     def convert(self, parent, helper, dialog): # converts decimal numbers into binary and hexadecimal
         cp = str(self.DecimalInput.get())
         try:
