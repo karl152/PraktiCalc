@@ -449,7 +449,10 @@ def Settings() :
     MsgBoxStyleFrame = ttk.LabelFrame(SettingsWindowFrame, text="Messagebox Style")
     MsgBoxStyleFrame.columnconfigure(0, weight=1)
     MsgBoxStyleSelect = ttk.Combobox(MsgBoxStyleFrame, values=MsgBoxStyles)
-    MsgBoxStyleSelect.current(CurrentMsgBoxStyle)
+    try:
+        MsgBoxStyleSelect.current(CurrentMsgBoxStyle)
+    except:
+        MsgBoxStyleSelect.set("[X] Invalid selection!")
     SettingsOKButton = ttk.Button(SettingsWindowFrame, text="OK", command=loadTheme)
     SettingsWindowFrame.grid(row=0, column=0, sticky="nesw")
     StatusBarToggle.grid(row=0, column=0, sticky="w", padx=10)
