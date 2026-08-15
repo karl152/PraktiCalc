@@ -421,9 +421,7 @@ class PraktiCalculator:
             self.CalculationString += char
         self.LastResult = "0"
     def backspace(self): # backspace button
-        if self.CalculationString == "0":
-            pass
-        elif len(self.CalculationString) <= 1:
+        if self.CalculationString != "0" and len(self.CalculationString) <= 1:
             self.CalculationString = "0"
         else:
             self.CalculationString = self.CalculationString[:-1]
@@ -696,12 +694,16 @@ class MainWindow(tk.Tk):
         self.HelpMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
         self.HelpMenu.add_command(label="About", command=lambda: dialog.info(self, helper))
         self.MemoryDisplay = tk.Menu(self.Menubar, tearoff=TheTearoff)
-        self.MemoryDisplay.add_command(label="Set memory", command=lambda: self.setMemory(calculator))
-        self.MemoryDisplay.add_command(label="Get memory", command=lambda: self.getMemory(calculator, cfg))
-        self.MemoryDisplay.add_command(label="Add to memory", command=lambda: self.addToMemory(calculator, helper, dialog))
-        self.MemoryDisplay.add_command(label="Subtract from memory", command=lambda: self.subtractFromMemory(calculator))
-        self.MemoryDisplay.add_command(label="Append to memory", command=lambda: self.appendToMemory(calculator))
-        self.MemoryDisplay.add_command(label="Clear memory", command=lambda: self.clearMemory(calculator))
+        MemoryDisplayCommands = {
+            "Set memory": lambda: self.setMemory(calculator),
+            "Get memory": lambda: self.getMemory(calculator, cfg),
+            "Add to memory": lambda: self.addToMemory(calculator, helper, dialog),
+            "Subtract from memory": lambda: self.subtractFromMemory(calculator),
+            "Append to memory": lambda: self.appendToMemory(calculator),
+            "Clear memory": lambda: self.clearMemory(calculator)
+            }
+        for cmd in MemoryDisplayCommands:
+            self.MemoryDisplay.add_command(label=cmd, command=MemoryDisplayCommands.get(cmd))
         self.Menubar.add_cascade(label="Calculator", menu=self.CalculatorMenu)
         self.Menubar.add_cascade(label="Tools", menu=self.ToolMenu)
         self.Menubar.add_cascade(label="Help", menu=self.HelpMenu)
@@ -746,7 +748,7 @@ class MainWindow(tk.Tk):
         PlusButton = ttk.Button(self.WindowFrame, text="+", command=lambda: self.append("plus", calculator, cfg))
         MinusButton = ttk.Button(self.WindowFrame, text="-", command=lambda: self.append("minus", calculator, cfg))
         MultiplyButton = ttk.Button(self.WindowFrame, text="x", command=lambda: self.append("asterisk", calculator, cfg))
-        DivideButton = ttk.Button(self.WindowFrame, text="÷", command=lambda: self.append("slash", calculator, cfg))
+        DivideButton = ttk.Button(self.WindowFrame, text="\u00f7", command=lambda: self.append("slash", calculator, cfg))
         SevenButton = ttk.Button(self.WindowFrame, text="7", command=lambda: self.append("7", calculator, cfg))
         EightButton = ttk.Button(self.WindowFrame, text="8", command=lambda: self.append("8", calculator, cfg))
         NineButton = ttk.Button(self.WindowFrame, text="9", command=lambda: self.append("9", calculator, cfg))
@@ -773,93 +775,60 @@ class MainWindow(tk.Tk):
         Checkb = ttk.Button(self, text="Check", command=lambda: print(calculator.xcheck())) # some debug thing
         sqrtButton = ttk.Button(self.WindowFrame, text="\u221a", command=lambda: self.append("\u221a" + "(", calculator, cfg))
         PowerButton = ttk.Button(self.WindowFrame, text="x^y", command=lambda: self.append("^", calculator, cfg))
+        SinLogs = [[], [], [], ["ld", "ln", "lg"]]
+        for i, sl in enumerate(("sin", "cos", "tan")):
+            SinLogs[i].append(sl)
+            SinLogs[i].append("a"+sl)
+            SinLogs[i].append(sl+"h")
+            SinLogs[i].append("a"+sl+"h")
         SinButton = ttk.Menubutton(self.WindowFrame, text="sin")
-        SinMenu = tk.Menu(SinButton, tearoff=TheTearoff)
-        SinMenu.add_command(label="sin", command=lambda: self.append("sin(", calculator, cfg))
-        SinMenu.add_command(label="asin", command=lambda: self.append("asin(", calculator, cfg))
-        SinMenu.add_command(label="sinh", command=lambda: self.append("sinh(", calculator, cfg))
-        SinMenu.add_command(label="asinh", command=lambda: self.append("asinh(", calculator, cfg))
-        SinButton["menu"] = SinMenu
         CosButton = ttk.Menubutton(self.WindowFrame, text="cos")
-        CosMenu = tk.Menu(CosButton, tearoff=TheTearoff)
-        CosMenu.add_command(label="cos", command=lambda: self.append("cos(", calculator, cfg))
-        CosMenu.add_command(label="acos", command=lambda: self.append("acos(", calculator, cfg))
-        CosMenu.add_command(label="cosh", command=lambda: self.append("cosh(", calculator, cfg))
-        CosMenu.add_command(label="acosh", command=lambda: self.append("acosh(", calculator, cfg))
-        CosButton["menu"] = CosMenu
         TanButton = ttk.Menubutton(self.WindowFrame, text="tan")
+        LogButton = ttk.Menubutton(self.WindowFrame, text="log")
+        SinMenu = tk.Menu(SinButton, tearoff=TheTearoff)
+        CosMenu = tk.Menu(CosButton, tearoff=TheTearoff)
         TanMenu = tk.Menu(TanButton, tearoff=TheTearoff)
-        TanMenu.add_command(label="tan", command=lambda: self.append("tan(", calculator, cfg))
-        TanMenu.add_command(label="atan", command=lambda: self.append("atan(", calculator, cfg))
-        TanMenu.add_command(label="tanh", command=lambda: self.append("tanh(", calculator, cfg))
-        TanMenu.add_command(label="atanh", command=lambda: self.append("atanh(", calculator, cfg))
+        LogMenu = tk.Menu(LogButton, tearoff=TheTearoff)
+        for i, menu in enumerate((SinMenu, CosMenu, TanMenu, LogMenu)):
+            for label in SinLogs[i]:
+                menu.add_command(label=label, command=lambda l=label: self.append(l+"(", calculator, cfg))
+        SinButton["menu"] = SinMenu
+        CosButton["menu"] = CosMenu
         TanButton["menu"] = TanMenu
-        LdButton = ttk.Button(self.WindowFrame, text="ld", command=lambda: self.append("ld(", calculator, cfg))
-        LnButton = ttk.Button(self.WindowFrame, text="ln", command=lambda: self.append("ln(", calculator, cfg))
-        LgButton = ttk.Button(self.WindowFrame, text="lg", command=lambda: self.append("lg(", calculator, cfg))
+        LogButton["menu"] = LogMenu
         MemoryButton = ttk.Menubutton(self.WindowFrame, text="M")
         MemoryMenu = tk.Menu(MemoryButton, tearoff=TheTearoff)
-        MemoryMenu.add_command(label="Set", command=lambda: self.setMemory(calculator))
-        MemoryMenu.add_command(label="Get", command=lambda: self.getMemory(calculator, cfg))
-        MemoryMenu.add_command(label="Add", command=lambda: self.addToMemory(calculator, helper, dialog))
-        MemoryMenu.add_command(label="Subtract", command=lambda: self.subtractFromMemory(calculator))
-        MemoryMenu.add_command(label="Append", command=lambda: self.appendToMemory(calculator))
-        MemoryMenu.add_command(label="Clear", command=lambda: self.clearMemory(calculator))
+        for cmd in MemoryDisplayCommands:
+            MemoryMenu.add_command(label=cmd.split()[0], command=MemoryDisplayCommands.get(cmd))
         MemoryButton["menu"] = MemoryMenu
-        LogButton = ttk.Menubutton(self.WindowFrame, text="log")
-        LogMenu = tk.Menu(LogButton, tearoff=TheTearoff)
-        LogMenu.add_command(label="ld", command=lambda: self.append("ld(", calculator, cfg))
-        LogMenu.add_command(label="ln", command=lambda: self.append("ln(", calculator, cfg))
-        LogMenu.add_command(label="lg", command=lambda: self.append("lg(", calculator, cfg))
-        LogButton["menu"] = LogMenu
         FactButton = ttk.Button(self.WindowFrame, text="!", command=lambda: self.append("fact(", calculator, cfg))
         KonstantButton = ttk.Menubutton(self.WindowFrame, text="\u03c0")
         KonstantMenu = tk.Menu(KonstantButton, tearoff=TheTearoff)
-        KonstantMenu.add_command(label="\u03c0", command=lambda: self.append("\u03c0", calculator, cfg))
-        KonstantMenu.add_command(label="e", command=lambda: self.append("e", calculator, cfg))
+        for cmd in ("\u03c0", "e"):
+            KonstantMenu.add_command(label=cmd, command=lambda c=cmd: self.append(c, calculator, cfg))
         KonstantButton["menu"] = KonstantMenu
         self.WindowFrame.grid(row=1, column=0, sticky=tk.NSEW)
         if bool(cfg.get("borderDisplay")) == False:
             self.Output.grid(row=0, column=0, columnspan=3, sticky=tk.NSEW)
             self.CopyButton.grid(row=0, column=3, sticky=tk.NSEW)
             self.BackspaceButton.grid(row=0, column=4, sticky=tk.NSEW)
-        else:
-            pass
-        PlusButton.grid(row=1, column=3, sticky=tk.NSEW)
-        MinusButton.grid(row=2, column=3, sticky=tk.NSEW)
-        MultiplyButton.grid(row=3, column=3, sticky=tk.NSEW)
-        DivideButton.grid(row=4, column=3, sticky=tk.NSEW)
-        SevenButton.grid(row=2, column=0, sticky=tk.NSEW)
-        EightButton.grid(row=2, column=1, sticky=tk.NSEW)
-        NineButton.grid(row=2, column=2, sticky=tk.NSEW)
-        CEButton.grid(row=1, column=4, sticky=tk.NSEW)
-        FourButton.grid(row=3, column=0, sticky=tk.NSEW)
-        FiveButton.grid(row=3, column=1, sticky=tk.NSEW)
-        SixButton.grid(row=3, column=2, sticky=tk.NSEW)
-        CommaButton.grid(row=5, column=2, sticky=tk.NSEW)
-        OneButton.grid(row=4, column=0, sticky=tk.NSEW)
-        TwoButton.grid(row=4, column=1, sticky=tk.NSEW)
-        ThreeButton.grid(row=4, column=2, sticky=tk.NSEW)
-        EqualButton.grid(row=5, column=3, sticky=tk.NSEW)
+        buttons = (
+            (MemoryButton, LeftParenButton, RightParenButton, PlusButton, CEButton),
+            (SevenButton, EightButton, NineButton, MinusButton, PowerButton),
+            (FourButton, FiveButton, SixButton, MultiplyButton, sqrtButton),
+            (OneButton, TwoButton, ThreeButton, DivideButton, ModuloButton),
+            (None, None, CommaButton, EqualButton, FactButton),
+            (SinButton, CosButton, TanButton, LogButton, KonstantButton)
+            )
+        for row, buttonrow in enumerate(buttons):
+            for col, button in enumerate(buttonrow):
+                if button != None:
+                    button.grid(row=row+1, column=col, sticky=tk.NSEW)
         ZeroButton.grid(row=5, column=0, columnspan=2, sticky=tk.NSEW)
-        ModuloButton.grid(row=4, column=4, sticky=tk.NSEW)
-        sqrtButton.grid(row=3, column=4, sticky=tk.NSEW)
-        LeftParenButton.grid(row=1, column=1, sticky=tk.NSEW)
-        RightParenButton.grid(row=1, column=2, sticky=tk.NSEW)
-        PowerButton.grid(row=2, column=4, sticky=tk.NSEW)
-        SinButton.grid(row=6, column=0, sticky=tk.NSEW)
-        CosButton.grid(row=6, column=1, sticky=tk.NSEW)
-        TanButton.grid(row=6, column=2, sticky=tk.NSEW)
-        MemoryButton.grid(row=1, column=0, sticky=tk.NSEW)
-        LogButton.grid(row=6, column=3, sticky=tk.NSEW)
-        FactButton.grid(row=5, column=4, sticky=tk.NSEW)
-        KonstantButton.grid(row=6, column=4, sticky=tk.NSEW)
         self.bind("<Key>", lambda event: self.KeyPress(event, calculator, helper, dialog))
         if debug == True:
             Checkb.grid(row=2, column=0, sticky=tk.NSEW)
-        if platform.system() == "Darwin":
-            pass
-        else:
+        if platform.system() != "Darwin":
             self.geometry(f"{self.size}x{self.size}")
         self.protocol("WM_DELETE_WINDOW", lambda: helper.close(self))
         self.update_idletasks()
