@@ -1327,7 +1327,7 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "DecimalConverter.ini").exists():
             DecimalConverterMeta = configparser.ConfigParser()
             DecimalConverterMeta.read(self.FolderPath / "DecimalConverter.ini", encoding="utf-8")
-            if DecimalConverterMeta["PraktiXtension"]["version"] != "1.2":
+            if DecimalConverterMeta["PraktiXtension"]["version"] != "1.3":
                 self.updateDecimalConverter()
         if Path(self.FolderPath / "ExtensionManager.ini").exists():
             ExtensionManagerMeta = configparser.ConfigParser()
@@ -1385,8 +1385,6 @@ class ExtensionWindow(tk.Toplevel):
 
 import tkinter as tk
 from tkinter import ttk
-from tkinter import messagebox
-import platform
 
 class DecimalConverter(ttk.Frame):
     def __init__(self, tabs, parent, mainWin, helper, calculator, dialog, DarkMode):
@@ -1451,7 +1449,7 @@ class DecimalConverter(ttk.Frame):
         mainWin.update()"""
             DecimalConverterMetadata = configparser.ConfigParser()
             DecimalConverterMetadata["PraktiXtension"] = {"name": "Decimal Converter",
-                                                          "version": "1.2",
+                                                          "version": "1.3",
                                                           "filename": "DecimalConverter.py",
                                                           "description": "The PraktiCalc Decimal Converter",
                                                           "website": "",
