@@ -1,9 +1,10 @@
--- PraktiCalc Â© 2024-2026 Karl Wesseler
+-- PraktiCalc © 2024-2026 Karl Wesseler
 -- Licensed under the GNU General Public License v3.0.
 -- See https://www.gnu.org/licenses/gpl-3.0.txt for details.
 -- SPDX-License-Identifier: GPL-3.0-only
 
 -- Build Requirements:
+-- - Xcode Command Line Tools
 -- - modern Python with tkinter (not the macOS system Python 3.9)
 -- - ttkthemes
 -- - pyinstaller
@@ -26,3 +27,6 @@ tell application "Finder"
 	delete (POSIX file (workdir & "/dist") as alias)
 	delete (POSIX file (workdir & "/" & FileName & ".spec") as alias)
 end tell
+
+-- patch Info.plist
+do shell script "cd " & FileName & ".app/Contents/" & " && patch Info.plist < ../../InfoPlist.patch && sed -i '' 's/0.0.0/" & PraktiCalcVersion & "/g' Info.plist"

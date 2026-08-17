@@ -1,0 +1,27 @@
+--- Info0.plist	2026-08-17 20:49:12
++++ Info.plist	2026-08-17 21:06:28
+@@ -3,7 +3,7 @@
+ <plist version="1.0">
+ <dict>
+ 	<key>CFBundleDisplayName</key>
+-	<string>prakticalc-1.5.4-aarch64</string>
++	<string>PraktiCalc</string>
+ 	<key>CFBundleExecutable</key>
+ 	<string>prakticalc-1.5.4-aarch64</string>
+ 	<key>CFBundleIconFile</key>
+@@ -13,12 +13,14 @@
+ 	<key>CFBundleInfoDictionaryVersion</key>
+ 	<string>6.0</string>
+ 	<key>CFBundleName</key>
+-	<string>prakticalc-1.5.4-aarch64</string>
++	<string>PraktiCalc</string>
+ 	<key>CFBundlePackageType</key>
+ 	<string>APPL</string>
+ 	<key>CFBundleShortVersionString</key>
+ 	<string>0.0.0</string>
+ 	<key>NSHighResolutionCapable</key>
+ 	<true/>
++	<key>NSHumanReadableCopyright</key>
++	<string>Copyright © 2024-2026 Karl Wesseler</string>
+ </dict>
+ </plist>
