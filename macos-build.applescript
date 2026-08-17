@@ -17,6 +17,30 @@ on error
 	error number -128
 end try
 
+-- check if Python version is NOT 3.9
+set PyVersionString to do shell script "python --version"
+if PyVersionString contains "3.9." then
+	display dialog "You are using an outdated version of Python, which also may be the macOS system Python installation! Please read the build requirements in macos-build.applescript" with icon stop
+	error number -128
+end if
+
+-- check if PyInstaller is present
+try
+	do shell script "python -m PyInstaller --version"
+on error
+	display dialog "PyInstaller seems to be missing. Please read the build requirements in macos-build.applescript" with icon stop
+	error number -128
+end try
+
+-- check if TkInter and ttkthemes are present
+try
+	do shell script "python -c 'import tkinter, ttkthemes'"
+on error
+	display dialog "Missing Python modules: either tkinter or ttkthemes or both modules are currently missing!" with icon stop
+	error number -128
+end try
+
+-- set workdir to current directory
 set workdir to do shell script "pwd"
 
 -- ask for version number
