@@ -1,4 +1,4 @@
--- PraktiCalc © 2024-2026 Karl Wesseler
+-- PraktiCalc Â© 2024-2026 Karl Wesseler
 -- Licensed under the GNU General Public License v3.0.
 -- See https://www.gnu.org/licenses/gpl-3.0.txt for details.
 -- SPDX-License-Identifier: GPL-3.0-only
@@ -30,3 +30,11 @@ end tell
 
 -- patch Info.plist
 do shell script "cd " & FileName & ".app/Contents/" & " && patch Info.plist < ../../InfoPlist.patch && sed -i '' 's/0.0.0/" & PraktiCalcVersion & "/g' Info.plist"
+
+-- move app into builds directory
+tell application "Finder"
+	if not (exists folder "build" of POSIX file workdir) then
+		make new folder at POSIX file workdir with properties {name:"builds"}
+	end if
+	move (POSIX file (workdir & "/" & FileName & ".app") as alias) to POSIX file (workdir & "/builds") as alias
+end tell
