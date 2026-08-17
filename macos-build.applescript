@@ -9,7 +9,6 @@
 -- - pyinstaller
 
 set workdir to do shell script "pwd"
-set POSIXworkdir to POSIX file workdir
 
 -- ask for version number
 display dialog "Please enter the PraktiCalc version:" default answer "" with title "set PraktiCalcVersion"
@@ -20,21 +19,10 @@ set FileName to "prakticalc-" & PraktiCalcVersion & "-aarch64"
 do shell script "python3 -m PyInstaller --onefile --windowed --strip --clean prakticalc.py --add-data PraktiCalculator.png:. --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data python-powered.png:. --add-data PraktiCalc-MacOS.png:. --name " & FileName & " --icon PraktiCalc-MacOS.png"
 tell application "Finder"
 	-- move prakticalc.app to working directory
-	set relativebuildpath to "/dist/" & FileName & ".app"
-	set buildpath to workdir & relativebuildpath
-	set build to POSIX file buildpath as alias
-	move build to POSIXworkdir
+	set build to POSIX file (workdir & "/dist/" & FileName & ".app") as alias
+	move build to POSIX file workdir as alias
 	-- delete build files
-	set relativebuildfolderpath to "/build"
-	set relativedistfolderpath to "/dist"
-	set relativespecfilepath to "/" & FileName & ".spec"
-	set buildfolderpath to workdir & relativebuildfolderpath
-	set distfolderpath to workdir & relativedistfolderpath
-	set specfilepath to workdir & relativespecfilepath
-	set buildfolder to POSIX file buildfolderpath as alias
-	set distfolder to POSIX file distfolderpath as alias
-	set specfile to POSIX file specfilepath as alias
-	delete buildfolder
-	delete distfolder
-	delete specfile
+	delete (POSIX file (workdir & "/build") as alias)
+	delete (POSIX file (workdir & "/dist") as alias)
+	delete (POSIX file (workdir & "/" & FileName & ".spec") as alias)
 end tell
