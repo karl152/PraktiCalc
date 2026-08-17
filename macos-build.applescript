@@ -4,10 +4,18 @@
 -- SPDX-License-Identifier: GPL-3.0-only
 
 -- Build Requirements:
--- - Xcode Command Line Tools
 -- - modern Python with tkinter (not the macOS system Python 3.9)
 -- - ttkthemes
 -- - pyinstaller
+-- - patch (from the Xcode Command Line Tools or from somewhere else)
+
+-- check if patch is present
+try
+	do shell script "which patch"
+on error
+	display dialog "patch seems to be missing, try installing the Xcode Command Line Tools or another implementation" with icon stop
+	error number -128
+end try
 
 set workdir to do shell script "pwd"
 
