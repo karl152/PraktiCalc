@@ -65,7 +65,7 @@ do shell script "cd " & FileName & ".app/Contents/" & " && patch Info.plist < ..
 
 -- move app into builds directory
 tell application "Finder"
-	if not (exists folder "build" of POSIX file workdir) then
+	if not (exists folder "builds" of POSIX file workdir) then
 		make new folder at POSIX file workdir with properties {name:"builds"}
 	end if
 	move (POSIX file (workdir & "/" & FileName & ".app") as alias) to POSIX file (workdir & "/builds") as alias
