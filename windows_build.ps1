@@ -6,8 +6,41 @@
 # REQUIREMENTS
 # - Windows 7 or newer
 # - PowerShell 2+ with 7-Zip or PowerShell 5/7
-# - Python 3.8 or newer with tkinter and pip
-# - PIP Modules: ttkthemes, pyinstaller
+# - Python 3.8 or newer with tkinter
+# - Python modules: ttkthemes, pyinstaller
+
+function Test-Test {
+    param (
+        $DepName
+    )
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Dependence $DepName not found, please ensure that you got all required dependencies installed" -ErrorAction Stop
+    } else {
+        Write-Host "Found $DepName"
+    }
+}
+
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    Write-Host "PraktiCalc build script for Windows running on PowerShell 7 or newer"
+} elseif ($PSVersionTable.PSVersion.Major -eq 5) {
+    Write-Host "PraktiCalc build script for Windows running on Windows PowerShell 5"
+} elseif ($PSVersionTable.PSVersion.Major -ge 2) {
+    Write-Host "PraktiCalc build script for Windows running on Windows PowerShell 2 or later"
+    & 'C:\Program Files\7-Zip\7z.exe' | Select-String '^7-Zip'
+    Test-Test "7-Zip"
+} else {
+    Write-Error "Incompatible PowerShell version!" -ErrorAction Stop
+}
+
+& python --version
+Test-Test "Python 3"
+& python -m PyInstaller --version
+Test-Test "PyInstaller"
+& python -c "import tkinter"
+Test-Test "TkInter"
+& python -c "import ttkthemes"
+Test-Test "ttkthemes"
+Write-Host
 
 $mode = $args[0]
 $winVersion = [System.Environment]::OSVersion.Version
