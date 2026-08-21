@@ -1,5 +1,5 @@
 Name:		prakticalc
-Version:		1.5.3
+Version:		1.5.4
 Release:		1%{?dist}
 Summary:	practical calculator written in Python
 
@@ -34,6 +34,26 @@ cp -r * %{buildroot}/
 %license usr/share/prakticalc/LICENSE
 
 %changelog
+* Fri Aug 21 2026 Karl Wesseler <karldpbkz@gmail.com> - 1.5.4
+- updated to Tk 9.0 for Windows 11 builds
+- restructured the info dialog
+- added highlights to exit buttons in alternative dialogs
+- added keybinds "C", ".", "%", "!"
+- added number of files to progressbar in Windows installer (Tk 9.0 only)
+- allowed for new calculations to be started with 0
+- improved Decimal Converter by adding scrollbars and using capital letters
+- re-enabled input focus on Windows in Decimal Converter
+- cleaned up some UI code
+- improved macOS build script and fixed the application name and info dialog
+- added dependence checking in build scripts for macOS and Windows
+- removed "feel free to close this window" state in extension window
+- fixed calculation string getting replaced under certain circumstances
+- fixed settings window hiding after displaying restart messagebox
+- fixed AppImage build script not fully restoring its directory after build
+- fixed info dialog not closing when pressing the enter key
+- fixed keybinds for Tk 9.0
+- fixed the Windows icon being stretched
+- fixed ttk theming without ttkthemes on Windows
 * Sat Aug 01 2026 Karl Wesseler <karldpbkz@gmail.com> - 1.5.3
 - Added a button to open the extension folder from extension manager
 - Added a scrollbar to the extension manager
