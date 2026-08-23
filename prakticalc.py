@@ -36,7 +36,7 @@ elif platform.system() == "Darwin":
 # VARIABLES
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.5.4"
+PraktiCalcVersion = "1.5.5"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 allowWindowsShutdownDialog = "--allowShutdownDialog" in sys.argv
 MsgBoxStyles = ["Tkinter", "Alternative"]
@@ -1982,7 +1982,7 @@ class ConsoleWindow(tk.Toplevel):
         self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=1)
         self.bind("<Key>", lambda event: self.run(parent, helper, console) if event.keysym == "Return" else self.ConsoleKey(event))
-        self.ConsoleOutput = scrolledtext.ScrolledText(self, bg="black", fg="white")
+        self.ConsoleOutput = scrolledtext.ScrolledText(self, bg="black", fg="white", font="TkFixedFont")
         self.ConsoleOutput.vbar.config(bg="black")
         ConsoleInputLabel = tk.Label(self, text="INPUT: ", bg="black", fg="white")
         self.ConsoleInput = tk.Entry(self, bg="black", fg="white")
