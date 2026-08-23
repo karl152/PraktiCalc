@@ -1,0 +1,19 @@
+--- PraktiCalc/deb-dsc-build.sh	2026-08-21 21:39:26.085852379 +0200
++++ "PraktiCalc (Kopie)/deb-dsc-build.sh"	2026-08-23 12:05:38.130594180 +0200
+@@ -34,7 +34,7 @@
+ Maintainer: Karl <karldpbkz@gmail.com>
+ Section: utils
+ Priority: optional
+-Build-Depends: debhelper-compat (=13)
++Build-Depends: debhelper-compat (=12)
+ Standards-Version: 4.7.2.0
+ Homepage: https://github.com/karl152/PraktiCalc
+ 
+@@ -45,7 +45,6 @@
+ Description: practical calculator written in Python
+  A practical calculator written in Python with Tkinter and TTK
+ Depends: python3 (>= 3.8), python3-tk
+-Recommends: python3-ttkthemes
+ Suggests: x11-utils, gxmessage, yad, kdialog, zenity
+ Provides: prakticalc
+ Replaces: prakticalc
