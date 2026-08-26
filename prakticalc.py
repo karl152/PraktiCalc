@@ -218,11 +218,12 @@ class Configuration:
                                     ("nativeMenuBar", False),
                                     ("menuTearoff", False),
                                     ("configVersion", "1.0"))
-            if platform.system() == "Linux" and platform.freedesktop_os_release().get("NAME") == "Ubuntu":
-                DefaultConfiguration["theme"] = "yaru"
         for value in DefaultConfiguration:
             self.backend.set(value[0], value[1])
             print("set " + value[0] + " to " + str(value[1]))
+        if platform.system() == "Linux" and platform.freedesktop_os_release().get("NAME") == "Ubuntu":
+            self.set("theme", "yaru")
+            print("detected Ubuntu, changing theme to yaru")
         if platform.system() != "Windows" and platform.system() != "Darwin" and ttkthemesOK == False:
             self.set("theme", "default")
             self.set("nativeMenuBar", True)
