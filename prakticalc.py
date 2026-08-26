@@ -194,7 +194,7 @@ class Configuration:
                                     ("borderDisplay", False),
                                     ("allowShutdownDialog", False),
                                     ("noDPIAwareness", False),
-                                    ("nativeMenuBar", False),
+                                    ("nativeMenuBar", True),
                                     ("menuTearoff", False),
                                     ("configVersion", "1.0"))
         elif platform.system() == "Darwin":
@@ -221,9 +221,13 @@ class Configuration:
         for value in DefaultConfiguration:
             self.backend.set(value[0], value[1])
             print("set " + value[0] + " to " + str(value[1]))
+        if platform.system() == "Linux" and platform.freedesktop_os_release().get("NAME") == "Ubuntu":
+            self.set("theme", "yaru")
+            print("detected Ubuntu, changing theme to yaru")
         if platform.system() != "Windows" and platform.system() != "Darwin" and ttkthemesOK == False:
             self.set("theme", "default")
-            print("changed the theme to default because ttkthemes isn't present")
+            self.set("nativeMenuBar", True)
+            print("changed the theme to default and enabled native menubar because ttkthemes isn't present")
     def reset(self): # deletes local configuration storage
         self.backend.reset()
     def remove(self, key): # deletes a value from configuration
