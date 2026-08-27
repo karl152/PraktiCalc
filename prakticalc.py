@@ -958,7 +958,7 @@ class SettingsWindow(tk.Toplevel):
         self.columnconfigure(0, weight=1)
         if platform.system() == "Windows":
             self.attributes("-toolwindow", True)
-            self.focus_force()
+            self.focus_set()
         SettingsWindowFrame = ttk.Frame(self)
         SettingsWindowFrame.columnconfigure(0, weight=1)
         SettingsWindowFrame.columnconfigure(1, weight=1)
@@ -1070,7 +1070,7 @@ Licensed under the GPLv3"""
             CustomInfox.columnconfigure(0, weight=1)
             if platform.system() == "Windows":
                 CustomInfox.attributes("-toolwindow", True)
-                CustomInfox.focus_force()
+                CustomInfox.focus_set()
             CustomInfoFrame = ttk.Frame(CustomInfox)
             CustomInfoFrame.rowconfigure(0, weight=1)
             CustomInfoFrame.columnconfigure(0, weight=1)
@@ -1152,7 +1152,7 @@ Licensed under the GPLv3"""
             ErrorWindow.columnconfigure(0, weight=1)
             if platform.system() == "Windows":
                 ErrorWindow.attributes("-toolwindow", True)
-                ErrorWindow.focus_force()
+                ErrorWindow.focus_set()
             ErrorWindowFrame = ttk.Frame(ErrorWindow)
             ErrorWindowFrame.rowconfigure(0, weight=1)
             ErrorWindowFrame.columnconfigure(0, weight=1)
@@ -1212,7 +1212,7 @@ class HelpWindow(tk.Toplevel):
         self.columnconfigure(0, weight=1)
         self.title("PraktiCalc Help")
         if platform.system() == "Windows":
-            self.focus_force()
+            self.focus_set()
         HelpFrame = ttk.Frame(self)
         HelpFrame.rowconfigure(0, weight=1)
         HelpFrame.columnconfigure(0, weight=1)
@@ -1241,7 +1241,7 @@ class HistoryWindow(tk.Toplevel):
         # self.config(height=400, width=256)
         if platform.system() == "Windows":
             self.attributes("-toolwindow", True)
-            self.focus_force()
+            self.focus_set()
         HistoryWindowFrame = ttk.Frame(self)
         HistoryWindowFrame.columnconfigure(0, weight=1)
         HistoryWindowFrame.rowconfigure(0, weight=1)
@@ -2036,7 +2036,7 @@ class ConsoleWindow(tk.Toplevel):
         ConsoleAboutWindow = tk.Toplevel(parent)
         if platform.system() == "Windows":
             ConsoleAboutWindow.attributes("-toolwindow", True)
-            ConsoleAboutWindow.focus_force()
+            ConsoleAboutWindow.focus_set()
         ConsoleAboutWindow.columnconfigure(0, weight=1)
         for cw in range(4):
             ConsoleAboutWindow.rowconfigure(cw, weight=1)
