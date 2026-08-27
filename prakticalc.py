@@ -708,6 +708,9 @@ class MainWindow(tk.Tk):
             }
         for cmd in MemoryDisplayCommands:
             self.MemoryDisplay.add_command(label=cmd, command=MemoryDisplayCommands.get(cmd))
+        self.MemoryDisplay.bind("<Escape>", lambda _: self.toggleMemoryMenu())
+        self.MemoryDisplay.bind("<KeyPress-m>", lambda _: self.toggleMemoryMenu())
+        self.MemoryDisplay.bind("<KeyPress-M>", lambda _: self.toggleMemoryMenu())
         self.Menubar.add_cascade(label="Calculator", menu=self.CalculatorMenu)
         self.Menubar.add_cascade(label="Tools", menu=self.ToolMenu)
         self.Menubar.add_cascade(label="Help", menu=self.HelpMenu)
@@ -800,11 +803,11 @@ class MainWindow(tk.Tk):
         CosButton["menu"] = CosMenu
         TanButton["menu"] = TanMenu
         LogButton["menu"] = LogMenu
-        MemoryButton = ttk.Menubutton(self.WindowFrame, text="M")
-        MemoryMenu = tk.Menu(MemoryButton, tearoff=TheTearoff)
+        self.MemoryButton = ttk.Menubutton(self.WindowFrame, text="M")
+        MemoryMenu = tk.Menu(self.MemoryButton, tearoff=TheTearoff)
         for cmd in MemoryDisplayCommands:
             MemoryMenu.add_command(label=cmd.split()[0], command=MemoryDisplayCommands.get(cmd))
-        MemoryButton["menu"] = MemoryMenu
+        self.MemoryButton["menu"] = MemoryMenu
         FactButton = ttk.Button(self.WindowFrame, text="!", command=lambda: self.append("fact(", calculator, cfg))
         KonstantButton = ttk.Menubutton(self.WindowFrame, text="\u03c0")
         KonstantMenu = tk.Menu(KonstantButton, tearoff=TheTearoff)
@@ -817,7 +820,7 @@ class MainWindow(tk.Tk):
             self.CopyButton.grid(row=0, column=3, sticky=tk.NSEW)
             self.BackspaceButton.grid(row=0, column=4, sticky=tk.NSEW)
         buttons = (
-            (MemoryButton, LeftParenButton, RightParenButton, PlusButton, CEButton),
+            (self.MemoryButton, LeftParenButton, RightParenButton, PlusButton, CEButton),
             (SevenButton, EightButton, NineButton, MinusButton, PowerButton),
             (FourButton, FiveButton, SixButton, MultiplyButton, sqrtButton),
             (OneButton, TwoButton, ThreeButton, DivideButton, ModuloButton),
@@ -858,10 +861,18 @@ class MainWindow(tk.Tk):
                 "c": lambda: self.clear(calculator, cfg),
                 "C": lambda: self.clear(calculator, cfg),
                 "BackSpace": lambda: self.backspace(calculator, cfg),
+                "m": self.toggleMemoryMenu,
+                "M": self.toggleMemoryMenu
                 }
             run = Keys.get(Key)
             if run:
                 run()
+    def toggleMemoryMenu(self):
+        if self.MemoryDisplay.winfo_ismapped():
+            self.MemoryDisplay.unpost()
+        else:
+            self.MemoryDisplay.post(int(self.MemoryButton.winfo_rootx()+self.winfo_width()/4), int(self.MemoryButton.winfo_rooty()+self.winfo_height()/8))
+            self.MemoryDisplay.focus_set()
     def applySettings(self, calculator, cfg): # toggles border display
         if bool(cfg.get("borderDisplay")) == False:
             self.title("PraktiCalc")
