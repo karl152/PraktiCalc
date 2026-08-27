@@ -433,7 +433,7 @@ def Settings() :
     SettingsWindow.columnconfigure(0, weight=1)
     if platform.system() == "Windows":
         SettingsWindow.attributes("-toolwindow", True)
-        SettingsWindow.focus_force()
+        SettingsWindow.focus_set()
     changeTheme(SettingsWindow)
     SettingsWindowFrame = ttk.Frame(SettingsWindow)
     SettingsWindowFrame.columnconfigure(0, weight=1)
@@ -527,7 +527,7 @@ def CustomInfo() :
         CustomInfox.columnconfigure(0, weight=1)
         if platform.system() == "Windows":
             CustomInfox.attributes("-toolwindow", True)
-            CustomInfox.focus_force()
+            CustomInfox.focus_set()
         changeTheme(CustomInfox)
         CustomInfoFrame = ttk.Frame(CustomInfox)
         CustomInfoFrame.rowconfigure(0, weight=1)
@@ -587,7 +587,7 @@ def showError(message):
         ErrorWindow.columnconfigure(0, weight=1)
         if platform.system() == "Windows":
             ErrorWindow.attributes("-toolwindow", True)
-            ErrorWindow.focus_force()
+            ErrorWindow.focus_set()
         changeTheme(ErrorWindow)
         ErrorWindowFrame = ttk.Frame(ErrorWindow)
         ErrorWindowFrame.rowconfigure(0, weight=1)
@@ -686,7 +686,7 @@ def History() :
     # HistoryX.config(height=400, width=256)
     if platform.system() == "Windows":
         HistoryX.attributes("-toolwindow", True)
-        HistoryX.focus_force()
+        HistoryX.focus_set()
     changeTheme(HistoryX)
     HistoryWindowFrame = ttk.Frame(HistoryX)
     HistoryWindowFrame.columnconfigure(0, weight=1)
@@ -769,7 +769,7 @@ def More() :
     MoreWindow.columnconfigure(0, weight=1)
     if platform.system() == "Windows":
         MoreWindow.attributes("-toolwindow", True)
-        MoreWindow.focus_force()
+        MoreWindow.focus_set()
     changeTheme(MoreWindow)
     ConverterWindowFrame = ttk.Frame(MoreWindow)
     DecimalFrame = ttk.LabelFrame(ConverterWindowFrame, text="Decimal")
@@ -875,7 +875,7 @@ if console == True:
         ConsoleAboutWindow = tk.Toplevel(MainWindow)
         if platform.system() == "Windows":
             ConsoleAboutWindow.attributes("-toolwindow", True)
-            ConsoleAboutWindow.focus_force()
+            ConsoleAboutWindow.focus_set()
         ConsoleAboutWindow.columnconfigure(0, weight=1)
         for cw in range(4):
             ConsoleAboutWindow.rowconfigure(cw, weight=1)
