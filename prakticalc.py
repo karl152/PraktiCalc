@@ -1318,7 +1318,7 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "ExtensionManager.ini").exists():
             ExtensionManagerMeta = configparser.ConfigParser()
             ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini", encoding="utf-8")
-            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.12":
+            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.13":
                 self.updateExtensionManager()
         if Path(self.FolderPath / "PraktiGraph.ini").exists():
             PraktiGraphMeta = configparser.ConfigParser()
@@ -1670,11 +1670,18 @@ class ExtensionManager(ttk.Frame):
                         canload = False
                     if canload == False:
                         raise ImportWarning
+                    if Path(parent.FolderPath / ExtensionName).exists():
+                        overwritten = True
+                    else:
+                        overwritten = False
                     shutil.move(Path(tempdir) / "info.ini", parent.FolderPath / f"{ExtensionName[:-3]}.ini")
                     shutil.move(Path(tempdir) / "description.txt", parent.FolderPath / f"{ExtensionName[:-3]}.txt")
                     shutil.move(Path(tempdir) / ExtensionName, parent.FolderPath / ExtensionName)
-                    self.ExtensionTree.insert("", tk.END, text=ExtensionName[:-3])
-                    messagebox.showinfo(parent=parent, title="PraktiXtension installed", message="Extension installed successfully, reopen the extension window to load it")
+                    if overwritten == False:
+                        messagebox.showinfo(parent=parent, title="PraktiXtension installed", message="Extension installed successfully, reopen the extension window to load it")
+                        self.ExtensionTree.insert("", tk.END, text=ExtensionName[:-3])
+                    else:
+                        messagebox.showinfo(parent=parent, title="PraktiXtension upgraded", message="Extension successfully upgraded, replaced or reinstalled.\nPlease reopen the extension window to reload it")
                 except FileNotFoundError:
                     dialog.error("Extension not found in file", parent, helper)
                     return
@@ -1699,7 +1706,7 @@ class ExtensionManager(ttk.Frame):
         helper.close(parent)"""
             ExtensionManagerMetadata = configparser.ConfigParser()
             ExtensionManagerMetadata["PraktiXtension"] = {"name": "Extension Manager",
-                                                          "version": "1.12",
+                                                          "version": "1.13",
                                                           "filename": "ExtensionManager.py",
                                                           "description": "The PraktiCalc Extension Manager",
                                                           "website": "",
