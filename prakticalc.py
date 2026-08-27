@@ -254,10 +254,7 @@ class WindowsConfig:
                 elif value == False:
                     winreg.SetValueEx(PraktiKey, str(key), 0, winreg.REG_DWORD, 0)
             else:
-                try:
-                    showError("Error saving Configuration")
-                except:
-                    messagebox.showerror("Error writing configuration")
+                messagebox.showerror("Error writing configuration")
     def create(self):
         winreg.CreateKey(winreg.HKEY_CURRENT_USER, r"Software\PraktiCalc")
     def reset(self):
@@ -289,10 +286,7 @@ class MacConfig:
             with open(self.filepath, "wb") as file:
                 plistlib.dump(data, file)
         else:
-            try:
-                showError("Error saving Configuration")
-            except:
-                messagebox.showerror("Error writing configuration")
+            messagebox.showerror("Error writing configuration")
     def create(self):
         with open(self.filepath, "wb") as file:
             plistlib.dump({}, file)
@@ -338,10 +332,7 @@ class XDGConfig:
         elif isinstance(value, int):
             self.config["General"][str(key)] = str(value)
         else:
-            try:
-                showError("Error saving Configuration")
-            except:
-                messagebox.showerror("Error writing configuration")
+            messagebox.showerror("Error writing configuration")
         with open(self.path, "w", encoding="utf-8") as configfile:
             self.config.write(configfile)
     def create(self):
