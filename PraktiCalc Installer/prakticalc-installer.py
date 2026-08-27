@@ -28,7 +28,7 @@ except:
     pass
 
 #---------------------------
-PraktiCalcVersion = "1.5.4"
+PraktiCalcVersion = "1.5.5"
 #---------------------------
 
 def speak(string):
@@ -250,11 +250,15 @@ def actuallyInstall():
                     PrevInstallPath = winreg.QueryValueEx(PraktiKey, "InstallLocation")[0]
                     PreviousVersion = winreg.QueryValueEx(PraktiKey, "DisplayVersion")[0]
                     if Version(PraktiCalcVersion) < Version(PreviousVersion):
-                        messagebox.showerror(parent=InstallWizardWindow, title="Error", message="You already have a newer version of PraktiCalc installed!")
+                        messagebox.showerror(parent=InstallWizardWindow, title="Error - Downgrading unsupported", message="You already have a newer version of PraktiCalc installed!")
                         InstallWizardWindow.destroy()
                         exit()
                 subprocess.getoutput(r'reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /f')
-                shutil.rmtree(PrevInstallPath)
+                try:
+                    shutil.rmtree(PrevInstallPath)
+                except:
+                    messagebox.showerror(parent=InstallWizardWindow, title="Uninstallation Error", message="Failed to uninstall the previous version of PraktiCalc.\nPlease make sure it's closed and try again.\nIf that doesn't work, restart your PC and try again.\nThank you!")
+                    InstallWizardWindow.destroy()
                 Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc.url").unlink(missing_ok=True)
                 Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc.lnk").unlink(missing_ok=True)
                 Path("C:/Users/" + username + "/Desktop/PraktiCalc.url").unlink(missing_ok=True)
