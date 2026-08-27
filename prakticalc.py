@@ -724,14 +724,14 @@ class MainWindow(tk.Tk):
         self.CalculatorMenuButton["menu"] = self.CalculatorCustomMenu
         self.ToolMenuButton = ttk.Menubutton(self.MenuBarFrame, text="Tools")
         self.ToolCustomMenu = tk.Menu(self.ToolMenuButton, tearoff=TheTearoff)
-        self.ToolCustomMenu.add_command(label="History", command=lambda: HistoryWindow(self, calculator, helper))
-        self.ToolCustomMenu.add_command(label="Extensions", command=lambda: ExtensionWindow(self, helper, calculator, dialog, cfg))
+        self.ToolCustomMenu.add_command(label="History", accelerator="H", command=lambda: HistoryWindow(self, calculator, helper))
+        self.ToolCustomMenu.add_command(label="Extensions", accelerator="X", command=lambda: ExtensionWindow(self, helper, calculator, dialog, cfg))
         self.ToolCustomMenu.add_separator()
-        self.ToolCustomMenu.add_command(label="Settings", command=lambda: SettingsWindow(self, helper, calculator, cfg))
+        self.ToolCustomMenu.add_command(label="Settings", accelerator="S", command=lambda: SettingsWindow(self, helper, calculator, cfg))
         self.ToolMenuButton["menu"] = self.ToolCustomMenu
         self.HelpMenuButton = ttk.Menubutton(self.MenuBarFrame, text="Help")
         self.HelpCustomMenu = tk.Menu(self.HelpMenuButton, tearoff=TheTearoff)
-        self.HelpCustomMenu.add_command(label="About", command=lambda: dialog.info(self, helper))
+        self.HelpCustomMenu.add_command(label="About", accelerator="I", command=lambda: dialog.info(self, helper))
         self.HelpMenuButton["menu"] = self.HelpCustomMenu
         self.CalculatorMenuButton.grid(row=0, column=0, sticky=tk.W)
         self.ToolMenuButton.grid(row=0, column=1, sticky=tk.W)
