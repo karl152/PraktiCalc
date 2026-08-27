@@ -860,9 +860,10 @@ class MainWindow(tk.Tk):
             run = Keys.get(Key)
             if run:
                 run()
-    def toggleMemoryMenu(self):
+    def toggleMemoryMenu(self): # toggles the floating memory menu
         if self.MemoryDisplay.winfo_ismapped():
             self.MemoryDisplay.unpost()
+            self.focus_set()
         else:
             self.MemoryDisplay.post(int(self.MemoryButton.winfo_rootx()+self.winfo_width()/4), int(self.MemoryButton.winfo_rooty()+self.winfo_height()/8))
             self.MemoryDisplay.focus_set()
