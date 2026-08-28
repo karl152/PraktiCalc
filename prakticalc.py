@@ -720,20 +720,11 @@ class MainWindow(tk.Tk):
         self.Menubar.add_cascade(label="M: " + calculator.Memory, menu=self.MemoryDisplay)
         self.MenuBarFrame = ttk.Frame(self)
         self.CalculatorMenuButton = ttk.Menubutton(self.MenuBarFrame, text="Calculator")
-        self.CalculatorCustomMenu = tk.Menu(self.CalculatorMenuButton, tearoff=TheTearoff)
-        self.CalculatorCustomMenu.add_command(label="Quit", command=lambda: helper.close(self))
-        self.CalculatorMenuButton["menu"] = self.CalculatorCustomMenu
+        self.CalculatorMenuButton["menu"] = self.CalculatorMenu
         self.ToolMenuButton = ttk.Menubutton(self.MenuBarFrame, text="Tools")
-        self.ToolCustomMenu = tk.Menu(self.ToolMenuButton, tearoff=TheTearoff)
-        self.ToolCustomMenu.add_command(label="History", accelerator="H", command=lambda: HistoryWindow(self, calculator, helper))
-        self.ToolCustomMenu.add_command(label="Extensions", accelerator="X", command=lambda: ExtensionWindow(self, helper, calculator, dialog, cfg))
-        self.ToolCustomMenu.add_separator()
-        self.ToolCustomMenu.add_command(label="Settings", accelerator="S", command=lambda: SettingsWindow(self, helper, calculator, cfg))
-        self.ToolMenuButton["menu"] = self.ToolCustomMenu
+        self.ToolMenuButton["menu"] = self.ToolMenu
         self.HelpMenuButton = ttk.Menubutton(self.MenuBarFrame, text="Help")
-        self.HelpCustomMenu = tk.Menu(self.HelpMenuButton, tearoff=TheTearoff)
-        self.HelpCustomMenu.add_command(label="About", accelerator="I", command=lambda: dialog.info(self, helper))
-        self.HelpMenuButton["menu"] = self.HelpCustomMenu
+        self.HelpMenuButton["menu"] = self.HelpMenu
         self.CalculatorMenuButton.grid(row=0, column=0, sticky=tk.W)
         self.ToolMenuButton.grid(row=0, column=1, sticky=tk.W)
         self.HelpMenuButton.grid(row=0, column=2, sticky=tk.W)
