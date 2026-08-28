@@ -694,12 +694,12 @@ class MainWindow(tk.Tk):
         self.CalculatorMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
         self.CalculatorMenu.add_command(label="Quit", command=lambda: helper.close(self))
         self.ToolMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
-        self.ToolMenu.add_command(label="History", command=lambda: HistoryWindow(self, calculator, helper))
-        self.ToolMenu.add_command(label="Extensions", command=lambda: ExtensionWindow(self, helper, calculator, dialog, cfg))
+        self.ToolMenu.add_command(label="History", accelerator="H", command=lambda: HistoryWindow(self, calculator, helper))
+        self.ToolMenu.add_command(label="Extensions", accelerator="X", command=lambda: ExtensionWindow(self, helper, calculator, dialog, cfg))
         self.ToolMenu.add_separator()
-        self.ToolMenu.add_command(label="Settings", command=lambda: SettingsWindow(self, helper, calculator, cfg))
+        self.ToolMenu.add_command(label="Settings", accelerator="S", command=lambda: SettingsWindow(self, helper, calculator, cfg))
         self.HelpMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
-        self.HelpMenu.add_command(label="About", command=lambda: dialog.info(self, helper))
+        self.HelpMenu.add_command(label="About", accelerator="I", command=lambda: dialog.info(self, helper))
         self.MemoryDisplay = tk.Menu(self.Menubar, tearoff=TheTearoff)
         MemoryDisplayCommands = {
             "Set memory": lambda: self.setMemory(calculator),
