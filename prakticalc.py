@@ -148,6 +148,8 @@ class Configuration:
             self.backend = XDGConfig()
         try:
             detectedConfigVersion = str(self.get("configVersion"))
+            if detectedConfigVersion == "None":
+                detectedConfigVersion = str(self.get("configVersion"))
             try:
                 float(detectedConfigVersion)
             except:
