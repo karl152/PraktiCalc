@@ -36,7 +36,7 @@ elif platform.system() == "Darwin":
 # VARIABLES
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.5.5"
+PraktiCalcVersion = "1.5.6"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 allowWindowsShutdownDialog = "--allowShutdownDialog" in sys.argv
 MsgBoxStyles = ["Tkinter", "Alternative"]
@@ -459,13 +459,17 @@ class PraktiCalculator:
         self.clear()
         self.setOperators("rad")
         self.append(expression)
-        result = self.calculate()
-        self.clear()
-        self.HistoryList.pop()
-        self.LastResult = PreviousResult
-        self.CalculationString = PreviousCalculationString
-        self.setOperators(self.TrigMode)
-        return result
+        try:
+            result = self.calculate()
+        except Exception:
+            raise Exception
+        finally:
+            self.clear()
+            self.HistoryList.pop()
+            self.LastResult = PreviousResult
+            self.CalculationString = PreviousCalculationString
+            self.setOperators(self.TrigMode)
+            return result
     def setOperators(self, TrigMode): # defines all the additional operators
         self.operators = {}
         self.operators["sqrt"] = math.sqrt
