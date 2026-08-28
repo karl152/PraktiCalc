@@ -4,16 +4,16 @@
  <plist version="1.0">
  <dict>
  	<key>CFBundleDisplayName</key>
--	<string>prakticalc-1.5.4-aarch64</string>
+-	<string>prakticalc-1.5.5-aarch64</string>
 +	<string>PraktiCalc</string>
  	<key>CFBundleExecutable</key>
- 	<string>prakticalc-1.5.4-aarch64</string>
+ 	<string>prakticalc-1.5.5-aarch64</string>
  	<key>CFBundleIconFile</key>
 @@ -13,12 +13,14 @@
  	<key>CFBundleInfoDictionaryVersion</key>
  	<string>6.0</string>
  	<key>CFBundleName</key>
--	<string>prakticalc-1.5.4-aarch64</string>
+-	<string>prakticalc-1.5.5-aarch64</string>
 +	<string>PraktiCalc</string>
  	<key>CFBundlePackageType</key>
  	<string>APPL</string>
