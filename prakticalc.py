@@ -1757,14 +1757,14 @@ class PraktiGraph(ttk.Frame):
         self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=1)
         self.Canvas = tk.Canvas(self, background=self.BackgroundColor)
-        self.Canvas.grid(row=0, column=0, columnspan=4, sticky="news")
-        ttk.Separator(self, orient="horizontal").grid(row=1, column=0, columnspan=4, sticky="ew")
-        ttk.Label(self, text="f(x) = ").grid(row=2, column=0, sticky="e")
-        ttk.Label(self, text="g(x) = ").grid(row=3, column=0, sticky="e")
+        self.Canvas.grid(row=0, column=0, columnspan=4, sticky=tk.NSEW)
+        ttk.Separator(self, orient=tk.HORIZONTAL).grid(row=1, column=0, columnspan=4, sticky=tk.EW)
+        ttk.Label(self, text="f(x) = ").grid(row=2, column=0, sticky=tk.E)
+        ttk.Label(self, text="g(x) = ").grid(row=3, column=0, sticky=tk.E)
         self.fxEntry = ttk.Entry(self)
         self.gxEntry = ttk.Entry(self)
-        self.fxEntry.grid(row=2, column=1, columnspan=2, sticky="ew")
-        self.gxEntry.grid(row=3, column=1, columnspan=2, sticky="ew")
+        self.fxEntry.grid(row=2, column=1, columnspan=2, sticky=tk.EW)
+        self.gxEntry.grid(row=3, column=1, columnspan=2, sticky=tk.EW)
         self.fxColorButton = tk.Button(self, text="Color", fg=self.fxColor, bg=self.fxColor, command=lambda: self.setFxColor(parent, calculator))
         self.gxColorButton = tk.Button(self, text="Color", fg=self.gxColor, bg=self.gxColor, command=lambda: self.setGxColor(parent, calculator))
         if platform.system() == "Darwin":
@@ -1783,12 +1783,12 @@ class PraktiGraph(ttk.Frame):
         self.Table.column("#0", width=fullwidth // 12)
         for col in self.Table["columns"]:
             self.Table.column(col, width=fullwidth // 12)
-        self.Table.grid(row=4, column=0, columnspan=4, sticky="news")
-        ttk.Button(self, text="Clear", command=self.clear).grid(row=5, column=1, pady=10, padx=20, sticky="e")
-        ttk.Button(self, text="Draw", command=lambda: self.redraw(calculator)).grid(row=5, column=2, pady=10, padx=20, sticky="w")
-        ttk.Checkbutton(self, text="Draw numbers", variable=self.Numbers, command=lambda: self.redraw(calculator) if self.ClearStatus == False else self.doNothing()).grid(row=5, column=0, padx=(10, 0), sticky="w")
-        self.ScaleSlider = ttk.Scale(self, from_=int(25*mainWin.ScaleFactor), to=int(250*mainWin.ScaleFactor), orient="horizontal", variable=self.Scale, command=lambda _: self.redraw(calculator) if self.ClearStatus == False else self.doNothing())
-        self.ScaleSlider.grid(row=5, column=3, padx=(0, 10), sticky="e")
+        self.Table.grid(row=4, column=0, columnspan=4, sticky=tk.NSEW)
+        ttk.Button(self, text="Clear", command=self.clear).grid(row=5, column=1, pady=10, padx=20, sticky=tk.E)
+        ttk.Button(self, text="Draw", command=lambda: self.redraw(calculator)).grid(row=5, column=2, pady=10, padx=20, sticky=tk.W)
+        ttk.Checkbutton(self, text="Draw numbers", variable=self.Numbers, command=lambda: self.redraw(calculator) if self.ClearStatus == False else self.doNothing()).grid(row=5, column=0, padx=(10, 0), sticky=tk.W)
+        self.ScaleSlider = ttk.Scale(self, from_=int(25*mainWin.ScaleFactor), to=int(250*mainWin.ScaleFactor), orient=tk.HORIZONTAL, variable=self.Scale, command=lambda _: self.redraw(calculator) if self.ClearStatus == False else self.doNothing())
+        self.ScaleSlider.grid(row=5, column=3, padx=(0, 10), sticky=tk.E)
         self.bind("<Configure>", lambda event: self.after(200, lambda: self.redraw(calculator)) if self.ClearStatus == False else self.clear())
         self.fxEntry.focus_set()
     def redraw(self, calculator):
@@ -1865,7 +1865,7 @@ class PraktiGraph(ttk.Frame):
                     self.Canvas.create_line(self.XtoX(values[f][0]), self.YtoY(values[f][1]), self.XtoX(values[f+1][0]), self.YtoY(values[f+1][1]), fill=self.gxColor)
 
     def clear(self):
-        self.Canvas.delete("all")
+        self.Canvas.delete(tk.ALL)
         emptyness = []
         for col in self.cols:
             emptyness.append("")
