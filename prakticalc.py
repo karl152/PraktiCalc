@@ -1933,7 +1933,10 @@ class PraktiGraph(ttk.Frame):
                     else:
                         finalfunc += char
                 else:
-                    finalfunc += char
+                    if finalfunc[len(finalfunc)-1].isdigit() and not char.isdigit() and char not in IgnoredChars[1:]:
+                        finalfunc += f"*{char}"
+                    else:
+                        finalfunc += char
         print("PraktiGraph: " + finalfunc)
         return finalfunc
     def doNothing(self):
