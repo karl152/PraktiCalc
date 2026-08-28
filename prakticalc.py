@@ -1911,17 +1911,18 @@ class PraktiGraph(ttk.Frame):
                 SuperScript = False
                 newfunc += char
         finalfunc = ""
+        IgnoredChars = ("(", "^", "*", "+", "-", "*", "/", "%", ")")
         for char in newfunc:
             if finalfunc == "":
                 finalfunc = char
             elif char == "x":
-                if finalfunc[len(finalfunc)-1] not in (")", "^", "*"):
+                if finalfunc[len(finalfunc)-1] not in IgnoredChars[1:]:
                     finalfunc += "*x"
                 else:
                     finalfunc += "x"
             else:
                 if finalfunc[len(finalfunc)-1] == "x":
-                    if char not in ("(", "^", "*"):
+                    if char not in IgnoredChars[:-1]:
                         finalfunc += f"*{char}"
                     else:
                         finalfunc += char
