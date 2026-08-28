@@ -32,6 +32,7 @@ cd ..
 dpkg-deb --build --root-owner-group prakticalc/
 
 # clean up
+chmod 644 prakticalc/usr/bin/prakticalc
 rm -rf ./prakticalc/usr/share/prakticalc
 
 # show errors if lintian is installed
