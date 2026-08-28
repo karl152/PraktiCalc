@@ -147,13 +147,19 @@ class Configuration:
         else:
             self.backend = XDGConfig()
         try:
-            if str(self.get("configVersion")) == "1.0":
+            detectedConfigVersion = str(self.get("configVersion"))
+            try:
+                float(detectedConfigVersion)
+            except:
+                fail = True
+                return
+            if detectedConfigVersion == "1.0":
                 fail = False
                 return
-            else:
+            elif float(detectedConfigVersion) != 1.0:
                 fail = True
         except:
-            fail = True
+            fail = False
         finally:
             if fail == True:
                 try:
