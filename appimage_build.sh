@@ -59,6 +59,8 @@ cd ./linux-pkg-builds/AppImage
 echo "Cleaning"
 rm appimagetool-x86_64.AppImage
 cd ../..
+chmod -x ./linux-pkg-builds/AppImage/com.github.karl152.prakticalc.AppDir/AppRun
+rm linux-pkg-builds/AppImage/com.github.karl152.prakticalc.AppDir/.DirIcon
 rm -rf ./linux-pkg-builds/AppImage/com.github.karl152.prakticalc.AppDir/usr/bin
 rm -rf dist/
 rm -rf build/
