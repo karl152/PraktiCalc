@@ -1927,7 +1927,7 @@ class PraktiGraph(ttk.Frame):
                 else:
                     finalfunc += "("
             else:
-                if finalfunc[len(finalfunc)-1] == "x":
+                if finalfunc[len(finalfunc)-1] in ("x", ")"):
                     if char not in IgnoredChars[1:]:
                         finalfunc += f"*{char}"
                     else:
