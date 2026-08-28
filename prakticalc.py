@@ -1728,8 +1728,8 @@ class ExtensionManager(ttk.Frame):
             Path(self.FolderPath / "PraktiGraph.txt").unlink(missing_ok=True)
         if not Path(self.FolderPath / "PraktiGraph.py").exists():
             PraktiGraphCode = r"""# PraktiGraph
-# Copyright (C) 2026 Karl "karl152"
-# SPDX-License-Identifier: GPL-3.0
+# Copyright (C) 2026 Karl Wesseler
+# SPDX-License-Identifier: GPL-3.0-only
 
 import tkinter as tk
 from tkinter import ttk, messagebox, colorchooser
@@ -1911,7 +1911,25 @@ class PraktiGraph(ttk.Frame):
                     newfunc += "^"
                 SuperScript = False
                 newfunc += char
-        return newfunc[::-1]
+        finalfunc = ""
+        for char in newfunc:
+            if finalfunc == "":
+                finalfunc = char
+            elif char == "x":
+                if finalfunc[len(finalfunc)-1] not in (")", "^", "*"):
+                    finalfunc += "*x"
+                else:
+                    finalfunc += "x"
+            else:
+                if finalfunc[len(finalfunc)-1] == "x":
+                    if char not in ("(", "^", "*"):
+                        finalfunc += f"*{char}"
+                    else:
+                        finalfunc += char
+                else:
+                    finalfunc += char
+        #print(finalfunc[::-1])
+        return finalfunc[::-1]
     def doNothing(self):
         pass"""
             PraktiGraphMetadata = configparser.ConfigParser()
