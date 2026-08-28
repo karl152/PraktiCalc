@@ -521,25 +521,26 @@ class WindowHelper:
         # 2 = manual theming
     def changeTheme(self, WindowName): # sets the theme for a given window
         self.refreshTheming()
-        if self.theming != 0 and cfg.get("theme") == "black" or cfg.get("theme") == "equilux":
+        theme = self.ConfigurationStorage.get("theme")
+        if self.theming != 0 and theme == "black" or theme == "equilux":
             self.DarkMode = True
         else:
             self.DarkMode = False
         if platform.system() == "Darwin":
             if self.theming == 0:
                 self.style = ttk.Style(WindowName)
-                if bool(cfg.get("nativeTheme")) == True or self.ConfigurationStorage.get("theme") not in self.style.theme_names():
+                if bool(self.ConfigurationStorage.get("nativeTheme")) == True or theme not in self.style.theme_names():
                     self.style.theme_use(NativeTheme)
                     if subprocess.getoutput("defaults read -g AppleInterfaceStyle") == "Dark":
                         self.DarkMode = True
                     else:
                         self.DarkMode = False
                 else:
-                    self.style.theme_use(self.ConfigurationStorage.get("theme"))
+                    self.style.theme_use(theme)
             else:
                 self.style = ThemedStyle(WindowName)
-                if self.ConfigurationStorage.get("theme") in self.style.theme_names():
-                    self.style.theme_use(self.ConfigurationStorage.get("theme"))
+                if theme in self.style.theme_names():
+                    self.style.theme_use(theme)
                 else:
                     if messagebox.askyesno("Theming Error", "The specified theme couldn't be loaded!\nDo you want to reset the settings?") == True:
                         self.ConfigurationStorage.reset()
@@ -548,7 +549,7 @@ class WindowHelper:
             self.ajustTitleBars()
             if self.theming == 0:
                 self.style = ttk.Style(WindowName)
-                if bool(cfg.get("nativeTheme")) == True or self.ConfigurationStorage.get("theme") not in self.style.theme_names():
+                if bool(self.ConfigurationStorage.get("nativeTheme")) == True or theme not in self.style.theme_names():
                     self.style.theme_use(NativeTheme)
                     try:
                         ClassicStyleEnabled = ctypes.c_bool()
@@ -567,11 +568,11 @@ class WindowHelper:
                         except:
                             pass
                 else:
-                    self.style.theme_use(self.ConfigurationStorage.get("theme"))
+                    self.style.theme_use(theme)
             else:
                 self.style = ThemedStyle(WindowName)
-                if self.ConfigurationStorage.get("theme") in self.style.theme_names():
-                    self.style.theme_use(self.ConfigurationStorage.get("theme"))
+                if theme in self.style.theme_names():
+                    self.style.theme_use(theme)
                 else:
                     if messagebox.askyesno("Theming Error", "The specified theme couldn't be loaded!\nDo you want to reset the settings?") == True:
                         self.ConfigurationStorage.reset()
@@ -583,15 +584,15 @@ class WindowHelper:
                 self.style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
         elif self.theming == 0:
             self.style = ttk.Style(WindowName)
-            if bool(cfg.get("nativeTheme")) == True or self.ConfigurationStorage.get("theme") not in self.style.theme_names():
+            if bool(self.ConfigurationStorage.get("nativeTheme")) == True or theme not in self.style.theme_names():
                 self.style.theme_use(NativeTheme)
             else:
-                self.style.theme_use(self.ConfigurationStorage.get("theme"))
+                self.style.theme_use(theme)
         else:
             try:
                 self.style = ThemedStyle(WindowName)
-                if self.ConfigurationStorage.get("theme") in self.style.theme_names():
-                    self.style.theme_use(self.ConfigurationStorage.get("theme"))
+                if theme in self.style.theme_names():
+                    self.style.theme_use(theme)
                 else:
                     if messagebox.askyesno("Theming Error", "The specified theme couldn't be loaded!\nDo you want to reset the settings?") == True:
                         self.ConfigurationStorage.reset()
@@ -599,19 +600,19 @@ class WindowHelper:
             except:
                 self.theming = 2
                 theme_base = Path(sys._MEIPASS).joinpath("ttkthemes", "themes")
-                theme_path = Path(theme_base).joinpath(self.ConfigurationStorage.get("theme"))
+                theme_path = Path(theme_base).joinpath(theme)
                 WindowName.tk.call("lappend", "auto_path", theme_base)
                 try:
                     WindowName.tk.call("package", "require", f"ttk::theme::{self.ConfigurationStorage.get('theme')}")
                 except:
-                    theme_tcl = Path(theme_path).joinpath(self.ConfigurationStorage.get("theme") + ".tcl")
+                    theme_tcl = Path(theme_path).joinpath(theme + ".tcl")
                     if Path(theme_tcl).exists():
                         WindowName.tk.call("source", theme_tcl)
                     else:
                         print(f"Couldn't find theme {theme_tcl}")
                 self.style = ttk.Style()
                 try:
-                    self.style.theme_use(self.ConfigurationStorage.get("theme"))
+                    self.style.theme_use(theme)
                 except:
                     print("Using default ttk theme")
             try:
