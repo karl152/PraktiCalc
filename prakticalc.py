@@ -1928,7 +1928,8 @@ class PraktiGraph(ttk.Frame):
                         finalfunc += char
                 else:
                     finalfunc += char
-        #print(finalfunc[::-1])
+        finalfunc = finalfunc.replace("()", "(*)")
+        print(finalfunc[::-1])
         return finalfunc[::-1]
     def doNothing(self):
         pass"""
