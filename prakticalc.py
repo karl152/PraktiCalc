@@ -1922,7 +1922,7 @@ class PraktiGraph(ttk.Frame):
                 else:
                     finalfunc += "x"
             elif char == "(":
-                if finalfunc[len(finalfunc)-1].isdigit:
+                if finalfunc[len(finalfunc)-1].isdigit() or finalfunc[len(finalfunc)-1] in ("x", ")"):
                     finalfunc += "*("
                 else:
                     finalfunc += "("
