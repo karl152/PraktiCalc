@@ -1910,27 +1910,32 @@ class PraktiGraph(ttk.Frame):
                     newfunc += "^"
                 SuperScript = False
                 newfunc += char
+        newfunc = newfunc[::-1]
         finalfunc = ""
         IgnoredChars = ("(", "^", "*", "+", "-", "*", "/", "%", ")")
         for char in newfunc:
             if finalfunc == "":
                 finalfunc = char
             elif char == "x":
-                if finalfunc[len(finalfunc)-1] not in IgnoredChars[1:]:
+                if finalfunc[len(finalfunc)-1] not in IgnoredChars[:-1]:
                     finalfunc += "*x"
                 else:
                     finalfunc += "x"
+            elif char == "(":
+                if finalfunc[len(finalfunc)-1].isdigit:
+                    finalfunc += "*("
+                else:
+                    finalfunc += "("
             else:
                 if finalfunc[len(finalfunc)-1] == "x":
-                    if char not in IgnoredChars[:-1]:
+                    if char not in IgnoredChars[1:]:
                         finalfunc += f"*{char}"
                     else:
                         finalfunc += char
                 else:
                     finalfunc += char
-        finalfunc = finalfunc.replace("()", "(*)")
-        print(finalfunc[::-1])
-        return finalfunc[::-1]
+        print("PraktiGraph: " + finalfunc)
+        return finalfunc
     def doNothing(self):
         pass"""
             PraktiGraphMetadata = configparser.ConfigParser()
