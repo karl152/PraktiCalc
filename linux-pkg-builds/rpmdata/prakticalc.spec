@@ -1,10 +1,10 @@
 Name:		prakticalc
-Version:		1.5.5
-Release:		1%{?dist}
+Version:	1.5.5
+Release:	1%{?dist}
 Summary:	practical calculator written in Python
 
-License:		GPL-3.0-only
-Source0:		%{name}.tar.gz
+License:	GPL-3.0-only
+Source0:	%{name}.tar.gz
 
 BuildArch:	noarch
 
@@ -34,6 +34,20 @@ cp -r * %{buildroot}/
 %license usr/share/prakticalc/LICENSE
 
 %changelog
+* Fri Aug 28 2026 Karl Wesseler <karldpbkz@gmail.com> - 1.5.5
+- added the ability to omit * in PraktiGraph
+- added patch for deb-dsc-build.sh for Ubuntu 20.04 PPAs
+- added accelerator labels to menus
+- added line break to settings reset message
+- ajusted default theming settings
+- improved error detection for uninstallations on Windows
+- improved configuration management
+- improved focus handling for windows and widgets
+- improved extension reinstalling/upgrading
+- slightly improved the sidebar in Extension Manager
+- changed console font to be fixed-width on all systems
+- fixed stretched Linux icons
+- fixed "0" turning into "" when pressing backspace
 * Fri Aug 21 2026 Karl Wesseler <karldpbkz@gmail.com> - 1.5.4
 - updated to Tk 9.0 for Windows 11 builds
 - restructured the info dialog
