@@ -1790,6 +1790,7 @@ class PraktiGraph(ttk.Frame):
         self.ScaleSlider = ttk.Scale(self, from_=int(25*mainWin.ScaleFactor), to=int(250*mainWin.ScaleFactor), orient="horizontal", variable=self.Scale, command=lambda _: self.redraw(calculator) if self.ClearStatus == False else self.doNothing())
         self.ScaleSlider.grid(row=5, column=3, padx=(0, 10), sticky="e")
         self.bind("<Configure>", lambda event: self.after(200, lambda: self.redraw(calculator)) if self.ClearStatus == False else self.clear())
+        self.fxEntry.focus_set()
     def redraw(self, calculator):
         fxFunction = self.convert(self.fxEntry.get())
         gxFunction = self.convert(self.gxEntry.get())
