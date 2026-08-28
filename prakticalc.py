@@ -1322,7 +1322,7 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "PraktiGraph.ini").exists():
             PraktiGraphMeta = configparser.ConfigParser()
             PraktiGraphMeta.read(self.FolderPath / "PraktiGraph.ini", encoding="utf-8")
-            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.7":
+            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.8":
                 self.updatePraktiGraph()
         for file in self.FolderPath.iterdir():
             if file.suffix == ".py":
@@ -1935,7 +1935,7 @@ class PraktiGraph(ttk.Frame):
         pass"""
             PraktiGraphMetadata = configparser.ConfigParser()
             PraktiGraphMetadata["PraktiXtension"] = {"name": "PraktiGraph",
-                                                          "version": "1.7",
+                                                          "version": "1.8",
                                                           "filename": "PraktiGraph.py",
                                                           "description": "The PraktiCalc Graph Thing",
                                                           "website": "",
