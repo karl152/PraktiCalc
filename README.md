@@ -19,20 +19,60 @@ A practical calculator with GUI featuring a calculating history, an extension sy
 
 ### Get PraktiCalc
 You can download PraktiCalc at the [Releases page](https://github.com/karl152/PraktiCalc/releases) on GitHub. There should be a few files for each release there:
-| file name example                       | description                                                      |
-|-----------------------------------------|------------------------------------------------------------------|
-| prakticalc-x.x-win-amd64-installer.exe  | PraktiCalc Installer for Windows 11 on 64-Bit x86 Processors     |
-| prakticalc-x.x-win7-amd64-installer.exe | PraktiCalc Installer for Windows 7+ on 64-Bit x86 Processors     |
-| prakticalc-x.x-win-amd64-portable.zip   | PraktiCalc for Windows 11 on 64-Bit x86 Processors (Portable)    |
-| prakticalc-x.x-win7-amd64-portable.zip  | PraktiCalc for Windows 7+ on 64-Bit x86 Processors (Portable)    |
-| prakticalc-x.x.deb                      | installable PraktiCalc Debian Package                            |
-| PraktiCalc-x86_64.AppImage              | portable AppImage file for Linux on 64-Bit x86 Processors        |
-| PraktiCalc-aarch64.AppImage             | portable AppImage file for Linux on 64-Bit ARM Processors        |
-| prakticalc-x.x-aarch64.app              | portable unsigned App file for macOS on Apple Silicon Processors |
-| prakticalc-x.x.tcz*                     | PraktiCalc TinyCore Extension, can be loaded on TinyCore 17+     |
-| prakticalc-x.x-x.fcxx.noarch.rpm        | installable PraktiCalc Fedora RPM package                        |
-| Source code (zip)                       | ZIP archive with the source code                                 |
-| Source code (tar.gz)                    | gzipped tar archive with the source code                         |
+<table>
+    <tr>
+        <th>file name example</th>
+        <th>description</th>
+    </tr>
+    <tr>
+        <td>prakticalc-x.x-win-amd64-installer.exe</td>
+        <td>Installer for Windows 11 on AMD64</td>
+    </tr>
+    <tr>
+        <td>prakticalc-x.x-win-amd64-portable.exe</td>
+        <td>Portable executable for Windows 11 on AMD64</td>
+    </tr>
+    <tr>
+        <td>prakticalc-x.x-win7-amd64-installer.exe</td>
+        <td>Installer for Windows 7 on AMD64</td>
+    </tr>
+    <tr>
+        <td>prakticalc-x.x-win7-amd64-portable.exe</td>
+        <td>Portable executable for Windows 7 on AMD64</td>
+    </tr>
+    <tr>
+        <td>prakticalc-x.x-aarch64.app.zip</td>
+        <td>Zipped unsigned app folder for macOS on Apple Silicon</td>
+    </tr>
+    <tr>
+        <td>prakticalc-x.x.deb</td>
+        <td>Package for Debian stable</td>
+    </tr>
+    <tr>
+        <td>prakticalc-x.x-x.fcxx.noarch.rpm</td>
+        <td>RPM package for the latest Fedora Linux</td>
+    </tr>
+    <tr>
+        <td>prakticalc-x.x.tcz*</td>
+        <td>TinyCore extension, compatible with TinyCore 17 and newer</td>
+    </tr>
+    <tr>
+        <td>PraktiCalc-x86_64.AppImage</td>
+        <td>Linux AppImage for AMD64 processors (built on Debian stable)</td>
+    </tr>
+    <tr>
+        <td>PraktiCalc-aarch64.AppImage</td>
+        <td>Linux AppImage for ARM64 processors (built on Debian stable)</td>
+    </tr>
+    <tr>
+        <td>Source code (zip)</td>
+        <td>ZIP archive with the source code</td>
+    </tr>
+    <tr>
+        <td>Source code (tar.gz)</td>
+        <td>Gzipped tar archive with the source code</td>
+    </tr>
+</table>
 
 Please note that the macOS package is unsigned. Look up how to open unsigned Apps on macOS to use it.
 
