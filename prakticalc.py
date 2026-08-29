@@ -1322,7 +1322,7 @@ class ExtensionWindow(tk.Toplevel):
         if Path(self.FolderPath / "PraktiGraph.ini").exists():
             PraktiGraphMeta = configparser.ConfigParser()
             PraktiGraphMeta.read(self.FolderPath / "PraktiGraph.ini", encoding="utf-8")
-            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.8":
+            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.9":
                 self.updatePraktiGraph()
         for file in self.FolderPath.iterdir():
             if file.suffix == ".py":
@@ -1901,18 +1901,27 @@ class PraktiGraph(ttk.Frame):
                            "\u2076": "6",
                            "\u2077": "7",
                            "\u2078": "8",
-                           "\u2079": "9"}
+                           "\u2079": "9",
+                           "\u207a": "+",
+                           "\u207b": "-",
+                           "\u207d": "(",
+                           "\u207e": ")",
+                           "\u00b7": "."}
         SuperScript = False
         for char in reversed(func):
             if char in SuperScriptDict:
-                SuperScript = True
-                newfunc += char.translate(str.maketrans(SuperScriptDict))
+                if SuperScript == True:
+                    newfunc += char.translate(str.maketrans(SuperScriptDict))
+                else:
+                    newfunc += ")" + char.translate(str.maketrans(SuperScriptDict))
+                    SuperScript = True
             else:
                 if SuperScript == True:
-                    newfunc += "^"
+                    newfunc += "(^"
                 SuperScript = False
                 newfunc += char
         newfunc = newfunc[::-1]
+        print(newfunc)
         finalfunc = ""
         IgnoredChars = ("(", "^", "*", "+", "-", "*", "/", "%", ")")
         for char in newfunc:
@@ -1945,7 +1954,7 @@ class PraktiGraph(ttk.Frame):
         pass"""
             PraktiGraphMetadata = configparser.ConfigParser()
             PraktiGraphMetadata["PraktiXtension"] = {"name": "PraktiGraph",
-                                                          "version": "1.8",
+                                                          "version": "1.9",
                                                           "filename": "PraktiGraph.py",
                                                           "description": "The PraktiCalc Graph Thing",
                                                           "website": "",
