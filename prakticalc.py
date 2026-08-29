@@ -696,7 +696,7 @@ class MainWindow(tk.Tk):
         self.MenuTearoffTkVar = tk.BooleanVar(value=bool(TheTearoff))
         self.Menubar = tk.Menu(self)
         self.CalculatorMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
-        self.CalculatorMenu.add_command(label="Quit", command=lambda: helper.close(self))
+        self.CalculatorMenu.add_command(label="Quit", accelerator="Q", command=lambda: helper.close(self))
         self.ToolMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
         self.ToolMenu.add_command(label="History", accelerator="H", command=lambda: HistoryWindow(self, calculator, helper))
         self.ToolMenu.add_command(label="Extensions", accelerator="X", command=lambda: ExtensionWindow(self, helper, calculator, dialog, cfg))
@@ -860,7 +860,9 @@ class MainWindow(tk.Tk):
                 "C": lambda: self.clear(calculator, cfg),
                 "BackSpace": lambda: self.backspace(calculator, cfg),
                 "m": self.toggleMemoryMenu,
-                "M": self.toggleMemoryMenu
+                "M": self.toggleMemoryMenu,
+                "q": lambda: helper.close(self),
+                "Q": lambda: helper.close(self)
                 }
             run = Keys.get(Key)
             if run:
