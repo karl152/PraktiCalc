@@ -34,6 +34,14 @@ cp -r * %{buildroot}/
 %license usr/share/prakticalc/LICENSE
 
 %changelog
+* Sat Aug 29 2026 Karl Wesseler <karldpbkz@gmail.com> - 1.5.6
+- Added Q keybind to close the main window
+- Reworked README.md
+- Improved unicode superscript support in PraktiGraph
+- Slightly improved UI code by making both menu bars use the same menus
+- Fixed a bunch of issues with PraktiGraph
+- Fixed failed extension calculations staying in the calculator
+- Added M keybind with floating memory menu in 1.5.5 (forgot to mention that)
 * Fri Aug 28 2026 Karl Wesseler <karldpbkz@gmail.com> - 1.5.5
 - added the ability to omit * in PraktiGraph
 - added patch for deb-dsc-build.sh for Ubuntu 20.04 PPAs
