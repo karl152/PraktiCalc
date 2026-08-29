@@ -114,6 +114,7 @@ PraktiCalc has its own extension system, currently working with the PraktiXtensi
 * [PraktiXtension GitHub](https://github.com/karl152/PraktiXtensions)
 * [Submit your PraktiXtension](https://praktixtensions.blogspot.com/p/submit.html)
 * [Download the PXT Builder extension](https://raw.githubusercontent.com/karl152/PraktiXtensions/refs/heads/main/PXTBuilder.pxt)
+
 There are some preinstalled extensions included and updated within PraktiCalc:
 #### Decimal Converter
 This extension converts decimal numbers into binary and hexadecimal numbers. It was a standalone feature until PraktiCalc 1.4 and was converted into an extension for PraktiCalc 1.5.
