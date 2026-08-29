@@ -469,7 +469,7 @@ class PraktiCalculator:
             self.LastResult = PreviousResult
             self.CalculationString = PreviousCalculationString
             self.setOperators(self.TrigMode)
-            return result
+        return result
     def setOperators(self, TrigMode): # defines all the additional operators
         self.operators = {}
         self.operators["sqrt"] = math.sqrt
