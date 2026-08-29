@@ -28,7 +28,7 @@ except:
     pass
 
 #---------------------------
-PraktiCalcVersion = "1.5.5"
+PraktiCalcVersion = "1.5.6"
 #---------------------------
 
 def speak(string):
