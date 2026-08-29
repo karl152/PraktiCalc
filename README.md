@@ -54,7 +54,7 @@ You can download PraktiCalc at the [Releases page](https://github.com/karl152/Pr
     </tr>
     <tr>
         <td>prakticalc-x.x.tcz*</td>
-        <td>TinyCore extension, compatible with TinyCore 17 and newer</td>
+        <td>TinyCore extension, compatible with Tiny Core 17 and newer</td>
     </tr>
     <tr>
         <td>PraktiCalc-x86_64.AppImage</td>
@@ -74,17 +74,66 @@ You can download PraktiCalc at the [Releases page](https://github.com/karl152/Pr
     </tr>
 </table>
 
-Please note that the macOS package is unsigned. Look up how to open unsigned Apps on macOS to use it.
+> [!IMPORTANT]
+> The macOS builds are unsigned and won't work thanks to Gatekeeper. Open them with right click the first time as a workaround.
 
-#### Building PraktiCalc
-The build scripts will help you to build PraktiCalc into installable packages.
-For building on Windows 10 or newer, you need Python with tkinter and the following modules installed via pip: `ttkthemes`, `pyinstaller`
-For older versions of Windows, you need Python with the same modules and PowerShell 5 or 7-Zip installed. The lastest available Python version is recommended, that being Python 3.8.20 on Windows NT 6 (Windows 7/Vista). Windows Vista is unsupported by PraktiCalc, but should work in theory.
-Buildung deb packages required the following dependencies installed via apt from the Debian package sources: `python3-tk`, `python3-ttkthemes`. AppImages require the same packages and additionally `python3-pyinstaller`. `appimagetool` will be downloaded automatically by the build script. AppImageUpdate is also supported, by the way. RPMs need `rpm-build`, `rpmdevtools`, `python3-devel` and `python3-tkinter`.
+#### Distributions & Mirrors
+There are two PPAs for Ubuntu and Ubuntu-based systems, which you can enable to get automatic updates for PraktiCalc. The [karl52/prakticalc](https://launchpad.net/~karl52/+archive/ubuntu/prakticalc) PPA always tracks the latest release, while the [karl52/prakticalc-lts](https://launchpad.net/~karl52/+archive/ubuntu/prakticalc-lts) PPA always tracks the latest 1.5.x release. You can install PPAs by running `sudo add-apt-repository ppa:karl52/prakticalc`.
 
-#### Extension system
-PraktiXtensions are Python scripts that add a tab with a TkInter-GUI to the extension window. They can use any modules imported in the main file. For the graphical user interface, ttk-Widgets should be used. If that's not possible, consider using the value of the DarkMode parameter to set the background and foreground colors.
+There are two git mirrors, one on [SourceForge](https://sourceforge.net/p/prakticalc/code/) and one on [Launchpad](https://git.launchpad.net/~karl52/+git/PraktiCalc)
+
+### Building PraktiCalc
+Generally, you need Python 3.8 or newer with TkInter (Tcl/Tk). These build scripts will help you to build PraktiCalc into installable packages.
+
+<table>
+    <tr>
+        <th>operating system</th>
+        <th>build script</th>
+        <th>dependencies</th>
+    </tr>
+    <tr>
+        <td>Windows</td>
+        <td>windows_build.ps1</td>
+        <td>tkinter, pyinstaller, ttkthemes; PowerShell 5+ or PowerShell 2+ with 7-Zip</td>
+    </tr>
+    <tr>
+        <td>macOS</td>
+        <td>macos-build.applescript</td>
+        <td>Xcode Command Line Tools, modern Python (not the one from Xcode) with tkinter, ttkthemes and pyinstaller</td>
+    </tr>
+    <tr>
+        <td>Linux AppImage</td>
+        <td>appimage_build.sh</td>
+        <td>wget2/wget/curl; Python with tkinter, ttkthemes, pyinstaller; build system must be able to run AppImages</td>
+    </tr>
+    <tr>
+        <td>Debian (only deb)</td>
+        <td>debian_build.sh</td>
+        <td>dash, gzip, nano, dpkg-deb, optional lintian</td>
+    </tr>
+    <tr>
+        <td>Debian (deb & dsc)</td>
+        <td>deb-dsc-build.sh</td>
+        <td>dash, gzip, dh, dpkg-buildpackage</td>
+    </tr>
+    <tr>
+        <td>Fedora Linux</td>
+        <td>rpm-build.sh</td>
+        <td>rpm-build, rpmdevtools, python3-tkinter, python3-devel</td>
+    </tr>
+    <tr>
+        <td>Tiny Core Linux</td>
+        <td>tinycore.build.sh</td>
+        <td>squashfs-tools</td>
+    </tr>
+</table>
+
+> [!NOTE]
+> While `ttkthemes` is highly recommended, PraktiCalc also works without it.
+
+### Extension system
+PraktiXtensions are Python scripts that add a tab with a TkInter GUI to the extension window. They can use any modules imported in the main file. For the graphical user interface, ttk widgets should be used. If that's not possible, consider using the value of the `DarkMode` parameter to set the background and foreground colors.
 A full extension has three files: the Python file with the code itself, a metadata file and a description. These metadata entries will be shown by the built-in extension manager. You can distribute your extensions as a single PXT file, which is basically a renamed ZIP archive.
 Consider using the [PXT Builder](https://raw.githubusercontent.com/karl152/PraktiXtensions/refs/heads/main/PXTBuilder.pxt) (which is an extension itself) for comfortably building PXT files from Python files.
 
-More documentation is available at https://github.com/karl152/PraktiXtensions. Also check out the [extension gallery](https://praktixtensions.blogspot.com/)
+More documentation is available at https://github.com/karl152/PraktiXtensions. Also check out the [PraktiXtension Gallery](https://praktixtensions.blogspot.com/).
