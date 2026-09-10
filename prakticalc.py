@@ -851,6 +851,7 @@ class MainWindow(tk.Tk):
                 "h": lambda: HistoryWindow(self, calculator, helper),
                 "H": lambda: HistoryWindow(self, calculator, helper),
                 "i": lambda: dialog.info(self, helper),
+                "I": lambda: dialog.info(self, helper),
                 "s": lambda: SettingsWindow(self, helper, calculator, cfg),
                 "S": lambda: SettingsWindow(self, helper, calculator, cfg),
                 "x": lambda: ExtensionWindow(self, helper, calculator, dialog, cfg),
