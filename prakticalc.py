@@ -1028,7 +1028,7 @@ class SettingsWindow(tk.Toplevel):
             self.ThemeSelector.config(state=tk.DISABLED)
         else:
             self.ThemeSelector.config(state=tk.NORMAL)
-    def loadTheme(self, parent, helper, cfg, calculator): # saves the selected theme choice in the settigns window
+    def loadTheme(self, parent, helper, cfg, calculator): # saves the selected theme choice in the settings window
         cfg.set("theme", self.ThemeSelector.get())
         cfg.set("nativeTheme", parent.UseNativeThemeTkVar.get())
         cfg.set("borderDisplay", parent.BorderDisplayTkVar.get())
