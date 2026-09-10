@@ -1,0 +1,23 @@
+[project]
+name = "prakticalc_karl152"
+version = "1.6.0"
+authors = [
+  { name="Karl Wesseler", email="karldpbkz@gmail.com" },
+]
+description = "A practical calculator"
+readme = "README.md"
+requires-python = ">=3.8.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "GPL-3-only"
+license-files = ["LICEN[CS]E*"]
+
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project.urls]
+Homepage = "https://github.com/karl152/PraktiCalc"
+Issues = "https://github.com/karl152/PraktiCalc/issues"
