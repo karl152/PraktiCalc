@@ -766,7 +766,6 @@ class MainWindow(tk.Tk):
         TwoButton = ttk.Button(self.WindowFrame, text="2", command=lambda: self.append("2", calculator, cfg))
         ThreeButton = ttk.Button(self.WindowFrame, text="3", command=lambda: self.append("3", calculator, cfg))
         EqualButton = ttk.Button(self.WindowFrame, text="=", command=lambda: self.calculate(self, helper, calculator, dialog, cfg))
-        InfoButton = ttk.Button(self.WindowFrame, text="i", command=lambda: dialog.info(self, helper))
         ZeroButton = ttk.Button(self.WindowFrame, text="0", command=lambda: self.zero(calculator, cfg))
         LeftParenButton = ttk.Button(self.WindowFrame, text="(", command=lambda: self.append("parenleft", calculator, cfg))
         RightParenButton = ttk.Button(self.WindowFrame, text=")", command=lambda: self.append("parenright", calculator, cfg))
