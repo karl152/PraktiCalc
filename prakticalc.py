@@ -17,39 +17,29 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 # MODULES
-import tkinter as tk
-from tkinter import ttk, messagebox, font, scrolledtext, filedialog, colorchooser
+import wx, wx.adv
+from tkinter import messagebox, colorchooser
 from pathlib import Path
 from decimal import Decimal
-try:
-    from ttkthemes import ThemedStyle
-    ttkthemesOK = True
-except:
-    ttkthemesOK = False
-import platform, subprocess, sys, shutil, math, getpass, time, configparser, importlib.util, webbrowser, zipfile, tempfile, hashlib, re
+import platform, subprocess, sys, shutil, math, time, configparser, importlib.util, webbrowser, zipfile, tempfile, hashlib, re, random, threading
 if platform.system() == "Windows":
-    import winreg
+    import winreg, getpass
     from ctypes import wintypes
 elif platform.system() == "Darwin":
     import plistlib
 
 # VARIABLES
-CLIHelp = "--help" in sys.argv
-CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.5.6"
-BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
-allowWindowsShutdownDialog = "--allowShutdownDialog" in sys.argv
-MsgBoxStyles = ["Tkinter", "Alternative"]
+PraktiCalcVersion = "1.6"
+MsgBoxStyles = ["Tkinter", "Alternative", "wxPython"]
 if platform.system() == "Windows":
     import ctypes
-    NativeTheme = "vista"
     if shutil.which("wscript"):
         MsgBoxStyles.append("VBScript")
     if shutil.which("msg"):
         MsgBoxStyles.append("Windows Messaging Service")
-    if allowWindowsShutdownDialog == True:
+    if "--allowShutdownDialog" in sys.argv:
         MsgBoxStyles.append("Windows Shutdown")
-    if BypassWindowsDPIFix == False:
+    if "--nodpiawareness" not in sys.argv:
         try:
             ctypes.windll.shcore.SetProcessDpiAwareness(2)
         except:
@@ -58,20 +48,16 @@ if platform.system() == "Windows":
         WingWebDings = True
     else:
         WingWebDings = False
-        dwmapi = ctypes.WinDLL("dwmapi")
-        DWMWA_USE_IMMERSIVE_DARK_MODE = 20
 elif platform.system() == "Darwin":
-    NativeTheme = "aqua"
     WingWebDings = False
     MsgBoxStyles.append("AppleScript")
 else:
     WingWebDings = False
-    NativeTheme = "default"
     AdditionalLinuxMsgBoxStyles = ["xmessage", "gxmessage", "wmessage", "yad", "kdialog", "zenity", "Xdialog", "notify-send"]
     for MsgBoxStyle in AdditionalLinuxMsgBoxStyles:
         if shutil.which(MsgBoxStyle):
             MsgBoxStyles.append(MsgBoxStyle)
-if CLIHelp == True:
+if "--help" in sys.argv:
     if platform.system() == "Windows":
         messagebox.showinfo("PraktiCalc CLI Options", "PraktiCalc " + PraktiCalcVersion + """ CLI Options:
 --allowShutdownDialog: allow the shutdown dialog to be used
@@ -82,13 +68,12 @@ if CLIHelp == True:
 --version: display version and exit""")
     else:
         print("PraktiCalc " + PraktiCalcVersion + " CLI Options")
-        print("--debug      | add a test button for debugging")
-        print("--console    | show console for debugging")
-        print("--notheming  | disables theming")
-        print("--help       | display this help text and exit")
-        print("--version    | display version and exit")
+        print("--debug\t\tadd a test button for debugging")
+        print("--console\tshow console for debugging")
+        print("--help\t\tdisplay this help text and exit")
+        print("--version\tdisplay version and exit")
     sys.exit(0)
-if CLIVersion == True:
+if "--version" in sys.argv:
     if platform.system() == "Windows":
         messagebox.showinfo("PraktiCalc " + PraktiCalcVersion, "PraktiCalc " + PraktiCalcVersion)
     else:
@@ -117,6 +102,7 @@ if RunningAsOneFileExe == True:
     PraktiCalcIconMonoPath = (sys._MEIPASS + "/PraktiCalculator_icon.xbm")
     PraktiCalcIconMonoInvertedPath = (sys._MEIPASS + "/PraktiCalculator_icon_inverted.xbm")
     PythonPowerPath = (sys._MEIPASS + "/python-powered.png")
+    WxPowerPath = (sys._MEIPASS + "/powered-by-wxwidgets-88x31.png")
     VBSInfoPath = (sys._MEIPASS + "/info.vbs")
     VBSErrorPath = (sys._MEIPASS + "/error.vbs")
 else:
@@ -126,6 +112,7 @@ else:
     PraktiCalcIconMonoPath = "PraktiCalculator_icon.xbm"
     PraktiCalcIconMonoInvertedPath = "PraktiCalculator_icon_inverted.xbm"
     PythonPowerPath = "python-powered.png"
+    WxPowerPath = "powered-by-wxwidgets-88x31-blue.png"
     VBSInfoPath = "info.vbs"
     VBSErrorPath = "error.vbs"
 
@@ -229,14 +216,6 @@ class Configuration:
         for value in DefaultConfiguration:
             self.backend.set(value[0], value[1])
             print("set " + value[0] + " to " + str(value[1]))
-        if int(platform.python_version_tuple()[1]) >= 10:
-            if platform.system() == "Linux" and platform.freedesktop_os_release().get("NAME") == "Ubuntu":
-                self.set("theme", "yaru")
-                print("detected Ubuntu, changing theme to yaru")
-        if platform.system() != "Windows" and platform.system() != "Darwin" and ttkthemesOK == False:
-            self.set("theme", "default")
-            self.set("nativeMenuBar", True)
-            print("changed the theme to default and enabled native menubar because ttkthemes isn't present")
     def reset(self): # deletes local configuration storage
         self.backend.reset()
     def remove(self, key): # deletes a value from configuration
@@ -388,7 +367,7 @@ class PraktiCalculator:
             Result = str(Result)
         if Result == "-0":
             Result = "0"
-        self.HistoryList.append(f"{self.CalculationString}={Result}")
+        self.HistoryList.append(f"{self.CalculationString}\t=\t{Result}")
         self.CalculationString = Result
         self.LastResult = Result
         return Result
@@ -512,403 +491,166 @@ class PraktiCalculator:
         self.Rounding = bool(cfg.get("roundResult"))
         self.no0 = bool(cfg.get("showTrailing0"))
 
-# provides settings, theming and ajustments for windows
-class WindowHelper:
-    def __init__(self, cfg):
-        self.WindowList = []
-        self.ConfigurationStorage = cfg
-        self.refreshTheming()
-        self.availableThemes = ["error loading list"]
-    def refreshTheming(self):
-        self.theming = 0
-        if ttkthemesOK == True and bool(self.ConfigurationStorage.get("nativeTheme")) == False and "--notheming" not in sys.argv:
-            self.theming = 1
-        # 0 = theming from ttk
-        # 1 = theming from ttkthemes
-        # 2 = manual theming
-    def changeTheme(self, WindowName): # sets the theme for a given window
-        self.refreshTheming()
-        theme = self.ConfigurationStorage.get("theme")
-        if self.theming != 0 and theme == "black" or theme == "equilux":
-            self.DarkMode = True
-        else:
-            self.DarkMode = False
-        if platform.system() == "Darwin":
-            if self.theming == 0:
-                self.style = ttk.Style(WindowName)
-                if bool(self.ConfigurationStorage.get("nativeTheme")) == True or theme not in self.style.theme_names():
-                    self.style.theme_use(NativeTheme)
-                    if subprocess.getoutput("defaults read -g AppleInterfaceStyle") == "Dark":
-                        self.DarkMode = True
-                    else:
-                        self.DarkMode = False
-                else:
-                    self.style.theme_use(theme)
-            else:
-                self.style = ThemedStyle(WindowName)
-                if theme in self.style.theme_names():
-                    self.style.theme_use(theme)
-                else:
-                    if messagebox.askyesno("Theming Error", "The specified theme couldn't be loaded!\nDo you want to reset the settings?") == True:
-                        self.ConfigurationStorage.reset()
-                    return
-        elif platform.system() == "Windows":
-            self.ajustTitleBars()
-            if self.theming == 0:
-                self.style = ttk.Style(WindowName)
-                if bool(self.ConfigurationStorage.get("nativeTheme")) == True or theme not in self.style.theme_names():
-                    self.style.theme_use(NativeTheme)
-                    try:
-                        ClassicStyleEnabled = ctypes.c_bool()
-                        ctypes.windll.dwmapi.DwmIsCompositionEnabled(ctypes.byref(ClassicStyleEnabled))
-                        ClassicStyleEnabled = not ClassicStyleEnabled.value
-                    except Exception:
-                        ClassicStyleEnabled = True
-                    if ClassicStyleEnabled == True:
-                        if ctypes.windll.user32.GetSysColor(5) == 0:
-                            self.DarkMode = True
-                    if platform.release() in "110":
-                        try:
-                            with winreg.OpenKeyEx(winreg.HKEY_CURRENT_USER, r"Control Panel\Accessibility\HighContrast") as ContrastKey:
-                                if winreg.QueryValueEx(ContrastKey, "LastUpdatedThemeId")[0] in [1, 2, 3]:
-                                    self.DarkMode = True
-                        except:
-                            pass
-                else:
-                    self.style.theme_use(theme)
-            else:
-                self.style = ThemedStyle(WindowName)
-                if theme in self.style.theme_names():
-                    self.style.theme_use(theme)
-                else:
-                    if messagebox.askyesno("Theming Error", "The specified theme couldn't be loaded!\nDo you want to reset the settings?") == True:
-                        self.ConfigurationStorage.reset()
-                    return
-            if WingWebDings == True:
-                self.style.configure("Webdings.TButton", font=webdingsfont)
-                self.style.configure("Wingdings.TButton", font=wingdingsfont)
-            else:
-                self.style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
-        elif self.theming == 0:
-            self.style = ttk.Style(WindowName)
-            if bool(self.ConfigurationStorage.get("nativeTheme")) == True or theme not in self.style.theme_names():
-                self.style.theme_use(NativeTheme)
-            else:
-                self.style.theme_use(theme)
-        else:
-            try:
-                self.style = ThemedStyle(WindowName)
-                if theme in self.style.theme_names():
-                    self.style.theme_use(theme)
-                else:
-                    if messagebox.askyesno("Theming Error", "The specified theme couldn't be loaded!\nDo you want to reset the settings?") == True:
-                        self.ConfigurationStorage.reset()
-                    return
-            except:
-                self.theming = 2
-                theme_base = Path(sys._MEIPASS).joinpath("ttkthemes", "themes")
-                theme_path = Path(theme_base).joinpath(theme)
-                WindowName.tk.call("lappend", "auto_path", theme_base)
-                try:
-                    WindowName.tk.call("package", "require", f"ttk::theme::{self.ConfigurationStorage.get('theme')}")
-                except:
-                    theme_tcl = Path(theme_path).joinpath(theme + ".tcl")
-                    if Path(theme_tcl).exists():
-                        WindowName.tk.call("source", theme_tcl)
-                    else:
-                        print(f"Couldn't find theme {theme_tcl}")
-                self.style = ttk.Style()
-                try:
-                    self.style.theme_use(theme)
-                except:
-                    print("Using default ttk theme")
-            try:
-                self.style.configure("LargeUnicode.TButton", font=LargeUnicodeFont)
-            except:
-                print("Unable to increase font size of some buttons")
-        try:
-            self.style.configure("Treeview", rowheight=40)
-            self.availableThemes = self.style.theme_names()
-        except:
-            print("Unable to increase row height of Treeview tables")
-    def ajustTitleBar(self, hwnd): # changes the appearance of the Windows title bar
-        if platform.system() == "Windows":
-            try:
-                value = wintypes.BOOL(self.DarkMode)
-                dwmapi.DwmSetWindowAttribute(wintypes.HWND(hwnd), wintypes.DWORD(DWMWA_USE_IMMERSIVE_DARK_MODE), ctypes.byref(value), ctypes.sizeof(value))
-            except:
-                pass
-    def ajustTitleBars(self): # changes the appearance of all Windows title bars
-        for window in self.WindowList:
-            try:
-                self.ajustTitleBar(ctypes.windll.user32.GetParent(window.winfo_id()))
-            except:
-                pass
-    def close(self, window): # closes the given window and removes it from the window list
-        window.destroy()
-        self.WindowList.remove(window)
-
 # main window
-class MainWindow(tk.Tk):
-    def __init__(self, helper, calculator, dialog, cfg):
-        global wingdingsfont, webdingsfont, LargeUnicodeFont
-        super().__init__()
-        self.title("PraktiCalc")
-        self.DPI = self.winfo_fpixels("1i")
-        if platform.system() == "Windows":
-            if cfg.get("noDPIAwareness") == 1:
-                self.ScaleFactor = 1
-            else:
-                self.ScaleFactor = self.DPI/72
-        else:
-            self.ScaleFactor = self.DPI/72
-        #print(self.DPI)
-        #print(self.ScaleFactor)
-        self.size = int(250*self.ScaleFactor)
-        self.icon_mono = tk.BitmapImage(file=PraktiCalcIconMonoPath)
-        self.icon = tk.PhotoImage(file=PraktiCalcIconPath)
-        NativeMenubar = bool(cfg.get("nativeMenuBar"))
-        if platform.system() == "Darwin":
-            self.macicon = tk.PhotoImage(file=PraktiCalcMacIconPath)
-            self.iconphoto(True, self.macicon)
-        else:
-            self.iconphoto(True, self.icon)
-        self.icon_mono_inverted = tk.BitmapImage(file=PraktiCalcIconMonoInvertedPath)
-        if WingWebDings == True:
-            wingdingsfont = font.Font(family="Wingdings")
-            webdingsfont = font.Font(family="Webdings")
-        else:
-            LargeUnicodeFont = font.Font(family="TkDefaultFont", size=14)
-        self.UseNativeThemeTkVar = tk.BooleanVar(value=bool(cfg.get("nativeTheme")))
-        self.BorderDisplayTkVar = tk.BooleanVar(value=bool(cfg.get("borderDisplay")))
-        self.CurrentMsgBoxStyleTkVar = tk.StringVar(value=cfg.get("dialogStyle"))
-        self.NativeMenubarTkVar = tk.BooleanVar(value=NativeMenubar)
-        self.AngleUnitTkVar = tk.StringVar(value=cfg.get("angleUnit"))
-        self.RoundResultTkVar = tk.BooleanVar(value=bool(cfg.get("roundResult")))
-        self.showTrailingZeroTkVar = tk.BooleanVar(value=bool(cfg.get("showTrailing0")))
-        self.config(width=256, height=315)
-        self.rowconfigure(1, weight=1)
-        self.columnconfigure(0, weight=1)
-        if platform.system() != "Darwin":
-            TheTearoff = cfg.get("menuTearoff")
-        else:
-            TheTearoff = 0
-        self.MenuTearoffTkVar = tk.BooleanVar(value=bool(TheTearoff))
-        self.Menubar = tk.Menu(self)
-        self.CalculatorMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
-        self.CalculatorMenu.add_command(label="Quit", accelerator="Q", command=lambda: helper.close(self))
-        self.ToolMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
-        self.ToolMenu.add_command(label="History", accelerator="H", command=lambda: HistoryWindow(self, calculator, helper))
-        self.ToolMenu.add_command(label="Extensions", accelerator="X", command=lambda: ExtensionWindow(self, helper, calculator, dialog, cfg))
-        self.ToolMenu.add_separator()
-        self.ToolMenu.add_command(label="Settings", accelerator="S", command=lambda: SettingsWindow(self, helper, calculator, cfg))
-        self.HelpMenu = tk.Menu(self.Menubar, tearoff=TheTearoff)
-        self.HelpMenu.add_command(label="About", accelerator="I", command=lambda: dialog.info(self, helper))
-        self.MemoryDisplay = tk.Menu(self.Menubar, tearoff=TheTearoff)
-        MemoryDisplayCommands = {
-            "Set memory": lambda: self.setMemory(calculator),
-            "Get memory": lambda: self.getMemory(calculator, cfg),
-            "Add to memory": lambda: self.addToMemory(calculator, helper, dialog),
-            "Subtract from memory": lambda: self.subtractFromMemory(calculator),
-            "Append to memory": lambda: self.appendToMemory(calculator),
-            "Clear memory": lambda: self.clearMemory(calculator)
+class MainWindow(wx.Frame):
+    def __init__(self, calculator, dialog, cfg):
+        super().__init__(None, title="PraktiCalc", size=(450, 450))
+        self.Menubar = wx.MenuBar()
+        self.CalculatorMenu = wx.Menu()
+        self.CalculatorMenuQuitItem = self.CalculatorMenu.Append(wx.NewIdRef(), "Quit\tQ")
+        self.Bind(wx.EVT_MENU, lambda _: self.Close(), self.CalculatorMenuQuitItem)
+        self.ToolMenu = wx.Menu()
+        self.ToolMenuHistoryItem = self.ToolMenu.Append(wx.NewIdRef(), "History\tH")
+        self.ToolMenuSettingsItem = self.ToolMenu.Append(wx.NewIdRef(), "Settings\tS")
+        self.ToolMenu.AppendSeparator()
+        self.ToolMenuExtensionsItem = self.ToolMenu.Append(wx.NewIdRef(), "Extensions\tX")
+        self.Bind(wx.EVT_MENU, lambda _: HistoryWindow(self, calculator), self.ToolMenuHistoryItem)
+        self.Bind(wx.EVT_MENU, lambda _: SettingsWindow(self, calculator, cfg), self.ToolMenuSettingsItem)
+        self.Bind(wx.EVT_MENU, lambda _: ExtensionWindow(self, calculator, dialog, cfg), self.ToolMenuExtensionsItem)
+        self.HelpMenu = wx.Menu()
+        self.HelpMenuAboutItem = self.HelpMenu.Append(wx.NewIdRef(), "About\tI")
+        self.Bind(wx.EVT_MENU, lambda _: dialog.info(self), self.HelpMenuAboutItem)
+        self.MemoryDisplay = wx.Menu()
+        self.FloatingMemoryDisplay = wx.Menu()
+        self.MemoryDisplayCommands = {
+            "Set memory": lambda _: self.setMemory(calculator),
+            "Get memory": lambda _: self.getMemory(calculator, cfg),
+            "Add to memory": lambda _: self.addToMemory(calculator, dialog),
+            "Subtract from memory": lambda _: self.subtractFromMemory(calculator),
+            "Append to memory": lambda _: self.appendToMemory(calculator),
+            "Clear memory": lambda _: self.clearMemory(calculator)
             }
-        for cmd in MemoryDisplayCommands:
-            self.MemoryDisplay.add_command(label=cmd, command=MemoryDisplayCommands.get(cmd))
-        self.MemoryDisplay.bind("<Escape>", lambda _: self.toggleMemoryMenu())
-        self.MemoryDisplay.bind("<KeyPress-m>", lambda _: self.toggleMemoryMenu())
-        self.MemoryDisplay.bind("<KeyPress-M>", lambda _: self.toggleMemoryMenu())
-        self.Menubar.add_cascade(label="Calculator", menu=self.CalculatorMenu)
-        self.Menubar.add_cascade(label="Tools", menu=self.ToolMenu)
-        self.Menubar.add_cascade(label="Help", menu=self.HelpMenu)
-        self.Menubar.add_cascade(label="M: " + calculator.Memory, menu=self.MemoryDisplay)
-        self.MenuBarFrame = ttk.Frame(self)
-        self.CalculatorMenuButton = ttk.Menubutton(self.MenuBarFrame, text="Calculator")
-        self.CalculatorMenuButton["menu"] = self.CalculatorMenu
-        self.ToolMenuButton = ttk.Menubutton(self.MenuBarFrame, text="Tools")
-        self.ToolMenuButton["menu"] = self.ToolMenu
-        self.HelpMenuButton = ttk.Menubutton(self.MenuBarFrame, text="Help")
-        self.HelpMenuButton["menu"] = self.HelpMenu
-        self.CalculatorMenuButton.grid(row=0, column=0, sticky=tk.W)
-        self.ToolMenuButton.grid(row=0, column=1, sticky=tk.W)
-        self.HelpMenuButton.grid(row=0, column=2, sticky=tk.W)
-        self.CustomMemoryDisplay = ttk.Label(self.MenuBarFrame, text="M: 0")
-        self.CustomMemoryDisplay.grid(row=0, column=3, padx=(7, 0), sticky=tk.W)
-        if NativeMenubar == True:
-            self.config(menu=self.Menubar)
-        else:
-            self.MenuBarFrame.grid(row=0, column=0, sticky=tk.EW)
-        self.WindowFrame = ttk.Frame(self)
-        for colrow in range(5):
-            self.WindowFrame.rowconfigure(colrow, weight=1, uniform="buttons")
-            self.WindowFrame.columnconfigure(colrow, weight=1, uniform="buttons")
-        self.WindowFrame.rowconfigure(5, weight=1)
-        self.WindowFrame.rowconfigure(6, weight=1)
-        if bool(cfg.get("borderDisplay")) == True:
-            self.WindowFrame.rowconfigure(0, weight=0, uniform="")
-        self.Output = ttk.Entry(self.WindowFrame)
-        self.Output.insert(0, "0")
-        self.Output.config(state="readonly")
-        # BUTTONS
-        PlusButton = ttk.Button(self.WindowFrame, text="+", command=lambda: self.append("plus", calculator, cfg))
-        MinusButton = ttk.Button(self.WindowFrame, text="-", command=lambda: self.append("minus", calculator, cfg))
-        MultiplyButton = ttk.Button(self.WindowFrame, text="x", command=lambda: self.append("asterisk", calculator, cfg))
-        DivideButton = ttk.Button(self.WindowFrame, text="\u00f7", command=lambda: self.append("slash", calculator, cfg))
-        SevenButton = ttk.Button(self.WindowFrame, text="7", command=lambda: self.append("7", calculator, cfg))
-        EightButton = ttk.Button(self.WindowFrame, text="8", command=lambda: self.append("8", calculator, cfg))
-        NineButton = ttk.Button(self.WindowFrame, text="9", command=lambda: self.append("9", calculator, cfg))
-        CEButton = ttk.Button(self.WindowFrame, text="CE", command=lambda: self.clear(calculator, cfg))
-        FourButton = ttk.Button(self.WindowFrame, text="4", command=lambda: self.append("4", calculator, cfg))
-        FiveButton = ttk.Button(self.WindowFrame, text="5", command=lambda: self.append("5", calculator, cfg))
-        SixButton = ttk.Button(self.WindowFrame, text="6", command=lambda: self.append("6", calculator, cfg))
-        CommaButton = ttk.Button(self.WindowFrame, text=",", command=lambda: self.append("comma", calculator, cfg))
-        OneButton = ttk.Button(self.WindowFrame, text="1", command=lambda: self.append("1", calculator, cfg))
-        TwoButton = ttk.Button(self.WindowFrame, text="2", command=lambda: self.append("2", calculator, cfg))
-        ThreeButton = ttk.Button(self.WindowFrame, text="3", command=lambda: self.append("3", calculator, cfg))
-        EqualButton = ttk.Button(self.WindowFrame, text="=", command=lambda: self.calculate(self, helper, calculator, dialog, cfg))
-        InfoButton = ttk.Button(self.WindowFrame, text="i", command=lambda: dialog.info(self, helper))
-        ZeroButton = ttk.Button(self.WindowFrame, text="0", command=lambda: self.zero(calculator, cfg))
-        LeftParenButton = ttk.Button(self.WindowFrame, text="(", command=lambda: self.append("parenleft", calculator, cfg))
-        RightParenButton = ttk.Button(self.WindowFrame, text=")", command=lambda: self.append("parenright", calculator, cfg))
-        if WingWebDings == True:
-            self.BackspaceButton = ttk.Button(self.WindowFrame, text="Õ", command=lambda: self.backspace(calculator, cfg), style="Wingdings.TButton")
-            self.CopyButton = ttk.Button(self.WindowFrame, text="4", command=self.copyResult, style="Wingdings.TButton")
-        else:
-            self.BackspaceButton = ttk.Button(self.WindowFrame, text="\u232b", command=lambda: self.backspace(calculator, cfg))
-            self.CopyButton = ttk.Button(self.WindowFrame, text="\u2398", command=self.copyResult, style="LargeUnicode.TButton")
-        ModuloButton = ttk.Button(self.WindowFrame, text="%", command=lambda: self.append("%", calculator, cfg))
-        Checkb = ttk.Button(self, text="Check", command=lambda: print(calculator.xcheck())) # some debug thing
-        sqrtButton = ttk.Button(self.WindowFrame, text="\u221a", command=lambda: self.append("\u221a" + "(", calculator, cfg))
-        PowerButton = ttk.Button(self.WindowFrame, text="x^y", command=lambda: self.append("^", calculator, cfg))
+        self.MemoryItems = []
+        for cmd in self.MemoryDisplayCommands:
+            for menu in (self.MemoryDisplay, self.FloatingMemoryDisplay):
+                CurrentItem = menu.Append(wx.NewIdRef(), cmd)
+                self.Bind(wx.EVT_MENU, self.MemoryDisplayCommands.get(cmd), CurrentItem)
+        MenubarLabels = ("Calculator", "Tools", "Help", "M: 0")
+        for i, menu in enumerate((self.CalculatorMenu, self.ToolMenu, self.HelpMenu, self.MemoryDisplay)):
+            self.Menubar.Append(menu, MenubarLabels[i])
+        self.SetMenuBar(self.Menubar)
+        self.panel = wx.Panel(self)
+        # WIDGETS
+        self.Output = wx.TextCtrl(self.panel, style=wx.TE_READONLY)
+        self.Output.SetValue("0")
+        AppendButtons = ["+", "-", "(", ")", ".", "%"] # 5-10
+        for i in range(1, 10):
+            AppendButtons.append(str(i)) # 11-19
+        FurtherAppendButtons = {
+            "x": "*", # 20
+            "\u00f7": "/", # 21
+            "\u221a": "\u221a(", # 22
+            "x^y": "^", # 23
+            "!": "fact(" # 24
+            }
+        ButtonSpecs = {
+            "CE": lambda _: self.clear(calculator, cfg), # 0
+            "=": lambda _: self.calculate(self, calculator, dialog, cfg), # 1
+            "\u2398": lambda _: self.copyResult(), # 2
+            "\u232b": lambda _: self.backspace(calculator, cfg), # 3
+            "0": lambda _: self.zero(calculator, cfg) # 4
+            }
+        for btn in AppendButtons:
+            ButtonSpecs[btn] = lambda _, b=btn: self.append(b, calculator, cfg)
+        for btn in FurtherAppendButtons:
+            ButtonSpecs[btn] = lambda _, b=btn: self.append(FurtherAppendButtons.get(b), calculator, cfg)
+        self.Buttons = []
+        for i, item in enumerate(ButtonSpecs):
+            self.Buttons.append(wx.Button(self.panel, label=item))
+            self.Buttons[i].Bind(wx.EVT_BUTTON, ButtonSpecs.get(item))
         SinLogs = [[], [], [], ["ld", "ln", "lg"]]
         for i, sl in enumerate(("sin", "cos", "tan")):
             SinLogs[i].append(sl)
             SinLogs[i].append("a"+sl)
             SinLogs[i].append(sl+"h")
             SinLogs[i].append("a"+sl+"h")
-        SinButton = ttk.Menubutton(self.WindowFrame, text="sin")
-        CosButton = ttk.Menubutton(self.WindowFrame, text="cos")
-        TanButton = ttk.Menubutton(self.WindowFrame, text="tan")
-        LogButton = ttk.Menubutton(self.WindowFrame, text="log")
-        SinMenu = tk.Menu(SinButton, tearoff=TheTearoff)
-        CosMenu = tk.Menu(CosButton, tearoff=TheTearoff)
-        TanMenu = tk.Menu(TanButton, tearoff=TheTearoff)
-        LogMenu = tk.Menu(LogButton, tearoff=TheTearoff)
-        for i, menu in enumerate((SinMenu, CosMenu, TanMenu, LogMenu)):
+        SinLogTanMenus = []
+        for i in range(4):
+            SinLogTanMenus.append(wx.Menu())
+        for i, menu in enumerate(SinLogTanMenus):
             for label in SinLogs[i]:
-                menu.add_command(label=label, command=lambda l=label: self.append(l+"(", calculator, cfg))
-        SinButton["menu"] = SinMenu
-        CosButton["menu"] = CosMenu
-        TanButton["menu"] = TanMenu
-        LogButton["menu"] = LogMenu
-        self.MemoryButton = ttk.Menubutton(self.WindowFrame, text="M")
-        MemoryMenu = tk.Menu(self.MemoryButton, tearoff=TheTearoff)
-        for cmd in MemoryDisplayCommands:
-            MemoryMenu.add_command(label=cmd.split()[0], command=MemoryDisplayCommands.get(cmd))
-        self.MemoryButton["menu"] = MemoryMenu
-        FactButton = ttk.Button(self.WindowFrame, text="!", command=lambda: self.append("fact(", calculator, cfg))
-        KonstantButton = ttk.Menubutton(self.WindowFrame, text="\u03c0")
-        KonstantMenu = tk.Menu(KonstantButton, tearoff=TheTearoff)
+                self.Bind(wx.EVT_MENU, lambda _, l=label: self.append(l+"(", calculator, cfg), menu.Append(wx.NewIdRef(), label))
+        for i, label in enumerate(("sin", "cos", "tan", "log")):
+            self.Buttons.append(Menubutton(self.panel, label, SinLogTanMenus[i])) # 25-28
+        self.MemoryMenu = wx.Menu()
+        for cmd in self.MemoryDisplayCommands:
+            self.Bind(wx.EVT_MENU, self.MemoryDisplayCommands.get(cmd), self.MemoryMenu.Append(wx.NewIdRef(), cmd.split()[0]))
+        self.Buttons.append(Menubutton(self.panel, "M", self.MemoryMenu)) # 29
+        self.KonstantMenu = wx.Menu()
         for cmd in ("\u03c0", "e"):
-            KonstantMenu.add_command(label=cmd, command=lambda c=cmd: self.append(c, calculator, cfg))
-        KonstantButton["menu"] = KonstantMenu
-        self.WindowFrame.grid(row=1, column=0, sticky=tk.NSEW)
-        if bool(cfg.get("borderDisplay")) == False:
-            self.Output.grid(row=0, column=0, columnspan=3, sticky=tk.NSEW)
-            self.CopyButton.grid(row=0, column=3, sticky=tk.NSEW)
-            self.BackspaceButton.grid(row=0, column=4, sticky=tk.NSEW)
+            self.Bind(wx.EVT_MENU, lambda _, c=cmd: self.append(c, calculator, cfg), self.KonstantMenu.Append(wx.NewIdRef(), cmd))
+        self.Buttons.append(Menubutton(self.panel, "\u03c0", self.KonstantMenu)) # 30
+        # Sizer
+        self.sizer = wx.GridBagSizer()
+        self.sizer.Add(self.Output, pos=(0, 0), span=(1, 3), flag=wx.EXPAND)
+        for i in range(3, 5):
+            self.sizer.Add(self.Buttons[i-1], pos=(0, i), flag=wx.EXPAND)
         buttons = (
-            (self.MemoryButton, LeftParenButton, RightParenButton, PlusButton, CEButton),
-            (SevenButton, EightButton, NineButton, MinusButton, PowerButton),
-            (FourButton, FiveButton, SixButton, MultiplyButton, sqrtButton),
-            (OneButton, TwoButton, ThreeButton, DivideButton, ModuloButton),
-            (None, None, CommaButton, EqualButton, FactButton),
-            (SinButton, CosButton, TanButton, LogButton, KonstantButton)
+            (29, 7, 8, 5, 0),
+            (17, 18, 19, 6, 23),
+            (14, 15, 16, 20, 22),
+            (11, 12, 13, 21, 10),
+            (None, None, 9, 1, 24),
+            (25, 26, 27, 28, 30)
             )
         for row, buttonrow in enumerate(buttons):
             for col, button in enumerate(buttonrow):
                 if button != None:
-                    button.grid(row=row+1, column=col, sticky=tk.NSEW)
-        ZeroButton.grid(row=5, column=0, columnspan=2, sticky=tk.NSEW)
-        self.bind("<Key>", lambda event: self.KeyPress(event, calculator, helper, dialog))
-        if debug == True:
-            Checkb.grid(row=2, column=0, sticky=tk.NSEW)
-        if platform.system() != "Darwin":
-            self.geometry(f"{self.size}x{self.size}")
-        self.protocol("WM_DELETE_WINDOW", lambda: helper.close(self))
-        self.update_idletasks()
-        helper.WindowList.append(self)
-        helper.changeTheme(self)
-    def KeyPress(self, event, calculator, helper, dialog): # processes keyboard input
-        Key = event.keysym
-        if Key in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "plus", "minus", "asterisk", "slash", "comma", "parenleft", "parenright", "e", "+", "-", "*", "/", "(", ")", ".", ",", "period", "percent", "%", "exclam", "!"]:
-            self.append(Key, calculator, cfg)
+                    self.sizer.Add(self.Buttons[button], pos=(row+1, col), flag=wx.EXPAND)
+        self.sizer.Add(self.Buttons[4], pos=(5, 0), span=(1, 2), flag=wx.EXPAND)
+        for colrow in range(5):
+            self.sizer.AddGrowableCol(colrow)
+            self.sizer.AddGrowableRow(colrow)
+        for i in range(2):
+            self.sizer.AddGrowableRow(i+5)
+        self.panel.SetSizerAndFit(self.sizer)
+        self.Output.Bind(wx.EVT_KEY_DOWN, lambda event: self.KeyPress(event, calculator, dialog))
+        self.updateDisplay(calculator, cfg)
+    def KeyPress(self, event, calculator, dialog): # processes keyboard input
+        Key = event.GetKeyCode()
+        if chr(Key) in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "e", "+", "-", "*", "/", "(", ")", ".", ",", "%", "!"]:
+            self.append(chr(Key), calculator, cfg)
         else:
             Keys = {
-                "0": lambda: self.zero(calculator, cfg),
-                "equal": lambda: self.calculate(self, helper, calculator, dialog, cfg),
-                "=": lambda: self.calculate(self, helper, calculator, dialog, cfg),
-                "Return": lambda: self.calculate(self, helper, calculator, dialog, cfg),
-                "h": lambda: HistoryWindow(self, calculator, helper),
-                "H": lambda: HistoryWindow(self, calculator, helper),
-                "i": lambda: dialog.info(self, helper),
-                "s": lambda: SettingsWindow(self, helper, calculator, cfg),
-                "S": lambda: SettingsWindow(self, helper, calculator, cfg),
-                "x": lambda: ExtensionWindow(self, helper, calculator, dialog, cfg),
-                "X": lambda: ExtensionWindow(self, helper, calculator, dialog, cfg),
-                "c": lambda: self.clear(calculator, cfg),
-                "C": lambda: self.clear(calculator, cfg),
-                "BackSpace": lambda: self.backspace(calculator, cfg),
-                "m": self.toggleMemoryMenu,
-                "M": self.toggleMemoryMenu,
-                "q": lambda: helper.close(self),
-                "Q": lambda: helper.close(self)
+                48: lambda: self.zero(calculator, cfg), # 0
+                61: lambda: self.calculate(self, helper, calculator, dialog, cfg), # =
+                13: lambda: self.calculate(self, calculator, dialog, cfg), # Return
+                104: lambda: HistoryWindow(self, calculator), # h
+                72: lambda: HistoryWindow(self, calculator),# H
+                105: lambda: dialog.info(self), # i
+                73: lambda: dialog.info(self), # I
+                115: lambda: SettingsWindow(self, calculator, cfg), # s
+                83: lambda: SettingsWindow(self, calculator, cfg), # S
+                120: lambda: ExtensionWindow(self, calculator, dialog, cfg), # x
+                88: lambda: ExtensionWindow(self, calculator, dialog, cfg), # X
+                99: lambda: self.clear(calculator, cfg), # c
+                67: lambda: self.clear(calculator, cfg), # C
+                8: lambda: self.backspace(calculator, cfg), # Backspace
+                109: self.toggleMemoryMenu, # m
+                77: self.toggleMemoryMenu, # M
+                113: self.Close, # q
+                81: self.Close # Q
                 }
+            if "--debug" in sys.argv:
+                Keys[68] = lambda: print(calculator.xcheck())
             run = Keys.get(Key)
             if run:
                 run()
+        event.Skip()
     def toggleMemoryMenu(self): # toggles the floating memory menu
-        if self.MemoryDisplay.winfo_ismapped():
-            self.MemoryDisplay.unpost()
-            self.focus_set()
-        else:
-            self.MemoryDisplay.post(int(self.MemoryButton.winfo_rootx()+self.winfo_width()/4), int(self.MemoryButton.winfo_rooty()+self.winfo_height()/8))
-            self.MemoryDisplay.focus_set()
-    def applySettings(self, calculator, cfg): # toggles border display
-        if bool(cfg.get("borderDisplay")) == False:
-            self.title("PraktiCalc")
-            self.Output.grid(row=0, column=0, columnspan=3, sticky=tk.NSEW)
-            self.CopyButton.grid(row=0, column=3, sticky=tk.NSEW)
-            self.BackspaceButton.grid(row=0, column=4, sticky=tk.NSEW)
-            self.WindowFrame.rowconfigure(0, weight=1)
-            self.updateDisplay(calculator, cfg)
-        elif bool(cfg.get("borderDisplay")) == True:
-            self.title("Border Display")
-            self.Output.grid_remove()
-            self.CopyButton.grid_remove()
-            self.BackspaceButton.grid_remove()
-            self.WindowFrame.rowconfigure(0, weight=0, uniform="")
-            self.updateDisplay(calculator, cfg)
-        if bool(cfg.get("nativeMenuBar")) == True:
-            self.MenuBarFrame.grid_remove()
-            self.config(menu=self.Menubar)
-        elif bool(cfg.get("nativeMenuBar")) == False:
-            self.MenuBarFrame.grid(row=0, column=0, sticky=tk.EW)
-            self.config(menu="")
-        calculator.updateFromSettings(cfg)
-            
+        self.PopupMenu(self.FloatingMemoryDisplay, self.Buttons[18].GetPosition())
     def copyResult(self): # copies the result
-        self.clipboard_clear()
-        self.clipboard_append(self.Output.get())
-        self.update()
+        if wx.TheClipboard.Open():
+            wx.TheClipboard.SetData(wx.TextDataObject(self.Output.GetValue()))
+            wx.TheClipboard.Close()
     def updateDisplay(self, calculator, cfg): # updates output
         if cfg.get("borderDisplay") == True:
-            self.title(calculator.CalculationString)
+            self.SetTitle(calculator.CalculationString)
         else:
-            self.Output.config(state=tk.NORMAL)
-            self.Output.delete(0, tk.END)
-            self.Output.insert(0, calculator.CalculationString)
-            self.Output.config(state="readonly")
+            self.SetTitle("PraktiCalc")
+        self.Output.SetValue(calculator.CalculationString)
+        self.Output.SetFocus()
+        self.Output.ShowPosition(self.Output.GetLastPosition())
     #  -#- the following methods call the calculator methods and update the display -#-
     def append(self, value, calculator, cfg):
         calculator.append(value)
@@ -916,11 +658,11 @@ class MainWindow(tk.Tk):
     def zero(self, calculator, cfg):
         calculator.zero()
         self.updateDisplay(calculator, cfg)
-    def calculate(self, parent, helper, calculator, dialog, cfg):
+    def calculate(self, parent, calculator, dialog, cfg):
         try:
             calculator.calculate()
         except Exception as e:
-            dialog.error(str(e), parent, helper)
+            dialog.error(str(e), self)
         self.updateDisplay(calculator, cfg)
     def clear(self, calculator, cfg):
         calculator.clear()
@@ -937,11 +679,11 @@ class MainWindow(tk.Tk):
     def appendToMemory(self, calculator):
         calculator.appendToMemory()
         self.refreshMemoryDisplay(calculator)
-    def addToMemory(self, calculator, helper, dialog):
+    def addToMemory(self, calculator, dialog):
         try:
             calculator.addToMemory()
         except Exception as e:
-            dialog.error(str(e), self, helper)
+            dialog.error(str(e), self)
         self.refreshMemoryDisplay(calculator)
     def subtractFromMemory(self, calculator):
         calculator.subtractFromMemory()
@@ -951,175 +693,180 @@ class MainWindow(tk.Tk):
         self.refreshMemoryDisplay(calculator)
     def refreshMemoryDisplay(self, calculator):
         NewLabel = "M: " + calculator.Memory
-        self.CustomMemoryDisplay.config(text=NewLabel)
-        self.Menubar.entryconfig(4, label=NewLabel)
+        self.Menubar.SetMenuLabel(3, NewLabel)
+
+# something that's a bit like ttk.Menubutton
+class Menubutton(wx.Button):
+    def __init__(self, parent, label, menu):
+        super().__init__(parent, label=label)
+        self.Bind(wx.EVT_BUTTON, lambda _: parent.PopupMenu(menu, self.GetPosition()))
+
+# wx.StaticBox with wx.Choice
+class ChoiceBox(wx.StaticBox):
+    def __init__(self, parent, label, choices):
+        super().__init__(parent, label=label)
+        self.choice = wx.Choice(self, choices=choices)
+        self.sizer = wx.GridBagSizer()
+        self.sizer.AddGrowableCol(0)
+        self.sizer.AddGrowableRow(0)
+        self.sizer.Add(self.choice, pos=(0, 0), flag=wx.EXPAND | wx.RIGHT | wx.LEFT, border=5)
+        self.sizer.Add(wx.StaticText(self), pos=(1, 0), flag=wx.BOTTOM, border=10)
+        self.SetSizerAndFit(self.sizer)
 
 # settings window
-class SettingsWindow(tk.Toplevel):
-    def __init__(self, parent, helper, calculator, cfg):
+class SettingsWindow(wx.Frame):
+    def __init__(self, parent, calculator, cfg):
         global MsgBoxStyles
-        super().__init__(parent)
-        self.title("Settings")
-        self.config(width=250, height=152)
-        self.rowconfigure(0, weight=1)
-        self.columnconfigure(0, weight=1)
+        super().__init__(parent, title="Settings", size=(400, 320))
+        self.panel = wx.Panel(self)
+        self.Tabs = wx.Notebook(self.panel)
+        self.AppearancePanel = wx.Panel(self.Tabs)
+        self.BehaviorPanel = wx.Panel(self.Tabs)
+        self.ConstantsPanel = wx.Panel(self.Tabs)
+        # ---
+        # Appearance
+        self.BorderDisplayCheck = wx.CheckBox(self.AppearancePanel, label="Border display")
+        self.BorderDisplayCheck.SetValue(bool(cfg.get("borderDisplay")))
+        ColorBackendChoices = ["Tkinter", "wxPython (ColourDialog)", "wxPython (PyColourChooser)", "wxPython (CubeColourDialog)", "KDialog", "YAD", "Zenity"]
+        self.ColorDialogBox = ChoiceBox(self.AppearancePanel, "Color dialog backend (WIP)", ColorBackendChoices)
+        self.DialogBox = ChoiceBox(self.AppearancePanel, "Message dialog backend", MsgBoxStyles)
+        self.DialogBox.choice.SetStringSelection(cfg.get("dialogStyle"))
+        self.AppearanceSizer = wx.GridBagSizer(5)
+        self.AppearanceSizer.AddGrowableCol(0)
+        self.AppearanceSizer.Add(self.BorderDisplayCheck, pos=(0, 0), flag=wx.EXPAND)
+        self.AppearanceSizer.Add(self.ColorDialogBox, pos=(1, 0), flag=wx.EXPAND)
+        self.AppearanceSizer.Add(self.DialogBox, pos=(2, 0), flag=wx.EXPAND)
+        self.AppearancePanel.SetSizerAndFit(self.AppearanceSizer)
+        # Behavior
+        self.AngleUnitBox = wx.RadioBox(self.BehaviorPanel, label="Angle unit", choices=["Degrees", "Radians", "Gradians"], majorDimension=1, style=wx.RA_SPECIFY_COLS)
+        AngleUnits = {
+            "deg": 0,
+            "rad": 1,
+            "grad": 2
+            }
+        self.RoundResultCheck = wx.CheckBox(self.BehaviorPanel, label="Round result")
+        self.ShowTrailingDotZeroCheck = wx.CheckBox(self.BehaviorPanel, label="Show trailing .0")
+        self.AngleUnitBox.SetSelection(AngleUnits.get(cfg.get("angleUnit")))
+        self.RoundResultCheck.SetValue(bool(cfg.get("roundResult")))
+        self.ShowTrailingDotZeroCheck.SetValue(bool(cfg.get("showTrailing0")))
+        self.BehaviorSizer = wx.GridBagSizer(5)
+        self.BehaviorSizer.AddGrowableCol(0)
+        self.BehaviorSizer.Add(self.AngleUnitBox, pos=(0, 0), flag=wx.EXPAND)
+        self.BehaviorSizer.Add(self.RoundResultCheck, pos=(1, 0), flag=wx.EXPAND)
+        self.BehaviorSizer.Add(self.ShowTrailingDotZeroCheck, pos=(2, 0), flag=wx.EXPAND)
         if platform.system() == "Windows":
-            self.attributes("-toolwindow", True)
-            self.focus_set()
-        SettingsWindowFrame = ttk.Frame(self)
-        SettingsWindowFrame.columnconfigure(0, weight=1)
-        SettingsWindowFrame.columnconfigure(1, weight=1)
-        SettingsWindowFrame.rowconfigure(0, weight=1)
-        SettingsTabs = ttk.Notebook(SettingsWindowFrame)
-        SettingsTabs.grid(row=0, column=0, columnspan=2, sticky=tk.NSEW)
-        AppearanceFrame = ttk.Frame(SettingsTabs)
-        AppearanceFrame.columnconfigure(0, weight=1)
-        BehaviorFrame = ttk.Frame(SettingsTabs)
-        BehaviorFrame.columnconfigure(0, weight=1)
-        SettingsTabs.add(AppearanceFrame, text="Appearance")
-        SettingsTabs.add(BehaviorFrame, text="Behavior")
-        ThemeFrame = ttk.LabelFrame(AppearanceFrame, text="Theme")
-        ThemeFrame.columnconfigure(0, weight=1)
-        if ttkthemesOK == False:
-            self.ThemeSelector = ttk.Combobox(ThemeFrame, values=helper.availableThemes)
-        else:
-            self.ThemeSelector = ttk.Combobox(ThemeFrame, values=["plastik", "keramik", "breeze", "yaru", "black", "clam", "alt", "classic"])
-        self.ThemeSelector.set(cfg.get("theme"))
-        self.NativeThemeToggle = ttk.Checkbutton(ThemeFrame, text="Native theme", variable=parent.UseNativeThemeTkVar, command=lambda: self.updateThemeComboBoxState(parent))
-        ThemeFrame.grid(row=0, column=0, sticky=tk.NSEW, padx=10)
-        self.ThemeSelector.grid(row=0, column=0, sticky=tk.EW, padx=5, pady=5)
-        self.NativeThemeToggle.grid(row=1, column=0, sticky=tk.W)
-        BorderDisplayToggle = ttk.Checkbutton(AppearanceFrame, text="Border display", variable=parent.BorderDisplayTkVar)
-        NativeMenubarToggle = ttk.Checkbutton(AppearanceFrame, text="Native menubar", variable=parent.NativeMenubarTkVar)
-        if platform.system() != "Darwin":
-            MenuTearoffToggle = ttk.Checkbutton(AppearanceFrame, text="Menu tearoff", variable=parent.MenuTearoffTkVar, command=lambda: messagebox.showinfo(parent=self, title="Restart required", message="You have to restart PraktiCalc to apply this setting"))
-        MsgBoxStyleFrame = ttk.LabelFrame(AppearanceFrame, text="Dialog style")
-        MsgBoxStyleFrame.columnconfigure(0, weight=1)
-        MsgBoxStyleSelect = ttk.OptionMenu(MsgBoxStyleFrame, parent.CurrentMsgBoxStyleTkVar, cfg.get("dialogStyle"), *MsgBoxStyles)
-        AngleUnitFrame = ttk.LabelFrame(BehaviorFrame, text="Angle unit")
-        ttk.Radiobutton(AngleUnitFrame, text="Degrees", value="deg", variable=parent.AngleUnitTkVar).grid(row=0, column=0, sticky=tk.W)
-        ttk.Radiobutton(AngleUnitFrame, text="Radians", value="rad", variable=parent.AngleUnitTkVar).grid(row=1, column=0, sticky=tk.W)
-        ttk.Radiobutton(AngleUnitFrame, text="Gradians", value="gon", variable=parent.AngleUnitTkVar).grid(row=2, column=0, sticky=tk.W)
-        AngleUnitFrame.grid(row=0, column=0, padx=10, sticky=tk.EW)
-        ttk.Checkbutton(BehaviorFrame, text="Round result", variable=parent.RoundResultTkVar).grid(row=1, column=0, padx=10, sticky=tk.W)
-        ttk.Checkbutton(BehaviorFrame, text="Show trailing .0", variable=parent.showTrailingZeroTkVar).grid(row=2, column=0, padx=10, sticky=tk.W)
-        SettingsOKButton = ttk.Button(SettingsWindowFrame, text="OK", command=lambda: self.loadTheme(parent, helper, cfg, calculator))
-        SettingsResetButton = ttk.Button(SettingsWindowFrame, text="Reset", command=lambda: self.reset(parent, helper, cfg))
-        SettingsWindowFrame.grid(row=0, column=0, sticky=tk.NSEW)
-        if bool(cfg.get("nativeTheme")) == True:
-            self.ThemeSelector.config(state=tk.DISABLED)
-        if "--notheming" in sys.argv:
-            self.NativeThemeToggle.config(state=tk.DISABLED)
-            self.ThemeSelector.config(state=tk.DISABLED)
-        BorderDisplayToggle.grid(row=1, column=0, sticky=tk.W, padx=10)
-        NativeMenubarToggle.grid(row=2, column=0, sticky=tk.W, padx=10)
-        if platform.system() != "Darwin":
-            MenuTearoffToggle.grid(row=3, column=0, sticky=tk.W, padx=10)
-        MsgBoxStyleFrame.grid(row=4, column=0, sticky=tk.EW, padx=10, pady=(0, 10))
-        MsgBoxStyleSelect.grid(row=0, column=0, sticky=tk.EW, padx=5, pady=5)
-        SettingsOKButton.grid(row=1, column=0, sticky=tk.EW, padx=10, pady=10)
-        SettingsResetButton.grid(row=1, column=1, sticky=tk.EW, padx=10, pady=10)
-        self.protocol("WM_DELETE_WINDOW", lambda: helper.close(self))
-        self.update_idletasks()
-        helper.WindowList.append(self)
-        helper.changeTheme(self)
-    def updateThemeComboBoxState(self, parent):
-        if parent.UseNativeThemeTkVar.get() == True:
-            self.ThemeSelector.config(state=tk.DISABLED)
-        else:
-            self.ThemeSelector.config(state=tk.NORMAL)
-    def loadTheme(self, parent, helper, cfg, calculator): # saves the selected theme choice in the settigns window
-        cfg.set("theme", self.ThemeSelector.get())
-        cfg.set("nativeTheme", parent.UseNativeThemeTkVar.get())
-        cfg.set("borderDisplay", parent.BorderDisplayTkVar.get())
-        cfg.set("nativeMenuBar", parent.NativeMenubarTkVar.get())
-        cfg.set("menuTearoff", parent.MenuTearoffTkVar.get())
-        cfg.set("roundResult", parent.RoundResultTkVar.get())
-        cfg.set("showTrailing0", parent.showTrailingZeroTkVar.get())
-        cfg.set("angleUnit", parent.AngleUnitTkVar.get())
-        try:
-            helper.changeTheme(parent)
-        except:
-            pass
-        helper.ajustTitleBars()
-        cfg.set("dialogStyle", parent.CurrentMsgBoxStyleTkVar.get())
-        parent.applySettings(calculator, cfg)
-        helper.close(self)
-    def reset(self, parent, helper, cfg): # resets the settings
+            self.ExtensionLocationBox = wx.RadioBox(self.BehaviorPanel, label="Extension location", choices=["AppData/Local", "AppData/Roaming"], majorDimension=1, style=wx.RA_SPECIFY_COLS)
+            self.ExtensionLocationBox.SetSelection(1)
+            self.BehaviorSizer.Add(self.ExtensionLocationBox, pos=(3, 0), flag=wx.EXPAND)
+        self.BehaviorPanel.SetSizerAndFit(self.BehaviorSizer)
+        # Constants
+        self.ConstantsList = wx.adv.EditableListBox(self.ConstantsPanel, label="Constants")
+        self.ConstantsList.SetStrings(["pi\t" + str(math.pi), "e\t" + str(math.e)])
+        self.ConstantsSizer = wx.GridBagSizer()
+        self.ConstantsSizer.AddGrowableCol(0)
+        self.ConstantsSizer.AddGrowableRow(0)
+        self.ConstantsSizer.Add(self.ConstantsList, pos=(0, 0), flag=wx.EXPAND)
+        self.ConstantsPanel.SetSizerAndFit(self.ConstantsSizer)
+        # ---
+        self.Tabs.AddPage(self.AppearancePanel, "Appearance")
+        self.Tabs.AddPage(self.BehaviorPanel, "Behavior")
+        self.Tabs.AddPage(self.ConstantsPanel, "Constants")
+        self.OKButton = wx.Button(self.panel, label="OK")
+        self.OKButton.SetBitmapLabel(wx.ArtProvider.GetBitmap(wx.ART_FLOPPY, wx.ART_BUTTON, (16, 16)))
+        self.OKButton.Bind(wx.EVT_BUTTON, lambda _: self.applySettings(parent, cfg, calculator))
+        self.ResetButton = wx.Button(self.panel, label="Reset")
+        self.ResetButton.SetBitmapLabel(wx.ArtProvider.GetBitmap(wx.ART_DELETE, wx.ART_BUTTON, (16, 16)))
+        self.ResetButton.Bind(wx.EVT_BUTTON, lambda _: self.reset(parent, cfg))
+        self.sizer = wx.GridBagSizer()
+        self.sizer.AddGrowableRow(0)
+        self.sizer.Add(self.Tabs, pos=(0, 0), span=(1, 2), flag=wx.EXPAND)
+        self.sizer.Add(self.OKButton, pos=(1, 0), flag=wx.ALL, border=5)
+        self.sizer.Add(self.ResetButton, pos=(1, 1), flag=wx.ALIGN_LEFT | wx.ALL, border=5)
+        self.sizer.AddGrowableCol(1)
+        self.panel.SetSizerAndFit(self.sizer)
+        self.Show()
+    def applySettings(self, parent, cfg, calculator): # saves the selected theme choice in the settigns window
+        AngleUnits = {
+            0: "deg",
+            1: "rad",
+            2: "grad"
+            }
+        cfg.set("borderDisplay", self.BorderDisplayCheck.GetValue())
+        cfg.set("roundResult", self.RoundResultCheck.GetValue())
+        cfg.set("showTrailing0", self.ShowTrailingDotZeroCheck.GetValue())
+        cfg.set("angleUnit", AngleUnits.get(self.AngleUnitBox.GetSelection()))
+        cfg.set("dialogStyle", self.DialogBox.choice.GetStringSelection())
+        calculator.updateFromSettings(cfg)
+        parent.updateDisplay(calculator, cfg)
+        self.Close()
+    def reset(self, parent, cfg): # resets the settings
         cfg.reset()
-        messagebox.showinfo(parent=self, title="Resetting settings", message="The settings have been reset and PraktiCalc will now close.\nDefault settings will be loaded when opening it again.")
-        helper.close(parent)
+        messagebox.showinfo(title="Resetting settings", message="The settings have been reset and PraktiCalc will now close.\nDefault settings will be loaded when opening it again.")
+        parent.Close()
+
+# custom info dialog
+class CustomInfoDialog(wx.Dialog):
+    def __init__(self, parent, infotext):
+        super().__init__(parent, title="About PraktiCalc")
+        self.panel = wx.Panel(self)
+        self.InfoBox = wx.StaticBox(self.panel, label="[i]")
+        if "--debug" in sys.argv:
+            self.InfoBox.SetLabel("[i] <-> RUNNING IN DEBUG MODE")
+        self.LogoBitmap = wx.StaticBitmap(self.InfoBox, bitmap=wx.Bitmap(PraktiCalcIconPath))
+        self.StaticInfoText = wx.StaticText(self.InfoBox, label=infotext + "\n")
+        self.InfoBoxSizer = wx.GridBagSizer()
+        self.InfoBoxSizer.Add(self.LogoBitmap, pos=(0, 0), flag=wx.ALIGN_CENTER | wx.ALL, border=5)
+        self.InfoBoxSizer.Add(self.StaticInfoText, pos=(1, 0), flag=wx.ALL, border=5)
+        self.InfoBox.SetSizerAndFit(self.InfoBoxSizer)
+        self.PythonPoweredBitmap = wx.Bitmap(PythonPowerPath, wx.BITMAP_TYPE_PNG)
+        self.PythonPoweredButton = wx.BitmapButton(self.panel, bitmap=self.PythonPoweredBitmap)
+        self.PythonPoweredButton.Bind(wx.EVT_BUTTON, lambda _: webbrowser.open_new_tab("https://www.python.org/"))
+        self.WxPoweredBitmap = wx.Bitmap(WxPowerPath, wx.BITMAP_TYPE_PNG)
+        self.WxPoweredButton = wx.BitmapButton(self.panel, bitmap=self.WxPoweredBitmap)
+        self.WxLinkMenu = wx.Menu()
+        self.Bind(wx.EVT_MENU, lambda _: webbrowser.open_new_tab("https://wxpython.org/"), self.WxLinkMenu.Append(wx.NewIdRef(), "wxPython"))
+        self.Bind(wx.EVT_MENU, lambda _: webbrowser.open_new_tab("https://wxwidgets.org/"), self.WxLinkMenu.Append(wx.NewIdRef(), "wxWidgets"))
+        self.WxPoweredButton.Bind(wx.EVT_BUTTON, lambda _: self.PopupMenu(self.WxLinkMenu, self.WxPoweredButton.GetPosition()))
+        self.OKButton = wx.Button(self.panel, label="OK")
+        self.OKButton.Bind(wx.EVT_BUTTON, lambda _: self.Close())
+        self.OKButton.SetFocus()
+        self.sizer = wx.GridBagSizer(5)
+        self.sizer.Add(self.InfoBox, pos=(0, 0), span=(1, 2), flag=wx.EXPAND | wx.ALL, border=5)
+        self.sizer.Add(self.PythonPoweredButton, pos=(1, 0), flag=wx.ALL, border=5)
+        self.sizer.Add(self.WxPoweredButton, pos=(1, 1), flag=wx.ALL, border=5)
+        self.sizer.Add(self.OKButton, pos=(1, 2), flag=wx.ALIGN_BOTTOM | wx.ALL, border=5)
+        self.panel.SetSizerAndFit(self.sizer)
+        self.Fit()
 
 # info and error dialogs
 class Dialog:
     def __init__(self, cfg):
         self.ConfigurationStorage = cfg
-    def info(self, parent, helper): # shows info dialogs
+    def info(self, parent): # shows info dialogs
         infotext = f"""PraktiCalc - a practical calculator
 Version {PraktiCalcVersion}
 Copyright \u00a9 2024-2026 Karl Wesseler
-Running on Python {platform.python_version()} / Tk {tk.TkVersion}
+Running on Python {platform.python_version()} / wxPython {wx.VERSION_STRING}
 Licensed under the GPLv3"""
-        if helper.theming != 0:
-            infotext += "\nThemes provided by the ttkthemes library"
-        if self.ConfigurationStorage.get("dialogStyle") == "Tkinter":
+        dlgStyle = self.ConfigurationStorage.get("dialogStyle")
+        if dlgStyle == "Tkinter":
             messagebox.showinfo("About PraktiCalc", infotext)
-        elif self.ConfigurationStorage.get("dialogStyle") == "Alternative":
-            CustomInfox = tk.Toplevel(parent)
-            self.PythonPower = tk.PhotoImage(file=PythonPowerPath)
-            try:
-                self.TclTkPower = tk.PhotoImage(file=str(CustomInfox.tk.globalgetvar("tk_library")) + "/images/pwrdLogo150.gif")
-            except:
-                pass
-            CustomInfox.title("About PraktiCalc")
-            CustomInfox.bind("<Return>", lambda event: helper.close(CustomInfox))
-            CustomInfox.rowconfigure(0, weight=1)
-            CustomInfox.columnconfigure(0, weight=1)
-            if platform.system() == "Windows":
-                CustomInfox.attributes("-toolwindow", True)
-                CustomInfox.focus_set()
-            CustomInfoFrame = ttk.Frame(CustomInfox)
-            CustomInfoFrame.rowconfigure(0, weight=1)
-            CustomInfoFrame.columnconfigure(0, weight=1)
-            CustomInfoExit = ttk.Button(CustomInfoFrame, text="OK", command=lambda: helper.close(CustomInfox))
-            ExtendedInfoFrame = ttk.LabelFrame(CustomInfoFrame, relief=tk.SUNKEN, text="[i]")
-            ExtendedInfoFrame.rowconfigure(0, weight=1)
-            ExtendedInfoFrame.rowconfigure(1, weight=1)
-            ExtendedInfoFrame.columnconfigure(0, weight=1)
-            ExtInfoIcon = ttk.Label(ExtendedInfoFrame, image=parent.icon)
-            ExtInfoText1 = ttk.Label(ExtendedInfoFrame, text=infotext, justify=tk.LEFT)
-            if "--debug" in sys.argv:
-                DebugIconFrame = ttk.Frame(ExtendedInfoFrame)
-                IconList = ["info", "question", "warning", "error", "hourglass", "gray75", "gray50", "gray25", "gray12"]
-                for icon in IconList:
-                    if helper.DarkMode == True:
-                        tk.Label(DebugIconFrame, bitmap=icon, bg="black", fg="white").grid(row=0, column=IconList.index(icon), padx=(0, 10))
-                    else:
-                        tk.Label(DebugIconFrame, bitmap=icon).grid(row=0, column=IconList.index(icon), padx=(0, 10))
-                DebugIconFrame.grid(row=2, column=0, padx=10, pady=(0, 5), sticky=tk.W)
-            CustomInfoFrame.grid(row=0, column=0, sticky=tk.NSEW)
-            CustomInfoExit.grid(row=1, column=1, padx=10, pady=10)
-            CustomInfoExit.focus_set()
-            if platform.system() == "Darwin" and self.ConfigurationStorage.get("nativeTheme") == 1:
-                tk.Button(CustomInfoFrame, font=("Tk.DefaultFont", 11), image=self.PythonPower, command=lambda: webbrowser.open_new_tab("https://www.python.org/")).grid(row=1, column=0, padx=10, pady=10, sticky=tk.SW)
-                if hasattr(self, "TclTkPower"):
-                    tk.Button(CustomInfoFrame, font=("Tk.DefaultFont", 11), image=self.TclTkPower, command=lambda: webbrowser.open_new_tab("https://www.tcl-lang.org/")).grid(row=0, column=1, padx=10, pady=10, sticky=tk.N)
-            else:
-                ttk.Button(CustomInfoFrame, image=self.PythonPower, command=lambda: webbrowser.open_new_tab("https://www.python.org/")).grid(row=1, column=0, padx=10, pady=10, sticky=tk.SW)
-                if hasattr(self, "TclTkPower"):
-                    ttk.Button(CustomInfoFrame, image=self.TclTkPower, command=lambda: webbrowser.open_new_tab("https://www.tcl-lang.org/")).grid(row=0, column=1, padx=10, pady=10, sticky=tk.N)
-            ExtendedInfoFrame.grid(row=0, column=0, padx=20, pady=10, sticky=tk.NSEW)
-            ExtInfoIcon.grid(row=0, column=0)
-            ExtInfoText1.grid(row=1, column=0, padx=10, pady=(0, 5))
-            CustomInfox.protocol("WM_DELETE_WINDOW", lambda: helper.close(CustomInfox))
-            CustomInfox.update_idletasks()
-            helper.WindowList.append(CustomInfox)
-            helper.changeTheme(CustomInfox)
+        elif dlgStyle == "Alternative":
+            CustomInfoDialog(parent, infotext).Show()
+        elif dlgStyle == "wxPython":
+            InfoData = wx.adv.AboutDialogInfo()
+            InfoData.Name = "PraktiCalc"
+            InfoData.SetIcon(wx.Icon(PraktiCalcIconPath, wx.BITMAP_TYPE_PNG))
+            InfoData.Version = PraktiCalcVersion
+            InfoData.Description = "A practical calculator"
+            InfoData.Copyright = "\u00a9 2024-2026 Karl Wesseler"
+            #InfoData.Developers = ["Karl Wesseler"]
+            wx.adv.AboutBox(InfoData)
         else:
             if platform.system() == "Windows":
                 pyver = platform.python_version()
                 styles = {
-                    "VBScript": lambda: subprocess.Popen(["wscript", VBSInfoPath, PraktiCalcVersion, pyver, str(tk.TkVersion), str(helper.theming)]),
+                    "VBScript": lambda: subprocess.Popen(["wscript", VBSInfoPath, PraktiCalcVersion, pyver, str(wx.VERSION_STRING), str(0)]),
                     "Windows Messaging Service": lambda: subprocess.Popen(["msg", getpass.getuser(), infotext]),
                     }
                 opendialog = styles.get(self.ConfigurationStorage.get("dialogStyle"))
@@ -1148,35 +895,30 @@ Licensed under the GPLv3"""
                     opendialog()
                 else:
                     print("ERROR: Unknown Message Box Style")
-    def error(self, message, parent, helper): # shows error dialogs
-        if self.ConfigurationStorage.get("dialogStyle") == "Tkinter":
+    def error(self, message, parent): # shows error dialogs
+        dlgStyle = self.ConfigurationStorage.get("dialogStyle")
+        if dlgStyle == "Tkinter":
             messagebox.showerror("Error", message)
-        elif self.ConfigurationStorage.get("dialogStyle") == "Alternative":
-            ErrorWindow = tk.Toplevel(parent)
-            ErrorWindow.title("Error")
-            ErrorWindow.bind("<Return>", lambda event: helper.close(ErrorWindow))
-            ErrorWindow.rowconfigure(0, weight=1)
-            ErrorWindow.columnconfigure(0, weight=1)
-            if platform.system() == "Windows":
-                ErrorWindow.attributes("-toolwindow", True)
-                ErrorWindow.focus_set()
-            ErrorWindowFrame = ttk.Frame(ErrorWindow)
-            ErrorWindowFrame.rowconfigure(0, weight=1)
-            ErrorWindowFrame.columnconfigure(0, weight=1)
-            ErrorExitButton = ttk.Button(ErrorWindowFrame, text="OK", command=lambda: helper.close(ErrorWindow))
-            ExtendedErrorFrame = ttk.LabelFrame(ErrorWindowFrame, relief=tk.SUNKEN, text="[X]")
-            ExtendedErrorFrame.rowconfigure(0, weight=1)
-            ExtendedErrorFrame.columnconfigure(0, weight=1)
-            ErrorTextLabel = ttk.Label(ExtendedErrorFrame, text=message)
-            ErrorWindowFrame.grid(row=0, column=0, sticky=tk.NSEW)
-            ErrorExitButton.grid(row=1, column=1, padx=10, pady=10)
-            ErrorExitButton.focus_set()
-            ExtendedErrorFrame.grid(row=0, column=0, padx=20, pady=10, sticky=tk.NSEW)
-            ErrorTextLabel.grid(row=0, column=0)
-            ErrorWindow.protocol("WM_DELETE_WINDOW", lambda: helper.close(ErrorWindow))
-            ErrorWindow.update_idletasks()
-            helper.WindowList.append(ErrorWindow)
-            helper.changeTheme(ErrorWindow)
+        elif dlgStyle == "Alternative":
+            ErrorWindow = wx.Dialog(parent, title="Error")
+            ErrorWindow.panel = wx.Panel(ErrorWindow)
+            ErrorWindow.ErrorBox = wx.StaticBox(ErrorWindow.panel, label="[X]")
+            ErrorWindow.ErrorText = wx.StaticText(ErrorWindow.ErrorBox, label=message+"\n")
+            ErrorWindow.BoxSizer = wx.GridBagSizer()
+            ErrorWindow.BoxSizer.Add(ErrorWindow.ErrorText, pos=(0, 0), flag=wx.ALL, border=5)
+            ErrorWindow.ErrorBox.SetSizerAndFit(ErrorWindow.BoxSizer)
+            ErrorWindow.OKButton = wx.Button(ErrorWindow.panel, label="OK")
+            ErrorWindow.OKButton.Bind(wx.EVT_BUTTON, lambda _: ErrorWindow.Close())
+            ErrorWindow.OKButton.SetFocus()
+            ErrorWindow.sizer = wx.GridBagSizer(5)
+            ErrorWindow.sizer.Add(ErrorWindow.ErrorBox, pos=(0, 0), flag=wx.EXPAND | wx.ALL, border=5)
+            ErrorWindow.sizer.Add(ErrorWindow.OKButton, pos=(1, 1), flag=wx.ALL, border=5)
+            ErrorWindow.panel.SetSizerAndFit(ErrorWindow.sizer)
+            ErrorWindow.Fit()
+            ErrorWindow.Show()
+            return
+        elif dlgStyle == "wxPython":
+            wx.MessageDialog(parent, message, caption="Error", style=wx.OK | wx.ICON_ERROR).ShowModal()
         else:
             if platform.system() == "Windows":
                 styles = {
@@ -1210,767 +952,57 @@ Licensed under the GPLv3"""
                 else:
                     print("ERROR: Unknown Message Box Style")
 
-# unused help GUI
-class HelpWindow(tk.Toplevel):
-    def __init__(self, parent, helper):
-        super().__init__(parent)
-        self = tk.Toplevel(parent)
-        self.rowconfigure(0, weight=1)
-        self.columnconfigure(0, weight=1)
-        self.title("PraktiCalc Help")
-        if platform.system() == "Windows":
-            self.focus_set()
-        HelpFrame = ttk.Frame(self)
-        HelpFrame.rowconfigure(0, weight=1)
-        HelpFrame.columnconfigure(0, weight=1)
-        HelpFrame.grid(row=0, column=0, sticky=tk.NSEW)
-        HelpTabs = ttk.Notebook(HelpFrame)
-        Content1 = tk.Text(HelpTabs)
-        if helper.DarkMode == True:
-            Content1.config(fg="white", bg="black")
-        Content1.pack(fill=tk.BOTH, expand=True)
-        HelpTabs.add(Content1, text="Placeholder")
-        HelpTabs.grid(row=0, column=0, sticky=tk.NSEW)
-        Content1.insert(tk.END, "Sorry, this feature has been aborted.\n\n>_<")
-        Content1.config(state=tk.DISABLED)
-        self.protocol("WM_DELETE_WINDOW", lambda: helper.close(self))
-        self.update_idletasks()
-        helper.WindowList.append(self)
-        helper.changeTheme(self)
-
 # history window
-class HistoryWindow(tk.Toplevel):
-    def __init__(self, parent, calculator, helper):
-        super().__init__(parent)
-        self.rowconfigure(0, weight=1)
-        self.columnconfigure(0, weight=1)
-        self.title("History")
-        # self.config(height=400, width=256)
-        if platform.system() == "Windows":
-            self.attributes("-toolwindow", True)
-            self.focus_set()
-        HistoryWindowFrame = ttk.Frame(self)
-        HistoryWindowFrame.columnconfigure(0, weight=1)
-        HistoryWindowFrame.rowconfigure(0, weight=1)
-        HistoryWindowFrame.grid(row=0, column=0, sticky=tk.NSEW)
-        self.HistoryTreeview = ttk.Treeview(HistoryWindowFrame, height=15)
-        self.HistoryTreeview.heading("#0", text="History")
-        for entry in calculator.HistoryList:
-            self.HistoryTreeview.insert("", tk.END, text=entry)
-        HistoryClearButton = ttk.Button(HistoryWindowFrame, text="Clear history", command=lambda: self.clear(calculator))
-        self.HistoryTreeview.grid(row=0, column=0, sticky=tk.NSEW)
-        HistoryClearButton.grid(row=1, column=0, sticky=tk.NSEW, padx=5, pady=5)
-        self.protocol("WM_DELETE_WINDOW", lambda: helper.close(self))
-        self.update_idletasks()
-        helper.WindowList.append(self)
-        helper.changeTheme(self)
+class HistoryWindow(wx.Frame):
+    def __init__(self, parent, calculator):
+        super().__init__(parent, title="History")
+        self.panel = wx.Panel(self)
+        self.HistoryList = wx.ListBox(self.panel, choices=calculator.HistoryList)
+        self.ClearButton = wx.Button(self.panel, label="Clear history")
+        self.ClearButton.SetBitmapLabel(wx.ArtProvider.GetBitmap(wx.ART_DELETE, wx.ART_BUTTON, (16, 16)))
+        self.ClearButton.Bind(wx.EVT_BUTTON, lambda _: self.clear(calculator))
+        self.sizer = wx.GridBagSizer()
+        self.sizer.AddGrowableCol(0)
+        self.sizer.AddGrowableRow(0)
+        self.sizer.Add(self.HistoryList, pos=(0, 0), flag=wx.EXPAND)
+        self.sizer.Add(self.ClearButton, pos=(1, 0), flag=wx.EXPAND | wx.ALL, border=5)
+        self.panel.SetSizerAndFit(self.sizer)
+        self.Fit()
+        self.Show()
     def clear(self, calculator): # clears the history
         calculator.clearHistory()
-        self.HistoryTreeview.delete(*self.HistoryTreeview.get_children())
+        self.HistoryList.Clear()
 
 # extension window
-class ExtensionWindow(tk.Toplevel):
-    def __init__(self, parent, helper, calculator, dialog, cfg):
-        super().__init__(parent)
-        self.title("Extensions")
-        self.rowconfigure(0, weight=1)
-        self.columnconfigure(0, weight=1)
-        if platform.system() == "Windows":
-            if RunningAsOneFileExe == True:
-                if sys.executable == r"C:\Program Files\PraktiCalc\prakticalc.exe":
-                    self.FolderPath = Path.home() / "AppData" / "Roaming" / "PraktiXtensions"
-                else:
-                    f1 = Path(sys.executable).parent
-                    self.FolderPath = f1 / "extensions"
-            else:
-                self.FolderPath = Path.home() / "AppData" / "Roaming" / "PraktiXtensions"
-        elif platform.system() == "Darwin":
-            self.FolderPath = Path.home() / "Library" / "PraktiXtensions"
-        else:
-            self.FolderPath = Path.home() / ".config" / "PraktiXtensions"
-        self.Tabs = ttk.Notebook(self)
-        self.Tabs.grid(row=0, column=0, sticky=tk.NSEW)
-        self.protocol("WM_DELETE_WINDOW", lambda: helper.close(self))
-        self.update_idletasks()
-        helper.WindowList.append(self)
-        helper.changeTheme(self)
-        self.after(250, lambda: self.loadExtensions(parent, helper, calculator, dialog))
-    def loadExtensions(self, parent, helper, calculator, dialog): # loads extensions from the folder, writes default extensions to folder if folder doesn't exist
-        if not self.FolderPath.exists():
-            self.FolderPath.mkdir(parents=True)
-            self.updateDecimalConverter()
-            self.updateExtensionManager()
-            self.updatePraktiGraph()
-        ContentIsThere = False
-        for f in self.FolderPath.iterdir():
-            if not str(f).endswith("__pycache__"):
-                ContentIsThere = True
-        if ContentIsThere == False:
-            dialog.error(f"There are no extensions installed. You can install some manually in {self.FolderPath},\nor delete that folder to reset the extension system, which reinstalls the extension manager.", parent, helper)
-            helper.close(self)
-            return
-        if Path(self.FolderPath / "DecimalConverter.ini").exists():
-            DecimalConverterMeta = configparser.ConfigParser()
-            DecimalConverterMeta.read(self.FolderPath / "DecimalConverter.ini", encoding="utf-8")
-            if DecimalConverterMeta["PraktiXtension"]["version"] != "1.3":
-                self.updateDecimalConverter()
-        if Path(self.FolderPath / "ExtensionManager.ini").exists():
-            ExtensionManagerMeta = configparser.ConfigParser()
-            ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini", encoding="utf-8")
-            if ExtensionManagerMeta["PraktiXtension"]["version"] != "1.13":
-                self.updateExtensionManager()
-        if Path(self.FolderPath / "PraktiGraph.ini").exists():
-            PraktiGraphMeta = configparser.ConfigParser()
-            PraktiGraphMeta.read(self.FolderPath / "PraktiGraph.ini", encoding="utf-8")
-            if PraktiGraphMeta["PraktiXtension"]["version"] != "1.9":
-                self.updatePraktiGraph()
-        for file in self.FolderPath.iterdir():
-            if file.suffix == ".py":
-                if Path(self.FolderPath / f"{file.stem}.ini").exists():
-                    meta = configparser.ConfigParser()
-                    meta.read(Path(self.FolderPath / f"{file.stem}.ini"), encoding="utf-8")
-                    if meta["PraktiXtension"]["minpython"] == "default":
-                        if meta["PraktiXtension"]["maxpython"] == "default":
-                            canload = True
-                        elif tuple(meta["PraktiXtension"]["maxpython"].split(".")) >= platform.python_version_tuple()[:-1]:
-                            canload = True
-                        else: canload = False
-                    elif tuple(meta["PraktiXtension"]["minpython"].split(".")) <= platform.python_version_tuple()[:-1]:
-                        canload = True
-                    else:
-                        canload = False
-                    if canload == True:
-                        spec = importlib.util.spec_from_file_location(file.stem, file)
-                        module = importlib.util.module_from_spec(spec)
-                        spec.loader.exec_module(module)
-                        classs = getattr(module, file.stem)
-                        instance = classs(self.Tabs, self, parent, helper, calculator, dialog, helper.DarkMode)
-                        self.Tabs.add(instance, text=meta["PraktiXtension"]["name"])
-                        print("loaded extension " + meta["PraktiXtension"]["name"])
-                    else:
-                        dialog.error("Incompatible Python version", parent, helper)
-                else:
-                    spec = importlib.util.spec_from_file_location(file.stem, file)
-                    module = importlib.util.module_from_spec(spec)
-                    spec.loader.exec_module(module)
-                    classs = getattr(module, file.stem)
-                    instance = classs(self.Tabs, self, parent, helper, calculator, dialog, helper.DarkMode)
-                    self.Tabs.add(instance, text=file.stem)
-                    print("loaded extension " + file.stem)
-        self.geometry(f"{int(700*parent.ScaleFactor)}x{int(500*parent.ScaleFactor)}")
-    def updateDecimalConverter(self): # updates decimal converter extension to the version embedded here
-        if Path(self.FolderPath / "DecimalConverter.py").exists():
-            Path(self.FolderPath / "DecimalConverter.py").unlink()
-            Path(self.FolderPath / "DecimalConverter.ini").unlink(missing_ok=True)
-            Path(self.FolderPath / "DecimalConverter.txt").unlink(missing_ok=True)
-        if not Path(self.FolderPath / "DecimalConverter.py").exists():
-            DecimalConverterCode = r"""# PraktiCalc Decimal Converter
-# Copyright (C) 2024-2026 Karl Wesseler
-# SPDX-License-Identifier: GPL-3.0-only
-
-import tkinter as tk
-from tkinter import ttk
-
-class DecimalConverter(ttk.Frame):
-    def __init__(self, tabs, parent, mainWin, helper, calculator, dialog, DarkMode):
-        super().__init__(tabs)
-        DecimalFrame = ttk.LabelFrame(self, text="Decimal")
-        self.DecimalInput = ttk.Entry(DecimalFrame, width=70)
-        DecimalFrame.columnconfigure(0, weight=1)
-        self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=1)
-        self.rowconfigure(1, weight=1)
-        InsertButton = ttk.Button(DecimalFrame, text="OK", command=lambda: self.convert(parent, helper, dialog))
-        binFrame = ttk.LabelFrame(self, text="Binary")
-        hexFrame = ttk.LabelFrame(self, text="Hexadecimal")
-        frames = (binFrame, hexFrame)
-        for i in range(2):
-            frames[i].columnconfigure(0, weight=1)
-            frames[i].rowconfigure(0, weight=1)
-            frames[i].rowconfigure(1, weight=1)
-        self.BinDisplay = ttk.Entry(binFrame)
-        self.HexDisplay = ttk.Entry(hexFrame)
-        self.BinScrollbar = ttk.Scrollbar(binFrame, orient=tk.HORIZONTAL, command=self.BinDisplay.xview)
-        self.HexScrollbar = ttk.Scrollbar(hexFrame, orient=tk.HORIZONTAL, command=self.HexDisplay.xview)
-        self.BinDisplay.config(state="readonly", xscrollcommand=self.BinScrollbar.set)
-        self.HexDisplay.config(state="readonly", xscrollcommand=self.HexScrollbar.set)
-        BinCopyButton = ttk.Button(binFrame, text="Copy", command=lambda: self.copybin(mainWin))
-        HexCopyButton = ttk.Button(hexFrame, text="Copy", command=lambda: self.copyhex(mainWin))
-        DecimalFrame.grid(row=0, column=0, columnspan=2, sticky=tk.NSEW, padx=5)
-        self.DecimalInput.grid(row=0, column=0, pady=5, padx=5, sticky=tk.NSEW)
-        InsertButton.grid(row=0, column=1, padx=5, pady=5)
-        binFrame.grid(row=1, column=0, sticky=tk.NSEW, padx=5, pady=(0, 5))
-        hexFrame.grid(row=1, column=1, sticky=tk.NSEW, padx=5, pady=(0, 5))
-        self.BinDisplay.grid(row=0, column=0, sticky=tk.EW + tk.S)
-        self.HexDisplay.grid(row=0, column=0, sticky=tk.EW + tk.S)
-        self.BinScrollbar.grid(row=1, column=0, sticky=tk.EW + tk.N)
-        self.HexScrollbar.grid(row=1, column=0, sticky=tk.EW + tk.N)
-        BinCopyButton.grid(row=2, column=0, pady=(0, 5))
-        HexCopyButton.grid(row=2, column=0, pady=(0, 5))
-        self.DecimalInput.focus_set()
-    def convert(self, parent, helper, dialog): # converts decimal numbers into binary and hexadecimal
-        cp = str(self.DecimalInput.get())
-        try:
-            displays = [self.BinDisplay, self.HexDisplay]
-            DecimalNumber = int(cp)
-            BinaryNumber = bin(DecimalNumber)[2:]
-            HexadecimalNumber = hex(DecimalNumber)[2:]
-            for display in displays:
-                display.config(state=tk.NORMAL)
-                display.delete(0, tk.END)
-            self.BinDisplay.insert(0, str(BinaryNumber))
-            self.HexDisplay.insert(0, str(HexadecimalNumber).upper())
-            for display in displays:
-                display.config(state="readonly")
-        except:
-            dialog.error("Please enter a real number!", parent, helper)
-    def copybin(self, mainWin): # copies the binary output
-        mainWin.clipboard_clear()
-        mainWin.clipboard_append(self.BinDisplay.get())
-        mainWin.update()
-    def copyhex(self, mainWin): # copies the hexadecimal output
-        mainWin.clipboard_clear()
-        mainWin.clipboard_append(self.HexDisplay.get())
-        mainWin.update()"""
-            DecimalConverterMetadata = configparser.ConfigParser()
-            DecimalConverterMetadata["PraktiXtension"] = {"name": "Decimal Converter",
-                                                          "version": "1.3",
-                                                          "filename": "DecimalConverter.py",
-                                                          "description": "The PraktiCalc Decimal Converter",
-                                                          "website": "",
-                                                          "minpython": "default",
-                                                          "maxpython": "default",
-                                                          "sha256": "",
-                                                          "requiresinternet": "false",
-                                                          "pxtxlink": ""}
-            DecimalConverterDescription = "This is the known decimal converter that PraktiCalc includes by default, now as an extension."
-            with open(self.FolderPath / "DecimalConverter.py", "w", encoding="utf-8") as dcfile:
-                dcfile.write(DecimalConverterCode)
-            with open(self.FolderPath / "DecimalConverter.ini", "w", encoding="utf-8") as dcmeta:
-                DecimalConverterMetadata.write(dcmeta)
-            with open(self.FolderPath / "DecimalConverter.txt", "w", encoding="utf-8") as dcdesc:
-                dcdesc.write(DecimalConverterDescription)
-    def updateExtensionManager(self): # updates extension manager extension to the version embedded here
-        if Path(self.FolderPath / "ExtensionManager.py").exists():
-            Path(self.FolderPath / "ExtensionManager.py").unlink()
-            Path(self.FolderPath / "ExtensionManager.ini").unlink(missing_ok=True)
-            Path(self.FolderPath / "ExtensionManager.txt").unlink(missing_ok=True)
-        if not Path(self.FolderPath / "ExtensionManager.py").exists():
-            ExtensionManagerCode = r"""# PraktiCalc Extension Manager
-# Copyright (C) 2026 Karl Wesseler
-# SPDX-License-Identifier: GPL-3.0-only
-
-import tkinter as tk
-from tkinter import ttk, font, messagebox, filedialog
-from pathlib import Path
-import webbrowser, configparser, zipfile, tempfile, hashlib, shutil, platform, subprocess
-
-class ExtensionManager(ttk.Frame):
-    def __init__(self, tabs, parent, mainWin, helper, calculator, dialog, DarkMode):
-        super().__init__(tabs)
-        self.style = ttk.Style()
-        self.style.configure("ExtensionTitle.TLabel", font=font.Font(family="TkDefaultFont", size=15))
-        self.rowconfigure(1, weight=1)
-        self.columnconfigure(0, weight=1)
-        ttk.Label(self, text="The Extension Manager allows you to manage extensions in the PraktiXtension (.pxt) format.").grid(row=0, column=0, sticky=tk.W)
-        self.Splitter = ttk.PanedWindow(self, orient=tk.HORIZONTAL)
-        self.LeftFrame = ttk.Frame(self.Splitter)
-        self.RightFrame = ttk.LabelFrame(self.Splitter, text="Metadata")
-        self.ExtensionTree = ttk.Treeview(self.LeftFrame, selectmode=tk.BROWSE)
-        self.ExtensionTreeScrollbar = ttk.Scrollbar(self.LeftFrame, orient=tk.VERTICAL, command=self.ExtensionTree.yview)
-        self.ExtensionTree.config(yscrollcommand=self.ExtensionTreeScrollbar.set)
-        self.ExtensionTree.bind("<<TreeviewSelect>>", lambda event: self.updateMetadataDisplay(parent))
-        self.ExtensionTree.heading("#0", text="Extensions")
-        for file in parent.FolderPath.iterdir():
-            if file.suffix == ".py":
-                self.ExtensionTree.insert("", tk.END, text=file.stem)
-        ttk.Label(self.RightFrame).grid(row=0, column=0)
-        self.ExtensionTree.grid(row=0, column=0, columnspan=2, sticky=tk.NSEW)
-        self.ExtensionTreeScrollbar.grid(row=0, column=2, sticky=tk.NS)
-        self.AddButton = ttk.Button(self.LeftFrame, text="Add", command=lambda: self.addExtension(parent, helper, dialog))
-        self.AddButton.grid(row=1, column=0, padx=10, pady=10, sticky=tk.EW)
-        self.RemoveButton = ttk.Button(self.LeftFrame, text="Remove", state=tk.DISABLED, command=lambda: self.removeExtension(parent))
-        self.RemoveButton.grid(row=1, column=1, padx=10, pady=10, sticky=tk.EW)
-        self.OpenFolderButton = ttk.Button(self.LeftFrame, text="Open Extension Folder", command=lambda: self.openFolder(parent))
-        if platform.system() not in ("Windows", "Darwin"):
-            if not shutil.which("xdg-open"):
-                self.OpenFolderButton.config(state=tk.DISABLED)
-        self.OpenFolderButton.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky=tk.EW)
-        self.ResetButton = ttk.Button(self.LeftFrame, text="Reset Extension Folder", command=lambda: self.reset(parent, mainWin, helper))
-        self.ResetButton.grid(row=3, column=0, columnspan=2, padx=10, pady=(10, 0), sticky=tk.EW)
-        ttk.Separator(self.LeftFrame, orient=tk.HORIZONTAL).grid(row=4, rowspan=2, column=0, columnspan=2, pady=7, sticky=tk.EW)
-        ttk.Button(self.LeftFrame, text="PraktiXtension Gallery", command=lambda: webbrowser.open_new("https://praktixtensions.blogspot.com/p/browse.html")).grid(row=6, column=0, columnspan=2, padx=10, pady=(0, 10), sticky=tk.EW)
-        ttk.Separator(self.LeftFrame, orient=tk.VERTICAL).grid(row=5, rowspan=2, column=2, sticky=tk.NS + tk.W)
-        self.LeftFrame.columnconfigure(0, weight=1)
-        self.LeftFrame.columnconfigure(1, weight=1)
-        self.RightFrame.columnconfigure(0, weight=1)
-        self.TitleLabel = ttk.Label(self.RightFrame, text="", style="ExtensionTitle.TLabel")
-        self.DescriptionLabel = ttk.Label(self.RightFrame, text="")
-        self.InternetLabel = ttk.Label(self.RightFrame, text="requires internet connection")
-        self.WebsiteButton = ttk.Button(self.RightFrame, text="Website")
-        self.VersionDisplay = ttk.Entry(self.RightFrame, state="readonly")
-        self.LicenseDisplay = ttk.Entry(self.RightFrame, state="readonly")
-        self.minPyVerDisplay = ttk.Entry(self.RightFrame, state="readonly")
-        self.maxPyVerDisplay = ttk.Entry(self.RightFrame, state="readonly")
-        self.FileNameDisplay = ttk.Entry(self.RightFrame, state="readonly")
-        self.WebLinkDisplay = ttk.Entry(self.RightFrame, state="readonly")
-        self.ChecksumDisplay = ttk.Entry(self.RightFrame, state="readonly")
-        self.TitleLabel.grid(row=0, column=0, columnspan=2, sticky=tk.NE + tk.W)
-        self.DescriptionLabel.grid(row=1, column=0, columnspan=2, sticky=tk.EW)
-        ttk.Separator(self.RightFrame, orient=tk.HORIZONTAL).grid(row=3, column=0, columnspan=2, sticky=tk.EW)
-        Labels = ["Version", "File name", "License", "Website", "Minimal Python version", "Maximal Python version", "SHA256 checksum"]
-        Entrys = [self.VersionDisplay, self.FileNameDisplay, self.LicenseDisplay, self.WebLinkDisplay, self.minPyVerDisplay, self.maxPyVerDisplay, self.ChecksumDisplay]
-        for i in range(7):
-            ttk.Label(self.RightFrame, text=Labels[i]).grid(row=i+4, column=0, sticky=tk.EW, padx=10)
-            Entrys[i].grid(row=i+4, column=1, sticky=tk.EW, padx=10, pady=5)
-        self.DescriptionFrame = ttk.LabelFrame(self.RightFrame, text="Description")
-        self.DescriptionFrame.rowconfigure(0, weight=1)
-        self.DescriptionFrame.columnconfigure(0, weight=1)
-        self.DescriptionFrame.grid(row=11, column=0, columnspan=2, sticky=tk.NSEW, padx=5, pady=5)
-        self.DescriptionText = tk.Text(self.DescriptionFrame, font="TkFixedFont", height=15, state=tk.DISABLED, wrap=tk.WORD)
-        self.DescriptionScrollbar = ttk.Scrollbar(self.DescriptionFrame, orient=tk.VERTICAL, command=self.DescriptionText.yview)
-        self.DescriptionText.config(yscrollcommand=self.DescriptionScrollbar.set)
-        self.DescriptionScrollbar.grid(row=0, column=1, padx=(0, 5), pady=5, sticky=tk.NS)
-        if DarkMode == True:
-            self.DescriptionText.config(bg="black", fg="white")
-        self.DescriptionText.grid(row=0, column=0, sticky=tk.NSEW, padx=(5, 0), pady=5)
-        self.LeftFrame.rowconfigure(0, weight=1)
-        self.RightFrame.columnconfigure(1, weight=1)
-        self.RightFrame.rowconfigure(11, weight=1)
-        self.Splitter.add(self.LeftFrame)
-        self.Splitter.add(self.RightFrame)
-        self.Splitter.grid(row=1, column=0, sticky=tk.NSEW)
-    def updateMetadataDisplay(self, parent):
-        self.RemoveButton.config(state=tk.NORMAL)
-        ext = self.ExtensionTree.item(self.ExtensionTree.selection(), "text")
-        labels = [self.TitleLabel, self.DescriptionLabel]
-        displays = [self.VersionDisplay, self.FileNameDisplay, self.LicenseDisplay, self.WebLinkDisplay, self.minPyVerDisplay, self.maxPyVerDisplay, self.ChecksumDisplay]
-        if Path(parent.FolderPath / f"{ext}.ini").exists():
-            metadata = configparser.ConfigParser()
-            metadata.read(Path(parent.FolderPath / f"{ext}.ini"), encoding="utf-8")
-            self.TitleLabel.config(text=metadata["PraktiXtension"]["name"])
-            self.DescriptionLabel.config(text=metadata["PraktiXtension"]["description"])
-            if metadata["PraktiXtension"]["website"] != "":
-                try:
-                    self.WebsiteButton.config(command=lambda: webbrowser.open_new(metadata["PraktiXtension"]["website"]))
-                    self.WebsiteButton.grid(row=2, column=1, sticky=tk.E, padx=5, pady=5)
-                except:
-                    pass
-            else:
-                try:
-                    self.WebsiteButton.config(command=None)
-                    self.WebsiteButton.grid_remove()
-                except:
-                    pass
-            if metadata["PraktiXtension"]["requiresinternet"] == "true":
-                try:
-                    self.InternetLabel.grid(row=2, column=0, sticky=tk.EW)
-                except:
-                    pass
-            else:
-                try:
-                    self.InternetLabel.grid_remove()
-                except:
-                    pass
-            for display in displays:
-                display.config(state=tk.NORMAL)
-                display.delete(0, tk.END)
-            self.VersionDisplay.insert(0, metadata["PraktiXtension"]["version"])
-            self.FileNameDisplay.insert(0, metadata["PraktiXtension"]["filename"])
-            self.WebLinkDisplay.insert(0, metadata["PraktiXtension"]["website"])
-            self.minPyVerDisplay.insert(0, metadata["PraktiXtension"]["minpython"])
-            self.maxPyVerDisplay.insert(0, metadata["PraktiXtension"]["maxpython"])
-            self.ChecksumDisplay.insert(0, metadata["PraktiXtension"]["sha256"])
-            with open(Path(parent.FolderPath / metadata["PraktiXtension"]["filename"]), "r", encoding="utf-8") as extensionfile:
-                extensioncontent = extensionfile.read()
-            if "SPDX-License-Identifier: " in extensioncontent:
-                self.LicenseDisplay.insert(0, extensioncontent.split("SPDX-License-Identifier: ")[1].split()[0])
-            for display in displays:
-                display.config(state="readonly")
-        else:
-            self.TitleLabel.config(text=ext)
-            self.DescriptionLabel.config(text="no metadata found :(")
-            for display in displays:
-                display.config(state=tk.NORMAL)
-                display.delete(0, tk.END)
-                display.config(state="readonly")
-            try:
-                self.WebsiteButton.config(command=None)
-                self.WebsiteButton.grid_remove()
-            except:
-                pass
-            try:
-                self.InternetLabel.grid_remove()
-            except:
-                pass
-            if ext == "":
-                self.RemoveButton.config(state=tk.DISABLED)
-                self.DescriptionLabel.config(text="")
-            elif Path(parent.FolderPath / f"{ext}.py").exists():
-                with open(Path(parent.FolderPath / f"{ext}.py"), "r", encoding="utf-8") as extensionfile:
-                    extensioncontent = extensionfile.read()
-                if "SPDX-License-Identifier: " in extensioncontent:
-                    self.LicenseDisplay.config(state=tk.NORMAL)
-                    self.LicenseDisplay.insert(0, extensioncontent.split("SPDX-License-Identifier: ")[1].split()[0])
-                    self.LicenseDisplay.config(state="readonly")
-        self.DescriptionText.config(state=tk.NORMAL)
-        if Path(parent.FolderPath / f"{ext}.txt").exists():
-            with open(Path(parent.FolderPath / f"{ext}.txt"), "r", encoding="utf-8") as txt:
-                self.DescriptionText.delete("1.0", tk.END)
-                self.DescriptionText.insert(tk.END, txt.read())
-        else:
-            self.DescriptionText.delete("1.0", tk.END)
-        self.DescriptionText.config(state=tk.DISABLED)
-    def removeExtension(self, parent):
-        ext = self.ExtensionTree.item(self.ExtensionTree.selection(), "text")
-        Path(parent.FolderPath / f"{ext}.py").unlink()
-        Path(parent.FolderPath / f"{ext}.ini").unlink(missing_ok=True)
-        Path(parent.FolderPath / f"{ext}.txt").unlink(missing_ok=True)
-        self.ExtensionTree.delete(self.ExtensionTree.selection()[0])
-    def addExtension(self, parent, helper, dialog):
-        file = filedialog.askopenfilename(parent=parent, initialdir=Path.home(), filetypes=[("PraktiXtension", "*.pxt")])
-        if file == () or file == "":
-            return
-        with tempfile.TemporaryDirectory() as tempdir:
-            with zipfile.ZipFile(file, "r") as Extension:
-                for filename in Extension.namelist():
-                    if ".." in filename or filename.startswith("/"):
-                        dialog.error("Installing this extension would creates files outside of the usual extension directories, thus it's installation is aborted.", parent, helper)
-                        return
-                if not "info.ini" in Extension.namelist():
-                    abort = True
-                elif not "description.txt" in Extension.namelist():
-                    abort = True
-                else:
-                    abort = False
-                if abort == False:
-                    Extension.extractall(tempdir)
-                else:
-                    dialog.error("Extension couldn't be installed", parent, helper)
-                    return
-                try:
-                    metadata = configparser.ConfigParser()
-                    metadata.read(Path(tempdir) / "info.ini", encoding="utf-8")
-                    ExtensionName = metadata["PraktiXtension"]["filename"]
-                    if not ExtensionName in [file.name for file in Path(tempdir).iterdir() if file.is_file()]:
-                        raise FileNotFoundError
-                    with open(Path(tempdir) / ExtensionName, "rb") as ExtensionFile:
-                        if not metadata["PraktiXtension"]["sha256"] == "" and hashlib.sha256(ExtensionFile.read()).hexdigest() != metadata["PraktiXtension"]["sha256"]:
-                            raise ResourceWarning
-                    if metadata["PraktiXtension"]["minpython"] == "default":
-                        if metadata["PraktiXtension"]["maxpython"] == "default":
-                            canload = True
-                        elif tuple(metadata["PraktiXtension"]["maxpython"].split(".")) >= platform.python_version_tuple()[:-1]:
-                            canload = True
-                        else: canload = False
-                    elif tuple(metadata["PraktiXtension"]["minpython"].split(".")) <= platform.python_version_tuple()[:-1]:
-                        canload = True
-                    else:
-                        canload = False
-                    if canload == False:
-                        raise ImportWarning
-                    if Path(parent.FolderPath / ExtensionName).exists():
-                        overwritten = True
-                    else:
-                        overwritten = False
-                    shutil.move(Path(tempdir) / "info.ini", parent.FolderPath / f"{ExtensionName[:-3]}.ini")
-                    shutil.move(Path(tempdir) / "description.txt", parent.FolderPath / f"{ExtensionName[:-3]}.txt")
-                    shutil.move(Path(tempdir) / ExtensionName, parent.FolderPath / ExtensionName)
-                    if overwritten == False:
-                        messagebox.showinfo(parent=parent, title="PraktiXtension installed", message="Extension installed successfully, reopen the extension window to load it")
-                        self.ExtensionTree.insert("", tk.END, text=ExtensionName[:-3])
-                    else:
-                        messagebox.showinfo(parent=parent, title="PraktiXtension upgraded", message="Extension successfully upgraded, replaced or reinstalled.\nPlease reopen the extension window to reload it")
-                except FileNotFoundError:
-                    dialog.error("Extension not found in file", parent, helper)
-                    return
-                except ResourceWarning:
-                    dialog.error("Cryptographic verification of extension failed", parent, helper)
-                    return
-                except ImportWarning:
-                    dialog.error("Incompatible Python version", parent, helper)
-                    return
-                except Exception as e:
-                    dialog.error(str(e), parent, helper)
-                    return
-    def openFolder(self, parent):
-        if platform.system() == "Windows":
-            subprocess.Popen(["explorer", str(parent.FolderPath)])
-        elif platform.system() == "Darwin":
-            subprocess.Popen(["open", str(parent.FolderPath)])
-        else:
-            subprocess.Popen(["xdg-open", str(parent.FolderPath)])
-    def reset(self, parent, mainWin, helper):
-        shutil.rmtree(parent.FolderPath)
-        helper.close(parent)"""
-            ExtensionManagerMetadata = configparser.ConfigParser()
-            ExtensionManagerMetadata["PraktiXtension"] = {"name": "Extension Manager",
-                                                          "version": "1.13",
-                                                          "filename": "ExtensionManager.py",
-                                                          "description": "The PraktiCalc Extension Manager",
-                                                          "website": "",
-                                                          "minpython": "default",
-                                                          "maxpython": "default",
-                                                          "sha256": "",
-                                                          "requiresinternet": "false",
-                                                          "pxtxlink": ""}
-            ExtensionManagerDescription = "A graphical user interface to easily manage extensions in PraktiCalc."
-            with open(self.FolderPath / "ExtensionManager.py", "w", encoding="utf-8") as emfile:
-                emfile.write(ExtensionManagerCode)
-            with open(self.FolderPath / "ExtensionManager.ini", "w", encoding="utf-8") as emmeta:
-                ExtensionManagerMetadata.write(emmeta)
-            with open(self.FolderPath / "ExtensionManager.txt", "w", encoding="utf-8") as emdesc:
-                emdesc.write(ExtensionManagerDescription)
-    def updatePraktiGraph(self): # updates PraktiGraph extension to the version embedded here
-        if Path(self.FolderPath / "PraktiGraph.py").exists():
-            Path(self.FolderPath / "PraktiGraph.py").unlink()
-            Path(self.FolderPath / "PraktiGraph.ini").unlink(missing_ok=True)
-            Path(self.FolderPath / "PraktiGraph.txt").unlink(missing_ok=True)
-        if not Path(self.FolderPath / "PraktiGraph.py").exists():
-            PraktiGraphCode = r"""# PraktiGraph
-# Copyright (C) 2026 Karl Wesseler
-# SPDX-License-Identifier: GPL-3.0-only
-
-import tkinter as tk
-from tkinter import ttk, messagebox, colorchooser
-from decimal import Decimal
-import platform
-
-class PraktiGraph(ttk.Frame):
-    def __init__(self, tabs, parent, mainWin, helper, calculator, dialog, DarkMode):
-        super().__init__(tabs)
-        if DarkMode == False:
-            self.ForegroundColor = "#000000"
-            self.BackgroundColor = "#ffffff"
-            self.fxColor = "#000000"
-            self.gxColor = "#340098"
-        else:
-            self.ForegroundColor = "#ffffff"
-            self.BackgroundColor = "#000000"
-            self.fxColor = "#ffffff"
-            self.gxColor = "#5d00ff"
-        self.Scale = tk.IntVar(value=int(50*mainWin.ScaleFactor))
-        self.ClearStatus = True
-        self.TextOffset = 15
-        self.Numbers = tk.BooleanVar(value=True)
-        self.rowconfigure(0, weight=1)
-        self.columnconfigure(1, weight=1)
-        self.columnconfigure(2, weight=1)
-        self.Canvas = tk.Canvas(self, background=self.BackgroundColor)
-        self.Canvas.grid(row=0, column=0, columnspan=4, sticky=tk.NSEW)
-        ttk.Separator(self, orient=tk.HORIZONTAL).grid(row=1, column=0, columnspan=4, sticky=tk.EW)
-        ttk.Label(self, text="f(x) = ").grid(row=2, column=0, sticky=tk.E)
-        ttk.Label(self, text="g(x) = ").grid(row=3, column=0, sticky=tk.E)
-        self.fxEntry = ttk.Entry(self)
-        self.gxEntry = ttk.Entry(self)
-        self.fxEntry.grid(row=2, column=1, columnspan=2, sticky=tk.EW)
-        self.gxEntry.grid(row=3, column=1, columnspan=2, sticky=tk.EW)
-        self.fxColorButton = tk.Button(self, text="Color", fg=self.fxColor, bg=self.fxColor, command=lambda: self.setFxColor(parent, calculator))
-        self.gxColorButton = tk.Button(self, text="Color", fg=self.gxColor, bg=self.gxColor, command=lambda: self.setGxColor(parent, calculator))
-        if platform.system() == "Darwin":
-            self.fxColorButton.config(font=("TkDefaultFont", 11))
-            self.gxColorButton.config(font=("TkDefaultFont", 11))
-        self.fxColorButton.grid(row=2, column=3, padx=10)
-        self.gxColorButton.grid(row=3, column=3, padx=10)
-        self.cols = ("-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5")
-        self.Table = ttk.Treeview(self, columns=self.cols, height=2)
-        self.Table.heading("#0", text="x")
-        for col in self.cols:
-            self.Table.heading(col, text=col)
-        self.FirstTableRow = self.Table.insert("", tk.END, text="f(x)")
-        self.SecondTableRow = self.Table.insert("", tk.END, text="g(x)")
-        fullwidth = parent.winfo_width()
-        self.Table.column("#0", width=fullwidth // 12)
-        for col in self.Table["columns"]:
-            self.Table.column(col, width=fullwidth // 12)
-        self.Table.grid(row=4, column=0, columnspan=4, sticky=tk.NSEW)
-        ttk.Button(self, text="Clear", command=self.clear).grid(row=5, column=1, pady=10, padx=20, sticky=tk.E)
-        ttk.Button(self, text="Draw", command=lambda: self.redraw(calculator)).grid(row=5, column=2, pady=10, padx=20, sticky=tk.W)
-        ttk.Checkbutton(self, text="Draw numbers", variable=self.Numbers, command=lambda: self.redraw(calculator) if self.ClearStatus == False else self.doNothing()).grid(row=5, column=0, padx=(10, 0), sticky=tk.W)
-        self.ScaleSlider = ttk.Scale(self, from_=int(25*mainWin.ScaleFactor), to=int(250*mainWin.ScaleFactor), orient=tk.HORIZONTAL, variable=self.Scale, command=lambda _: self.redraw(calculator) if self.ClearStatus == False else self.doNothing())
-        self.ScaleSlider.grid(row=5, column=3, padx=(0, 10), sticky=tk.E)
-        self.bind("<Configure>", lambda event: self.after(200, lambda: self.redraw(calculator)) if self.ClearStatus == False else self.clear())
-        self.fxEntry.focus_set()
-    def redraw(self, calculator):
-        fxFunction = self.convert(self.fxEntry.get())
-        gxFunction = self.convert(self.gxEntry.get())
-        self.clear()
-        self.ClearStatus = False
-        height = self.Canvas.winfo_height()
-        width = self.Canvas.winfo_width()
-        #Xvalues = []
-        XvaluesConverted = []
-        for X in range(width):
-            #Xvalues.append(X)
-            XvaluesConverted.append(self.XbacktoX(X))
-
-        # Coordinate axes and arrows
-        self.Canvas.create_line(0, height/2, width, height/2, fill="grey", width=2)
-        self.Canvas.create_line(width/2, 0, width/2, height, fill="grey", width=2)
-        self.Canvas.create_line(width, height/2, width-10, height/2-10, fill="grey", width=2)
-        self.Canvas.create_line(width, height/2, width-10, height/2+10, fill="grey", width=2)
-        self.Canvas.create_line(width/2, 0, width/2-10, 10, fill="grey", width=2)
-        self.Canvas.create_line(width/2, 0, width/2+10, 10, fill="grey", width=2)
-        # Coordinate grid
-        for i in range(int(self.XbacktoX(width))+1):
-            self.Canvas.create_line(width/2+i*self.Scale.get(), 0, width/2+i*self.Scale.get(), height, fill="grey")
-            self.Canvas.create_text(width/2+i*self.Scale.get(), height/2+self.TextOffset, text=str(i), fill=self.ForegroundColor) if i != 0 and self.Numbers.get() == True else self.doNothing()
-            self.Canvas.create_line(width/2-i*self.Scale.get(), 0, width/2-i*self.Scale.get(), height, fill="grey")
-            self.Canvas.create_text(width/2-i*self.Scale.get(), height/2+self.TextOffset, text=f"-{i}", fill=self.ForegroundColor) if i != 0 and self.Numbers.get() == True else self.doNothing()
-        for i in range(int(self.YbacktoY(height))+1):
-            self.Canvas.create_line(0, height/2+i*self.Scale.get(), width, height/2+i*self.Scale.get(), fill="grey")
-            self.Canvas.create_text(width/2+self.TextOffset, height/2+i*self.Scale.get(), text=f"-{i}", fill=self.ForegroundColor) if i != 0 and self.Numbers.get() == True else self.doNothing()
-            self.Canvas.create_line(0, height/2-i*self.Scale.get(), width, height/2-i*self.Scale.get(), fill="grey")
-            self.Canvas.create_text(width/2+self.TextOffset, height/2-i*self.Scale.get(), text=str(i), fill=self.ForegroundColor) if i != 0 and self.Numbers.get() == True else self.doNothing()
-
-        # f(x)
-        if fxFunction != "":
-            # table
-            values = []
-            for col in self.cols:
-                try:
-                    values.append(calculator.quickCalc(fxFunction.replace("x", f"({col})")))
-                except:
-                    values.append("")
-            self.Table.item(self.FirstTableRow, values=values)
-            # graph
-            values = []
-            for i in XvaluesConverted:
-                try:
-                    values.append((i, calculator.quickCalc(fxFunction.replace("x", f"({i})"))))
-                except:
-                    pass
-            for f in range(len(values)-1):
-                if not abs(float(values[f][1]) - float(values[f+1][1])) > 10:
-                    self.Canvas.create_line(self.XtoX(values[f][0]), self.YtoY(values[f][1]), self.XtoX(values[f+1][0]), self.YtoY(values[f+1][1]), fill=self.fxColor)
-        # g(x)
-        if gxFunction != "":
-            # table
-            values = []
-            for col in self.cols:
-                try:
-                    values.append(calculator.quickCalc(gxFunction.replace("x", f"({col})")))
-                except:
-                    values.append("")
-            self.Table.item(self.SecondTableRow, values=values)
-            # graph
-            values = []
-            for i in XvaluesConverted:
-                try:
-                    values.append((i, calculator.quickCalc(gxFunction.replace("x", f"({i})"))))
-                except:
-                    pass
-            for f in range(len(values)-1):
-                if not abs(float(values[f][1]) - float(values[f+1][1])) > 10:
-                    self.Canvas.create_line(self.XtoX(values[f][0]), self.YtoY(values[f][1]), self.XtoX(values[f+1][0]), self.YtoY(values[f+1][1]), fill=self.gxColor)
-
-    def clear(self):
-        self.Canvas.delete(tk.ALL)
-        emptyness = []
-        for col in self.cols:
-            emptyness.append("")
-            self.Table.item(self.FirstTableRow, values=emptyness)
-            self.Table.item(self.SecondTableRow, values=emptyness)
-        self.ClearStatus = True
-    def setFxColor(self, parent, calculator):
-        self.fxColor = colorchooser.askcolor(parent=parent, color=self.fxColor)[1]
-        self.fxColorButton.config(fg=self.fxColor, bg=self.fxColor)
-        if self.ClearStatus == False:
-            self.redraw(calculator)
-    def setGxColor(self, parent, calculator):
-        self.gxColor = colorchooser.askcolor(parent=parent, color=self.gxColor)[1]
-        self.gxColorButton.config(fg=self.gxColor, bg=self.gxColor)
-        if self.ClearStatus == False:
-            self.redraw(calculator)
-    def YtoY(self, y):
-        return Decimal(self.Canvas.winfo_height())/Decimal(2)-Decimal(y) * Decimal(self.Scale.get())
-    def XtoX(self, x):
-        return Decimal(self.Canvas.winfo_width())/Decimal(2)+Decimal(x) * Decimal(self.Scale.get())
-    def YbacktoY(self, y):
-        return Decimal(y) / Decimal(self.Scale.get()) - (Decimal(self.Canvas.winfo_height())/Decimal(2)) / Decimal(self.Scale.get())
-    def XbacktoX(self, x):
-        return Decimal(x) / Decimal(self.Scale.get()) - (Decimal(self.Canvas.winfo_width())/Decimal(2)) / Decimal(self.Scale.get())
-    def convert(self, func):
-        newfunc = ""
-        SuperScriptDict = {"\u2070": "0",
-                           "\u00b9": "1",
-                           "\u00b2": "2",
-                           "\u00b3": "3",
-                           "\u2074": "4",
-                           "\u2075": "5",
-                           "\u2076": "6",
-                           "\u2077": "7",
-                           "\u2078": "8",
-                           "\u2079": "9",
-                           "\u207a": "+",
-                           "\u207b": "-",
-                           "\u207d": "(",
-                           "\u207e": ")",
-                           "\u00b7": "."}
-        SuperScript = False
-        for char in reversed(func):
-            if char in SuperScriptDict:
-                if SuperScript == True:
-                    newfunc += char.translate(str.maketrans(SuperScriptDict))
-                else:
-                    newfunc += ")" + char.translate(str.maketrans(SuperScriptDict))
-                    SuperScript = True
-            else:
-                if SuperScript == True:
-                    newfunc += "(^"
-                SuperScript = False
-                newfunc += char
-        newfunc = newfunc[::-1]
-        print(newfunc)
-        finalfunc = ""
-        IgnoredChars = ("(", "^", "*", "+", "-", "*", "/", "%", ")")
-        for char in newfunc:
-            if finalfunc == "":
-                finalfunc = char
-            elif char == "x":
-                if finalfunc[len(finalfunc)-1] not in IgnoredChars[:-1]:
-                    finalfunc += "*x"
-                else:
-                    finalfunc += "x"
-            elif char == "(":
-                if finalfunc[len(finalfunc)-1].isdigit() or finalfunc[len(finalfunc)-1] in ("x", ")"):
-                    finalfunc += "*("
-                else:
-                    finalfunc += "("
-            else:
-                if finalfunc[len(finalfunc)-1] in ("x", ")"):
-                    if char not in IgnoredChars[1:]:
-                        finalfunc += f"*{char}"
-                    else:
-                        finalfunc += char
-                else:
-                    if finalfunc[len(finalfunc)-1].isdigit() and not char.isdigit() and char not in IgnoredChars[1:]:
-                        finalfunc += f"*{char}"
-                    else:
-                        finalfunc += char
-        print("PraktiGraph: " + finalfunc)
-        return finalfunc
-    def doNothing(self):
-        pass"""
-            PraktiGraphMetadata = configparser.ConfigParser()
-            PraktiGraphMetadata["PraktiXtension"] = {"name": "PraktiGraph",
-                                                          "version": "1.9",
-                                                          "filename": "PraktiGraph.py",
-                                                          "description": "The PraktiCalc Graph Thing",
-                                                          "website": "",
-                                                          "minpython": "default",
-                                                          "maxpython": "default",
-                                                          "sha256": "",
-                                                          "requiresinternet": "false",
-                                                          "pxtxlink": ""}
-            PraktiGraphDescription = """This extension allows to draw simple graphs from mathematical functions.
-Please note that you have to write all multiplication operators."""
-            with open(self.FolderPath / "PraktiGraph.py", "w", encoding="utf-8") as pgfile:
-                pgfile.write(PraktiGraphCode)
-            with open(self.FolderPath / "PraktiGraph.ini", "w", encoding="utf-8") as pgmeta:
-                PraktiGraphMetadata.write(pgmeta)
-            with open(self.FolderPath / "PraktiGraph.txt", "w", encoding="utf-8") as pgdesc:
-                pgdesc.write(PraktiGraphDescription)
+class ExtensionWindow(wx.Dialog):
+    def __init__(self, parent, calculator, dialog, cfg):
+        super().__init__(parent, title="Extensions")
+        self.font = wx.Font(10, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        self.panel = wx.Panel(self)
+        self.sThing = wx.StaticText(self.panel, label=r""" _   ___   _
+|   |   |   |
+|   |   |   |
+|   \   /   |
+|    \_/    |
+|     _     |
+|    / \    |
+|_   \_/   _|""")
+        self.sThing.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_SCROLLBAR))
+        self.TextPartII = wx.StaticText(self.panel, label="""\nThe new PraktiCalc Extension system is far from done.
+As the Legacy Extension System relies on Tkinter, I
+couldn't just port it to wxPython, also because
+PraktiXtensions themselves depend on Tkinter.
+PraktiCalc 1.6 will support both PraktiXtensions and
+new PraktiCalc Extensions. Stay tuned!
+  ~Karl""")
+        self.sThing.SetFont(self.font)
+        self.TextPartII.SetFont(self.font)
+        self.sizer = wx.GridBagSizer(5)
+        self.sizer.Add(self.sThing, pos=(0, 0))
+        self.sizer.Add(self.TextPartII, pos=(0, 1))
+        self.panel.SetSizerAndFit(self.sizer)
+        self.Fit()
+        self.Show()
 
 # console
 class Console:
@@ -1991,6 +1023,7 @@ eval(<command>: executed a Python command within the program
 system(<command>: executes a system command and prints the output
 varget(<variable>: shows the value of the given variable
 confget(<key>: shows the value of the given key from the config
+info: shows version numbers
 
 Useful Tips:
 - don't close brackets
@@ -2028,85 +1061,32 @@ Useful Tips:
             output = self.ConfigurationStorage.get(command)
             if output == None:
                 output = "[!] Unknown value, resetting configuration"
+        elif command.startswith("info"):
+            output = f"PraktiCalc Console\t\t>_^\nCopyright (C) 2025-2026 Karl Wesseler\n*************************************\nPraktiCalc {PraktiCalcVersion}\nPython {platform.python_version()}\nwxPython {wx.VERSION_STRING}"
         else:
             output = "[X] Unknown command"
         return output
 
-# console window
-class ConsoleWindow(tk.Toplevel):
-    def __init__(self, parent, helper, console):
-        super().__init__(parent)
-        self.lcc = ""
-        self.title("PraktiCalc Console")
-        self.config(bg="black")
-        self.rowconfigure(0, weight=1)
-        self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=1)
-        self.columnconfigure(2, weight=1)
-        self.bind("<Key>", lambda event: self.run(parent, helper, console) if event.keysym == "Return" else self.ConsoleKey(event))
-        self.ConsoleOutput = scrolledtext.ScrolledText(self, bg="black", fg="white", font="TkFixedFont")
-        self.ConsoleOutput.vbar.config(bg="black")
-        ConsoleInputLabel = tk.Label(self, text="INPUT: ", bg="black", fg="white")
-        self.ConsoleInput = tk.Entry(self, bg="black", fg="white")
-        ConsoleExecuteButton = tk.Button(self, text="--^", bg="black", fg="white", command=lambda: self.run(parent, helper, console))
-        self.ConsoleOutput.grid(row=0, column=0, columnspan=3, sticky=tk.NSEW)
-        ConsoleInputLabel.grid(row=1, column=0, sticky=tk.EW)
-        self.ConsoleInput.grid(row=1, column=1, sticky=tk.EW)
-        ConsoleExecuteButton.grid(row=1, column=2, sticky=tk.EW, pady=2, padx=2)
-        self.ConsoleInput.focus_set()
-        self.protocol("WM_DELETE_WINDOW", lambda: helper.close(self))
-        self.update_idletasks()
-        helper.WindowList.append(self)
-        helper.ajustTitleBars()
-    def run(self, parent, helper, console): # runs a command
-        self.lcc = command = self.ConsoleInput.get()
-        if command == "clear":
-            self.ConsoleOutput.delete("1.0", tk.END)
-        elif command == "aboutwindow":
-            self.AboutWindow(parent, helper)
-        elif command == "exit":
-            helper.close(parent)
-            return
+# console text interface
+def ConsoleTextInterface(console, window):
+    print(console.execute("info") + "\n")
+    while True:
+        print(" -> ", end="")
+        nc = str(input())
+        if nc == "quit":
+            window.Close()
+            break
         else:
-            comoutput = console.execute(self.ConsoleInput.get())
-            self.ConsoleOutput.insert(tk.END, str(comoutput) + "\n")
-            self.ConsoleOutput.see(tk.END)
-        self.ConsoleInput.delete(0, tk.END)
-    def ConsoleKey(self, event): # sets entry to previous input if UP pressed
-        key = event.keysym
-        if key == "Up":
-            self.ConsoleInput.delete(0, tk.END)
-            self.ConsoleInput.insert(0, self.lcc)
-    def AboutWindow(self, parent, helper): # shows console about window
-        ConsoleAboutWindow = tk.Toplevel(parent)
-        if platform.system() == "Windows":
-            ConsoleAboutWindow.attributes("-toolwindow", True)
-            ConsoleAboutWindow.focus_set()
-        ConsoleAboutWindow.columnconfigure(0, weight=1)
-        for cw in range(4):
-            ConsoleAboutWindow.rowconfigure(cw, weight=1)
-        ConsoleAboutWindow.title("About PraktiCalc Console")
-        ConsoleAboutWindow.config(bg="black")
-        ConsoleAboutSpacer1 = tk.Label(ConsoleAboutWindow, bg="black")
-        ConsoleAboutSpacer2 = tk.Label(ConsoleAboutWindow, bg="black")
-        ConsoleAboutIcon = tk.Label(ConsoleAboutWindow, image=parent.icon_mono_inverted, fg="black", bg="white")
-        ConsoleAboutText = tk.Label(ConsoleAboutWindow, bg="black", text="PraktiCalc Console\nrunning on PraktiCalc " + PraktiCalcVersion + "\npowered by Python " + platform.python_version() + "\n Tcl: " + str(tk.TclVersion) + " | Tk: " + str(tk.TkVersion), fg="white")
-        ConsoleAboutSpacer1.grid(row=0, column=0, sticky=tk.NSEW)
-        ConsoleAboutIcon.grid(row=0, column=0, padx=152, pady=20)
-        ConsoleAboutText.grid(row=2, column=0, sticky=tk.NSEW)
-        ConsoleAboutSpacer2.grid(row=3, column=0, sticky=tk.NSEW)
-        ConsoleAboutWindow.protocol("WM_DELETE_WINDOW", lambda: helper.close(ConsoleAboutWindow))
-        ConsoleAboutWindow.update_idletasks()
-        helper.WindowList.append(ConsoleAboutWindow)
-        helper.ajustTitleBars()
+            print(console.execute(nc))
 
 if __name__ == "__main__":
     cfg = Configuration()
     Calculator = PraktiCalculator(cfg)
-    WindowHelp = WindowHelper(cfg)
     WindowDialog = Dialog(cfg)
-    Window = MainWindow(WindowHelp, Calculator, WindowDialog, cfg)
+    app = wx.App()
+    frame = MainWindow(Calculator, WindowDialog, cfg)
     if "--console" in sys.argv:
         cmd = Console(cfg)
-        CMDWindow = ConsoleWindow(Window, WindowHelp, cmd)
-    Window.mainloop()
+        threading.Thread(target=lambda: ConsoleTextInterface(cmd, frame), daemon=True).start()
+    frame.Show()
+    app.MainLoop()
