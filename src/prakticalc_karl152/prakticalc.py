@@ -126,7 +126,7 @@ debug = "--debug" in sys.argv
 # main window
 class MainWindow(wx.Frame):
     def __init__(self, calculator, dialog, cfg):
-        super().__init__(None, title="PraktiCalc", size=(450, 450))
+        super().__init__(None, title="PraktiCalc")
         self.Menubar = wx.MenuBar()
         self.CalculatorMenu = wx.Menu()
         self.CalculatorMenuQuitItem = self.CalculatorMenu.Append(wx.NewIdRef(), "Quit\tQ")
@@ -236,6 +236,7 @@ class MainWindow(wx.Frame):
         for i in range(2):
             self.sizer.AddGrowableRow(i+5)
         self.panel.SetSizerAndFit(self.sizer)
+        self.Fit()
         self.Output.Bind(wx.EVT_KEY_DOWN, lambda event: self.KeyPress(event, calculator, dialog))
         self.updateDisplay(calculator, cfg)
     def KeyPress(self, event, calculator, dialog): # processes keyboard input
@@ -349,7 +350,7 @@ class ChoiceBox(wx.StaticBox):
 class SettingsWindow(wx.Frame):
     def __init__(self, parent, calculator, cfg):
         global MsgBoxStyles
-        super().__init__(parent, title="Settings", size=(400, 320))
+        super().__init__(parent, title="Settings")
         self.panel = wx.Panel(self)
         self.Tabs = wx.Notebook(self.panel)
         self.AppearancePanel = wx.Panel(self.Tabs)
@@ -416,6 +417,7 @@ class SettingsWindow(wx.Frame):
         self.sizer.Add(self.ResetButton, pos=(1, 1), flag=wx.ALIGN_LEFT | wx.ALL, border=5)
         self.sizer.AddGrowableCol(1)
         self.panel.SetSizerAndFit(self.sizer)
+        self.Fit()
         self.Show()
     def applySettings(self, parent, cfg, calculator): # saves the selected theme choice in the settigns window
         AngleUnits = {
