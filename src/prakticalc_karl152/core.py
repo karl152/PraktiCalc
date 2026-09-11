@@ -21,6 +21,13 @@ if platform.system() == "Windows":
 elif platform.system() == "Darwin":
     import plistlib
 
+# test if this is running as a pyinstaller executable
+try:
+    print(sys._MEIPASS)
+    RunningAsOneFileExe =  True
+except:
+    RunningAsOneFileExe =  False
+
 class Configuration:
     def __init__(self):
         if platform.system() == "Windows":
