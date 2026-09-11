@@ -240,41 +240,43 @@ class MainWindow(wx.Frame):
             self.sizer.AddGrowableRow(i+5)
         self.panel.SetSizerAndFit(self.sizer)
         self.Fit()
-        self.Output.Bind(wx.EVT_KEY_DOWN, lambda event: self.KeyPress(event, calculator, dialog))
+        self.SetKeys(calculator, dialog, cfg)
         self.updateDisplay(calculator, cfg)
         w, h = self.GetSize()
         self.SetSize((w, h+h//2))
-    def KeyPress(self, event, calculator, dialog): # processes keyboard input
-        Key = event.GetKeyCode()
-        if chr(Key) in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "e", "+", "-", "*", "/", "(", ")", ".", ",", "%", "!"]:
-            self.append(chr(Key), calculator, cfg)
-        else:
-            Keys = {
-                48: lambda: self.zero(calculator, cfg), # 0
-                61: lambda: self.calculate(self, helper, calculator, dialog, cfg), # =
-                13: lambda: self.calculate(self, calculator, dialog, cfg), # Return
-                104: lambda: HistoryWindow(self, calculator), # h
-                72: lambda: HistoryWindow(self, calculator),# H
-                105: lambda: dialog.info(self), # i
-                73: lambda: dialog.info(self), # I
-                115: lambda: SettingsWindow(self, calculator, cfg), # s
-                83: lambda: SettingsWindow(self, calculator, cfg), # S
-                120: lambda: ExtensionWindow(self, calculator, dialog, cfg), # x
-                88: lambda: ExtensionWindow(self, calculator, dialog, cfg), # X
-                99: lambda: self.clear(calculator, cfg), # c
-                67: lambda: self.clear(calculator, cfg), # C
-                8: lambda: self.backspace(calculator, cfg), # Backspace
-                109: self.toggleMemoryMenu, # m
-                77: self.toggleMemoryMenu, # M
-                113: self.Close, # q
-                81: self.Close # Q
-                }
-            if "--debug" in sys.argv:
-                Keys[68] = lambda: print(calculator.xcheck())
-            run = Keys.get(Key)
-            if run:
-                run()
-        event.Skip()
+    def SetKeys(self, calculator, dialog, cfg):
+        Keys = {
+            48: lambda _: self.zero(calculator, cfg), # 0
+            61: lambda _: self.calculate(self, helper, calculator, dialog, cfg), # =
+            13: lambda _: self.calculate(self, calculator, dialog, cfg), # Return
+            104: lambda _: HistoryWindow(self, calculator), # h
+            72: lambda _: HistoryWindow(self, calculator),# H
+            105: lambda _: dialog.info(self), # i
+            73: lambda _: dialog.info(self), # I
+            115: lambda _: SettingsWindow(self, calculator, cfg), # s
+            83: lambda _: SettingsWindow(self, calculator, cfg), # S
+            120: lambda _: ExtensionWindow(self, calculator, dialog, cfg), # x
+            88: lambda _: ExtensionWindow(self, calculator, dialog, cfg), # X
+            99: lambda _: self.clear(calculator, cfg), # c
+            67: lambda _: self.clear(calculator, cfg), # C
+            8: lambda _: self.backspace(calculator, cfg), # Backspace
+            109: lambda _: self.toggleMemoryMenu(), # m
+            77: lambda _: self.toggleMemoryMenu(), # M
+            113: lambda _: self.Close(), # q
+            81: lambda _: self.Close() # Q
+            }
+        for k in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "e", "+", "-", "*", "/", "(", ")", ".", ",", "%", "!"]:
+            Keys[ord(k)] = lambda _, k=k: self.append(k, calculator, cfg)
+        if "--debug" in sys.argv:
+            Keys[68] = lambda _: print(calculator.xcheck())
+        ids = []
+        entries = []
+        for key in Keys:
+            ids.append(wx.NewIdRef())
+            entries.append(wx.AcceleratorEntry(wx.ACCEL_NORMAL, key, ids[-1]))
+        self.SetAcceleratorTable(wx.AcceleratorTable(entries))
+        for i, key in enumerate(Keys):
+            self.Bind(wx.EVT_MENU, Keys.get(key), ids[i])
     def toggleMemoryMenu(self): # toggles the floating memory menu
         self.PopupMenu(self.FloatingMemoryDisplay, self.Buttons[18].GetPosition())
     def copyResult(self): # copies the result
