@@ -100,8 +100,9 @@ if Path("./usr/share/tcltk/ttkthemes").exists():
 
 if RunningAsOneFileExe == True:
     if platform.system() == "Darwin":
-        PraktiCalcMacIconPath = (sys._MEIPASS + "/PraktiCalc-MacOS.png")
-    PraktiCalcIconPath = (sys._MEIPASS + "/PraktiCalculator_icon.png")
+        PraktiCalcIconPath = (sys._MEIPASS + "/PraktiCalc-MacOS.png")
+    else:
+        PraktiCalcIconPath = (sys._MEIPASS + "/PraktiCalculator_icon.png")
     PraktiCalcIconMonoPath = (sys._MEIPASS + "/PraktiCalculator_icon.xbm")
     PraktiCalcIconMonoInvertedPath = (sys._MEIPASS + "/PraktiCalculator_icon_inverted.xbm")
     PythonPowerPath = (sys._MEIPASS + "/python-powered.png")
@@ -110,8 +111,9 @@ if RunningAsOneFileExe == True:
     VBSErrorPath = (sys._MEIPASS + "/error.vbs")
 else:
     if platform.system() == "Darwin":
-        PraktiCalcMacIconPath = "PraktiCalc-MacOS.png"
-    PraktiCalcIconPath = "PraktiCalculator_icon.png"
+        PraktiCalcIconPath = "PraktiCalc-MacOS.png"
+    else:
+        PraktiCalcIconPath = "PraktiCalculator_icon.png"
     PraktiCalcIconMonoPath = "PraktiCalculator_icon.xbm"
     PraktiCalcIconMonoInvertedPath = "PraktiCalculator_icon_inverted.xbm"
     PythonPowerPath = "python-powered.png"
@@ -127,6 +129,7 @@ debug = "--debug" in sys.argv
 class MainWindow(wx.Frame):
     def __init__(self, calculator, dialog, cfg):
         super().__init__(None, title="PraktiCalc")
+        self.SetIcon(wx.Icon(PraktiCalcIconPath, wx.BITMAP_TYPE_PNG))
         self.Menubar = wx.MenuBar()
         self.CalculatorMenu = wx.Menu()
         self.CalculatorMenuQuitItem = self.CalculatorMenu.Append(wx.NewIdRef(), "Quit\tQ")
@@ -353,6 +356,7 @@ class SettingsWindow(wx.Frame):
     def __init__(self, parent, calculator, cfg):
         global MsgBoxStyles
         super().__init__(parent, title="Settings")
+        self.SetIcon(wx.Icon(PraktiCalcIconPath, wx.BITMAP_TYPE_PNG))
         self.panel = wx.Panel(self)
         self.Tabs = wx.Notebook(self.panel)
         self.AppearancePanel = wx.Panel(self.Tabs)
@@ -444,6 +448,7 @@ class SettingsWindow(wx.Frame):
 class CustomInfoDialog(wx.Dialog):
     def __init__(self, parent, infotext):
         super().__init__(parent, title="About PraktiCalc")
+        self.SetIcon(wx.Icon(PraktiCalcIconPath, wx.BITMAP_TYPE_PNG))
         self.panel = wx.Panel(self)
         self.InfoBox = wx.StaticBox(self.panel, label="[i]")
         if "--debug" in sys.argv:
@@ -537,6 +542,7 @@ Licensed under the GPLv3"""
             messagebox.showerror("Error", message)
         elif dlgStyle == "Alternative":
             ErrorWindow = wx.Dialog(parent, title="Error")
+            ErrorWindow.SetIcon(wx.Icon(PraktiCalcIconPath, wx.BITMAP_TYPE_PNG))
             ErrorWindow.panel = wx.Panel(ErrorWindow)
             ErrorWindow.ErrorBox = wx.StaticBox(ErrorWindow.panel, label="[X]")
             ErrorWindow.ErrorText = wx.StaticText(ErrorWindow.ErrorBox, label=message+"\n")
@@ -592,6 +598,7 @@ Licensed under the GPLv3"""
 class HistoryWindow(wx.Frame):
     def __init__(self, parent, calculator):
         super().__init__(parent, title="History")
+        self.SetIcon(wx.Icon(PraktiCalcIconPath, wx.BITMAP_TYPE_PNG))
         self.panel = wx.Panel(self)
         self.HistoryList = wx.ListBox(self.panel, choices=calculator.HistoryList)
         self.ClearButton = wx.Button(self.panel, label="Clear history")
@@ -612,7 +619,8 @@ class HistoryWindow(wx.Frame):
 # extension window
 class ExtensionWindow(wx.Dialog):
     def __init__(self, parent, calculator, dialog, cfg):
-        super().__init__(parent, title="Extensions")
+        super().__init__(parent, title="[WIP] Extensions")
+        self.SetIcon(wx.Icon(PraktiCalcIconPath, wx.BITMAP_TYPE_PNG))
         self.font = wx.Font(10, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         self.panel = wx.Panel(self)
         self.sThing = wx.StaticText(self.panel, label=r""" _   ___   _
