@@ -239,6 +239,8 @@ class MainWindow(wx.Frame):
         self.Fit()
         self.Output.Bind(wx.EVT_KEY_DOWN, lambda event: self.KeyPress(event, calculator, dialog))
         self.updateDisplay(calculator, cfg)
+        w, h = self.GetSize()
+        self.SetSize((w, h+h//2))
     def KeyPress(self, event, calculator, dialog): # processes keyboard input
         Key = event.GetKeyCode()
         if chr(Key) in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "e", "+", "-", "*", "/", "(", ")", ".", ",", "%", "!"]:
