@@ -1126,7 +1126,7 @@ Licensed under the GPLv3"""
                 opendialog = styles.get(self.ConfigurationStorage.get("dialogStyle"))
                 if opendialog:
                     opendialog()
-                elif self.ConfigurationStorage.get("dialogStyle") == "Windows Shutdown":
+                elif dlgStyle == "Windows Shutdown":
                     subprocess.Popen(["shutdown", "/s", "/t", "60", "/c", infotext])
                     time.sleep(20)
                     subprocess.Popen(["shutdown", "/a"])
@@ -1144,15 +1144,16 @@ Licensed under the GPLv3"""
                     "Xdialog": lambda: subprocess.Popen(["Xdialog", "--title=About PraktiCalc", "--msgbox", infotext.replace("\u00a9", "(C)"), "10", "40"]),
                     "notify-send": lambda: subprocess.Popen(["notify-send", "About PraktiCalc", "--icon=de.karl_52.PraktiCalc", "--action=OK", infotext]),
                     }
-                opendialog = styles.get(self.ConfigurationStorage.get("dialogStyle"))
+                opendialog = styles.get(dlgStyle)
                 if opendialog:
                     opendialog()
                 else:
                     print("ERROR: Unknown Message Box Style")
     def error(self, message, parent, helper): # shows error dialogs
-        if self.ConfigurationStorage.get("dialogStyle") == "Tkinter":
+        dlgStyle = self.ConfigurationStorage.get("dialogStyle")
+        if dlgStyle == "Tkinter":
             messagebox.showerror("Error", message)
-        elif self.ConfigurationStorage.get("dialogStyle") == "Alternative":
+        elif dlgStyle == "Alternative":
             ErrorWindow = tk.Toplevel(parent)
             ErrorWindow.title("Error")
             ErrorWindow.bind("<Return>", lambda event: helper.close(ErrorWindow))
@@ -1184,10 +1185,10 @@ Licensed under the GPLv3"""
                     "VBScript": lambda: subprocess.Popen(["wscript", VBSErrorPath, message]),
                     "Windows Messaging Service": lambda: subprocess.Popen(["msg", getpass.getuser(), message]),
                     }
-                opendialog = styles.get(self.ConfigurationStorage.get("dialogStyle"))
+                opendialog = styles.get(dlgStyle)
                 if opendialog:
                     opendialog()
-                elif self.ConfigurationStorage.get("dialogStyle") == "Windows Shutdown":
+                elif dlgStyle == "Windows Shutdown":
                     subprocess.Popen(["shutdown", "/s", "/t", "60", "/c", message])
                     time.sleep(10)
                     subprocess.Popen(["shutdown", "/a"])
