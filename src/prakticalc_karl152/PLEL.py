@@ -265,7 +265,7 @@ Licensed under the GPLv3"""
             if platform.system() == "Windows":
                 pyver = platform.python_version()
                 styles = {
-                    "VBScript": lambda: subprocess.Popen(["wscript", VBSInfoPath, PraktiCalcVersion, pyver, str(tk.TkVersion), str(helper.theming)]),
+                    "VBScript": lambda: subprocess.Popen(["wscript", VBSInfoPath, PraktiCalcVersion, pyver, str(tk.TkVersion), str(1)]),
                     "Windows Messaging Service": lambda: subprocess.Popen(["msg", getpass.getuser(), infotext]),
                     }
                 opendialog = styles.get(dlgStyle)

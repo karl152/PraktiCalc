@@ -4,18 +4,16 @@
 ' SPDX-License-Identifier: GPL-3.0-only
 
 Option Explicit
-Dim PraktiCalcVersion, pyver, TkVersion, theming, ttkthemesText, VBSversionText
+Dim PraktiCalcVersion, pyver, ToolkitVersion, PLEL, VBSversionText
 PraktiCalcVersion = WScript.Arguments(0)
 pyver = WScript.Arguments(1)
-TkVersion = WScript.Arguments(2)
-theming = WScript.Arguments(3)
+ToolkitVersion = WScript.Arguments(2)
+PLEL = WScript.Arguments(3)
 
-VBSversionText = ScriptEngine & " " & ScriptEngineMajorVersion & "." & ScriptEngineMinorVersion & "." & ScriptEngineBuildVersion
+VBSversionText = ScriptEngineMajorVersion & "." & ScriptEngineMinorVersion & "." & ScriptEngineBuildVersion
 
-If theming <> "0" Then
-    ttkthemesText = vbCrLf & "Themes provided by the ttkthemes library"
+If PLEL <> "0" Then
+    MsgBox "PraktiCalc Legacy Extension Loader" & vbCrLf & "Powered by PraktiCalc " & PraktiCalcVersion & vbCrLf & "Copyright (C) 2024-2026 Karl Wesseler" & vbCrLf & "Running on Python " & pyver & " / Tk " & ToolkitVersion & " / " & ScriptEngine & " " & VBSversionText & vbCrLf & "Licensed under the GPLv3", 64, "About PLEL"
 Else
-    ttkthemesText = ""
+    MsgBox "PraktiCalc - a practical calculator" & vbCrLf & "Version " & PraktiCalcVersion & vbCrLf & "Copyright (C) 2024-2026 Karl Wesseler" & vbCrLf & "Running on Python " & pyver & " / wxPython " & ToolkitVersion & " / VBS " & VBSversionText & vbCrLf & "Licensed under the GPLv3", 64, "About PraktiCalc"
 End If
-
-MsgBox "PraktiCalc - a practical calculator" & vbCrLf & "Version " & PraktiCalcVersion & vbCrLf & "Copyright (C) 2024-2026 Karl Wesseler" & vbCrLf & "Running on Python " & pyver & " / Tk " & TkVersion & " / " & VBSversionText & vbCrLf & "Licensed under the GPLv3" & ttkthemesText, 64, "About PraktiCalc"
