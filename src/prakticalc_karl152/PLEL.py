@@ -204,12 +204,13 @@ class Dialog:
     def __init__(self, cfg):
         self.ConfigurationStorage = cfg
     def info(self, parent, helper): # shows info dialogs
+        dlgStyle = self.ConfigurationStorage.get("dialogStyle")
         infotext = f"""PraktiCalc Legacy Extension Loader
 Powered by PraktiCalc {PraktiCalcVersion}
 Copyright \u00a9 2024-2026 Karl Wesseler
 Running on Python {platform.python_version()} / Tk {tk.TkVersion}
 Licensed under the GPLv3"""
-        if self.ConfigurationStorage.get("dialogStyle") == "Alternative":
+        if dlgStyle == "Alternative":
             CustomInfox = tk.Toplevel(parent)
             self.PythonPower = tk.PhotoImage(file=PythonPowerPath)
             try:
@@ -267,10 +268,10 @@ Licensed under the GPLv3"""
                     "VBScript": lambda: subprocess.Popen(["wscript", VBSInfoPath, PraktiCalcVersion, pyver, str(tk.TkVersion), str(helper.theming)]),
                     "Windows Messaging Service": lambda: subprocess.Popen(["msg", getpass.getuser(), infotext]),
                     }
-                opendialog = styles.get(self.ConfigurationStorage.get("dialogStyle"))
+                opendialog = styles.get(dlgStyle)
                 if opendialog:
                     opendialog()
-                elif self.ConfigurationStorage.get("dialogStyle") == "Windows Shutdown":
+                elif dlgStyle == "Windows Shutdown":
                     subprocess.Popen(["shutdown", "/s", "/t", "60", "/c", infotext])
                     time.sleep(20)
                     subprocess.Popen(["shutdown", "/a"])
@@ -288,13 +289,14 @@ Licensed under the GPLv3"""
                     "Xdialog": lambda: subprocess.Popen(["Xdialog", "--title=About PLEL", "--msgbox", infotext.replace("\u00a9", "(C)"), "10", "40"]),
                     "notify-send": lambda: subprocess.Popen(["notify-send", "About PLEL", "--icon=de.karl_52.PraktiCalc", "--action=OK", infotext]),
                     }
-                opendialog = styles.get(self.ConfigurationStorage.get("dialogStyle"))
+                opendialog = styles.get(dlgStyle)
                 if opendialog:
                     opendialog()
                 else:
                     messagebox.showinfo("About PLEL", infotext)
     def error(self, message, parent, helper): # shows error dialogs
-        if self.ConfigurationStorage.get("dialogStyle") == "Alternative":
+        dlgStyle = self.ConfigurationStorage.get("dialogStyle")
+        if dlgStyle == "Alternative":
             ErrorWindow = tk.Toplevel(parent)
             ErrorWindow.title("Error")
             ErrorWindow.bind("<Return>", lambda event: helper.close(ErrorWindow))
@@ -326,10 +328,10 @@ Licensed under the GPLv3"""
                     "VBScript": lambda: subprocess.Popen(["wscript", VBSErrorPath, message]),
                     "Windows Messaging Service": lambda: subprocess.Popen(["msg", getpass.getuser(), message]),
                     }
-                opendialog = styles.get(self.ConfigurationStorage.get("dialogStyle"))
+                opendialog = styles.get(dlgStyle)
                 if opendialog:
                     opendialog()
-                elif self.ConfigurationStorage.get("dialogStyle") == "Windows Shutdown":
+                elif dlgStyle == "Windows Shutdown":
                     subprocess.Popen(["shutdown", "/s", "/t", "60", "/c", message])
                     time.sleep(10)
                     subprocess.Popen(["shutdown", "/a"])
@@ -347,7 +349,7 @@ Licensed under the GPLv3"""
                     "Xdialog": lambda: subprocess.Popen(["Xdialog", "--title=Error", "--msgbox", message, "10", "40"]),
                     "notify-send": lambda: subprocess.Popen(["notify-send", "Error", "--icon=dialog-error", "--action=OK", message]),
                     }
-                opendialog = styles.get(self.ConfigurationStorage.get("dialogStyle"))
+                opendialog = styles.get(dlgStyle)
                 if opendialog:
                     opendialog()
                 else:
