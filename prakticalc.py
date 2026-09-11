@@ -1055,6 +1055,7 @@ class Dialog:
     def __init__(self, cfg):
         self.ConfigurationStorage = cfg
     def info(self, parent, helper): # shows info dialogs
+        dlgStyle = self.ConfigurationStorage.get("dialogStyle")
         infotext = f"""PraktiCalc - a practical calculator
 Version {PraktiCalcVersion}
 Copyright \u00a9 2024-2026 Karl Wesseler
@@ -1062,9 +1063,9 @@ Running on Python {platform.python_version()} / Tk {tk.TkVersion}
 Licensed under the GPLv3"""
         if helper.theming != 0:
             infotext += "\nThemes provided by the ttkthemes library"
-        if self.ConfigurationStorage.get("dialogStyle") == "Tkinter":
+        if dlgStyle == "Tkinter":
             messagebox.showinfo("About PraktiCalc", infotext)
-        elif self.ConfigurationStorage.get("dialogStyle") == "Alternative":
+        elif dlgStyle == "Alternative":
             CustomInfox = tk.Toplevel(parent)
             self.PythonPower = tk.PhotoImage(file=PythonPowerPath)
             try:
