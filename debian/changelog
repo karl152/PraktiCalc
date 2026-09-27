@@ -1,0 +1,217 @@
+prakticalc (1.5.6) stable; urgency=medium
+
+  * Added Q keybind to close the main window
+  * Reworked README.md
+  * Improved unicode superscript support in PraktiGraph
+  * Slightly improved UI code by making both menu bars use the same menus
+  * Fixed a bunch of issues with PraktiGraph
+  * Fixed failed extension calculations staying in the calculator
+  * Added M keybind with floating memory menu in 1.5.5 (forgot to mention that)
+
+ -- Karl Wesseler <karldpbkz@gmail.com>  Sat, 29 Aug 2026 16:47:00 +0200
+
+prakticalc (1.5.5) stable; urgency=medium
+
+  * added the ability to omit * in PraktiGraph
+  * added patch for deb-dsc-build.sh for Ubuntu 20.04 PPAs
+  * added accelerator labels to menus
+  * added line break to settings reset message
+  * ajusted default theming settings
+  * improved error detection for uninstallations on Windows
+  * improved configuration management
+  * improved focus handling for windows and widgets
+  * improved extension reinstalling/upgrading
+  * slightly improved the sidebar in Extension Manager
+  * changed console font to be fixed-width on all systems
+  * fixed stretched Linux icons
+  * fixed "0" turning into "" when pressing backspace
+
+ -- Karl Wesseler <karldpbkz@gmail.com>  Fri, 28 Aug 2026 17:00:00 +0200
+
+prakticalc (1.5.4) stable; urgency=medium
+
+  * updated to Tk 9.0 for Windows 11 builds
+  * restructured the info dialog
+  * added highlights to exit buttons in alternative dialogs
+  * added keybinds "C", ".", "%", "!"
+  * added number of files to progressbar in Windows installer (Tk 9.0 only)
+  * allowed for new calculations to be started with 0
+  * improved Decimal Converter by adding scrollbars and using capital letters
+  * re-enabled input focus on Windows in Decimal Converter
+  * cleaned up some UI code
+  * improved macOS build script and fixed the application name and info dialog
+  * added dependence checking in build scripts for macOS and Windows
+  * removed "feel free to close this window" state in extension window
+  * fixed calculation string getting replaced under certain circumstances
+  * fixed settings window hiding after displaying restart messagebox
+  * fixed AppImage build script not fully restoring its directory after build
+  * fixed info dialog not closing when pressing the enter key
+  * fixed keybinds for Tk 9.0
+  * fixed the Windows icon being stretched
+  * fixed ttk theming without ttkthemes on Windows
+
+ -- Karl Wesseler <karldpbkz@gmail.com>  Fri, 21 Aug 2026 20:16:00 +0200
+
+prakticalc (1.5.3) stable; urgency=medium
+
+  * Added a button to open the extension folder from extension manager
+  * Added a scrollbar to the extension manager
+  * The "E" key now types e (euler's number)
+  * Decreased installation size on Windows by about 30%
+  * Enabled word wrapping for long descriptions in extension manager
+  * Made header text in the extension manager shorter
+  * Removed downgrading support in Windows installer
+  * Improved memory system
+  * Improved error dialogs: xmessage, gxmessage, wmessage, notify-send
+  * More user feedback when installing extensions or resetting the settings
+  * Better error handling in the extension window
+  * Improved the build system
+  * Disabled Modify and Repair in Programs and Features on Windows
+  * Fixed licenses not shown in extension manager in metadata is missing
+  * Fixed extension window size on Fedora
+
+ -- Karl Wesseler <karldpbkz@gmail.com>  Sat, 01 Aug 2026 17:58:00 +0200
+
+prakticalc (1.5.2) stable; urgency=medium
+
+  * Added Fedora RPM builds
+  * Added new Debian package build system with source package support
+  * Reworked theming to work without ttkthemes
+  * Added "clam" and "alt" ttk themes to settings menu
+  * Added memory append, add and subtract operations
+  * Improved DPI scaling and accuracy in PraktiGraph
+  * Added unicode superscript support in PraktiGraph
+  * Updated the Extension Manager
+    - added a link to the PraktiXtension gallery
+    - descriptions now use fixed-width font and a scrollbar
+    - file open dialogs now start in the user's home directory
+  * Improved the info dialog
+    - it now shows the used version of Tk
+    - if VBS is used, it shows the VBScript version as well
+    - it only mentions ttkthemes if it's actually in use
+    - some Tk bitmaps are shown if in debug mode
+  * AppleScript dialogs now have window titles
+  * Pressing "X" now opens the extension window
+
+ -- Karl Wesseler <karldpbkz@gmail.com>  Sun, 12 Jul 2026 17:12:00 +0200
+
+prakticalc (1.5.1) stable; urgency=medium
+
+  * fixed a bug where parts of the calculation where deleted after using CE
+
+ -- Karl "karl152" <karldpbkz@gmail.com>  Mon, 25 May 2026 11:23:00 +0200
+
+prakticalc (1.5) stable; urgency=medium
+
+  * huge code restructure
+  * fixed Windows uninstaller not always running as administrator
+  * changed Windows installer to use unicode bullet points
+  * changed Windows installer to show a messagebox for CLI help
+  * reworked settings menu and added more options for appearance & bevavior
+  * added scrollbar to console
+  * added an option to change themes graphically on nearly all platforms
+  * added eval command to console
+  * added persistent configuration storage with platform-specific backends
+  * added support for dark window title bars on Windows
+  * removed dependency on SimpleEval
+  * reintroduced support for TinyCore Linux
+  * reintroduced Xdialog support
+  * added pi constant
+  * fixed error when exiting through the console
+  * made it possible to close more dialogs with the enter key
+  * added support for gxmessage
+  * added support for notify-send
+  * changed logo in console about window to always be centered
+  * added an extension system, more on github.com/karl152/PraktiXtensions
+  * added graphical extension manager and PraktiGraph (plotter)
+  * changed multiplication symbol from "x" to "*"
+  * added support for multiple angle units (degrees, radians, gradians)
+  * added asin, sinh, asinh, acos, cosh, acosh, atan, tanh, atanh
+  * added Euler's number
+  * added factorial
+  * added menu bar and restructured elements of the GUI
+  * changed Windows uninstaller to use PowerShell and wait longer
+  * made the progress bar in the Windows installer more accurate
+  * changed Windows installer to make in-place upgrades possible
+  * improved the size of the main window
+  * added option to clear the memory
+  * added the Python Powered logo to info dialog
+  * changed the info dialog to use more padding
+  * changed some text to use sentence case
+  * improved dark mode on macOS and Windows (classic, high contrast)
+  * added memory display to show the current value stored in memory
+  * changed console about window to show Tcl/Tk version
+  * changed portable Windows builds to be ZIP files
+  * removed space between license box and scrollbar in Windows installer
+  * added Wmessage support
+  * removed many CLI arguments
+  * fixed macOS icon being too big
+  * changed RDNS name
+  * improved DPI awareness on Windows
+  * added confget command to console for getting configuration values
+  * added support for AppImageUpdate
+  * changed Windows uninstaller to use another hourglass icon
+
+ -- Karl "karl152" <karldpbkz@gmail.com>  Sun, 24 May 2026 22:52:00 +0200
+
+prakticalc (1.4.1) stable; urgency=medium
+
+  * a result of -0 now turns into 0
+  * input in decimal converter doesn't disappear anymore
+  * input after calculation will append to the previous result
+  * improved Windows registry handling
+
+ -- Karl "karl152" <karldpbkz@gmail.com>  Tue, 10 Feb 2026 22:25:00 +0100
+
+prakticalc (1.4) stable; urgency=medium
+
+  * removed deprecated code
+  * fixed plus and minus keys not working
+  * new calculation system
+  * rearranged buttons in user interface
+  * added more operators
+  * added memory buttons
+  * added button to copy the calculation result to the clipboard
+  * reworked the history window and removed history limit
+  * added dialog integration for the Windows Messaging Service
+  * added optional dialog integration for Windows Shutdown
+  * improved Windows uninstaller startup time
+  * added a final page to the Windows installer
+  * added icons to Windows installer and uninstaller
+  * added optional TTS to Windows installer
+  * added option to use the window title bar for the calculation output
+  * added MacOS support
+  * added AppleScript dialog integration
+  * added Windows installer option for automated installations
+  * added rounding to fix rounding issues with the calculation result
+  * added support for the Keramik theme from ttkthemes
+  * changed how theming options are shown
+  * added a manpage for the Debian package
+ -- Karl "karl152" <karldpbkz@gmail.com>  Thu, 08 Jan 2026 16:07:00 +0100
+
+prakticalc (1.3.1) stable; urgency=medium
+
+  * added AppStream metainfo
+  * remove trailing .0 from results
+  * minor code cleanup
+
+ -- Karl "karl152" <karldpbkz@gmail.com>  Wed, 17 Dec 2025 11:33:00 +0100
+
+prakticalc (1.3) stable; urgency=medium
+
+  * changed all widgets to use ttk instead of tk to support theming
+  * rearranged UI with resizable grids
+  * messagebox dialog support for xmessage, kdialog, yad, zenity, VBS MsgBox
+  * Linux compatibility
+  * build scripts
+  * improved README
+  * new logo
+  * Wingdings/Webdings support for Windows computers without Unicode
+  * theming (native theme on Windows, three themes on Linux via ttkthemes)
+  * CLI arguments
+  * DPI scaling
+  * integrated debugging console
+  * English language
+  * many bug fixes
+
+ -- Karl "karl152" <karldpbkz@gmail.com>  Sat, 06 Dec 2025 23:26:00 +0100
