@@ -341,7 +341,7 @@ class Menubutton(wx.Button):
         super().__init__(parent, label=label)
         self.Bind(wx.EVT_BUTTON, lambda _: parent.PopupMenu(menu, self.GetPosition()))
 
-# wx.StaticBox with wx.Choice
+# wx.StaticBox with wx.Choice (somewhat broken on Windows, do not use!)
 class ChoiceBox(wx.StaticBox):
     def __init__(self, parent, label, choices):
         super().__init__(parent, label=label)
@@ -369,14 +369,19 @@ class SettingsWindow(wx.Frame):
         self.BorderDisplayCheck = wx.CheckBox(self.AppearancePanel, label="Border display")
         self.BorderDisplayCheck.SetValue(bool(cfg.get("borderDisplay")))
         ColorBackendChoices = ["Tkinter", "wxPython (ColourDialog)", "wxPython (PyColourChooser)", "wxPython (CubeColourDialog)", "KDialog", "YAD", "Zenity"]
-        self.ColorDialogBox = ChoiceBox(self.AppearancePanel, "Color dialog backend (WIP)", ColorBackendChoices)
-        self.DialogBox = ChoiceBox(self.AppearancePanel, "Message dialog backend", MsgBoxStyles)
-        self.DialogBox.choice.SetStringSelection(cfg.get("dialogStyle"))
+        self.ColorDialogTitle = wx.StaticText(self.AppearancePanel, label="Color dialog backend (WIP)")
+        self.ColorDialogChoice = wx.Choice(self.AppearancePanel, choices=ColorBackendChoices)
+        #self.ColorDialogChoice.SetStringSelection(cfg.get("colorChoiceBackend"))
+        self.DialogTitle = wx.StaticText(self.AppearancePanel, label="Message dialog backend")
+        self.DialogChoice = wx.Choice(self.AppearancePanel, choices=MsgBoxStyles)
+        self.DialogChoice.SetStringSelection(cfg.get("dialogStyle"))
         self.AppearanceSizer = wx.GridBagSizer(5)
         self.AppearanceSizer.AddGrowableCol(0)
         self.AppearanceSizer.Add(self.BorderDisplayCheck, pos=(0, 0), flag=wx.EXPAND)
-        self.AppearanceSizer.Add(self.ColorDialogBox, pos=(1, 0), flag=wx.EXPAND)
-        self.AppearanceSizer.Add(self.DialogBox, pos=(2, 0), flag=wx.EXPAND)
+        self.AppearanceSizer.Add(self.ColorDialogTitle, pos=(1, 0), flag=wx.TOP, border=5)
+        self.AppearanceSizer.Add(self.ColorDialogChoice, pos=(2, 0), flag=wx.EXPAND)
+        self.AppearanceSizer.Add(self.DialogTitle, pos=(3, 0), flag=wx.TOP, border=5)
+        self.AppearanceSizer.Add(self.DialogChoice, pos=(4, 0), flag=wx.EXPAND)
         self.AppearancePanel.SetSizerAndFit(self.AppearanceSizer)
         # Behavior
         self.AngleUnitBox = wx.RadioBox(self.BehaviorPanel, label="Angle unit", choices=["Degrees", "Radians", "Gradians"], majorDimension=1, style=wx.RA_SPECIFY_COLS)
@@ -437,7 +442,7 @@ class SettingsWindow(wx.Frame):
         cfg.set("roundResult", self.RoundResultCheck.GetValue())
         cfg.set("showTrailing0", self.ShowTrailingDotZeroCheck.GetValue())
         cfg.set("angleUnit", AngleUnits.get(self.AngleUnitBox.GetSelection()))
-        cfg.set("dialogStyle", self.DialogBox.choice.GetStringSelection())
+        cfg.set("dialogStyle", self.DialogChoice.GetStringSelection())
         calculator.updateFromSettings(cfg)
         parent.updateDisplay(calculator, cfg)
         self.Close()
