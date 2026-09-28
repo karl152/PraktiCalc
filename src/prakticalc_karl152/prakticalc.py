@@ -418,7 +418,7 @@ class SettingsWindow(wx.Frame):
         self.Tabs.AddPage(self.BehaviorPanel, "Behavior")
         self.Tabs.AddPage(self.ConstantsPanel, "Constants")
         self.OKButton = wx.Button(self.panel, label="OK")
-        self.OKButton.SetBitmapLabel(wx.ArtProvider.GetBitmap(wx.ART_FLOPPY, wx.ART_BUTTON, (16, 16)))
+        self.OKButton.SetBitmapLabel(wx.ArtProvider.GetBitmap(wx.ART_FILE_SAVE, wx.ART_BUTTON, (16, 16)))
         self.OKButton.Bind(wx.EVT_BUTTON, lambda _: self.applySettings(parent, cfg, calculator))
         self.ResetButton = wx.Button(self.panel, label="Reset")
         self.ResetButton.SetBitmapLabel(wx.ArtProvider.GetBitmap(wx.ART_DELETE, wx.ART_BUTTON, (16, 16)))
