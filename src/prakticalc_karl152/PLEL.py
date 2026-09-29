@@ -359,6 +359,7 @@ Licensed under the GPLv3"""
 class ExtensionWindow(tk.Tk):
     def __init__(self, helper, calculator, dialog, cfg):
         super().__init__()
+        global LargeUnicodeFont, wingdingsfont, webdingsfont
         parent = self
         self.title("PraktiCalc Legacy Extension Loader")
         self.DPI = self.winfo_fpixels("1i")
