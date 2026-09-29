@@ -7,7 +7,7 @@
 # - Windows 7 or newer
 # - PowerShell 2+ with 7-Zip or PowerShell 5/7
 # - Python 3.8 or newer with tkinter
-# - Python modules: ttkthemes, pyinstaller
+# - Python modules: wxpython, pyinstaller
 
 function Test-Test {
     param (
@@ -38,8 +38,8 @@ Test-Test "Python 3"
 Test-Test "PyInstaller"
 & python -c "import tkinter"
 Test-Test "TkInter"
-& python -c "import ttkthemes"
-Test-Test "ttkthemes"
+& python -c "import wx"
+Test-Test "wxPython"
 Write-Host
 
 $mode = $args[0]
@@ -56,14 +56,16 @@ if ($mode -eq "portable"){
 $PraktiCalcVersion = Read-Host "PraktiCalc Version"
 Write-Host "Building portable executable for PraktiCalc..."
 Remove-Item .\builds\prakticalc-$PraktiCalcVersion-$winVersionString-amd64-portable.zip -ErrorAction SilentlyContinue
-python.exe -m PyInstaller .\prakticalc.py --onedir --clean --windowed --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data python-powered.png:. --add-data info.vbs:. --add-data error.vbs:. --icon PraktiCalculator.ico
-New-Item -ItemType Directory .\builds -ErrorAction SilentlyContinue
-try {Compress-Archive -Path .\dist\prakticalc\* -DestinationPath .\builds\prakticalc-$PraktiCalcVersion-$winVersionString-amd64-portable.zip -CompressionLevel Optimal -Verbose}
-catch {& "C:\Program Files\7-Zip\7z.exe" a .\builds\prakticalc-$PraktiCalcVersion-$winVersionString-amd64-portable.zip .\dist\prakticalc\* -mx9}
-Write-Host "Cleaning up..."
-Remove-Item .\dist -Recurse -Force
+Set-Location .\src\prakticalc_karl152
+& python.exe -m PyInstaller prakticalc.py --onedir --clean --windowed --add-data PraktiCalculator_icon.png:. --add-data python-powered.png:. --add-data info.vbs:. --add-data error.vbs:. --add-data powered-by-wxwidgets-88x31.png:. --icon PraktiCalculator.ico
 Remove-Item .\build -Recurse -Force
 Remove-Item .\prakticalc.spec
+Set-Location ..\..
+New-Item -ItemType Directory .\builds -ErrorAction SilentlyContinue
+try {Compress-Archive -Path .\src\prakticalc_karl152\dist\prakticalc\* -DestinationPath .\builds\prakticalc-$PraktiCalcVersion-$winVersionString-amd64-portable.zip -CompressionLevel Optimal -Verbose}
+catch {& "C:\Program Files\7-Zip\7z.exe" a .\builds\prakticalc-$PraktiCalcVersion-$winVersionString-amd64-portable.zip .\src\prakticalc_karl152\dist\prakticalc\* -mx9}
+Write-Host "Cleaning up..."
+Remove-Item .\src\prakticalc_karl152\dist -Recurse -Force
 Write-Host "Done!"
 }
 elseif ($mode -eq "installer"){
@@ -72,14 +74,16 @@ Write-Host "Building installer for PraktiCalc..."
 Write-Host "[1/3] Building PraktiCalc..."
 Remove-Item .\builds\prakticalc-$PraktiCalcVersion-$winVersionString-amd64-installer.exe -ErrorAction SilentlyContinue
 Copy-Item .\LICENSE '.\PraktiCalc Installer\content' -Verbose
-python.exe -m PyInstaller .\prakticalc.py --onedir --clean --windowed --add-data PraktiCalculator_icon.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data python-powered.png:. --add-data info.vbs:. --add-data error.vbs:. --icon PraktiCalculator.ico
-Copy-Item .\dist\prakticalc\* '.\PraktiCalc Installer\content' -Recurse -Verbose
+Set-Location .\src\prakticalc_karl152
+& python.exe -m PyInstaller .\prakticalc.py --onedir --clean --windowed --add-data PraktiCalculator_icon.png:. --add-data python-powered.png:. --add-data info.vbs:. --add-data error.vbs:. --add-data powered-by-wxwidgets-88x31.png:. --icon PraktiCalculator.ico
+Copy-Item .\dist\prakticalc\* '..\..\PraktiCalc Installer\content' -Recurse -Verbose
 Remove-Item .\dist -Recurse -Force
 Remove-Item .\build -Recurse -Force
 Remove-Item .\prakticalc.spec
+Set-Location ..\..
 Write-Host "[2/3] Building Uninstaller..."
 Set-Location '.\PraktiCalc Uninstaller'
-python.exe -m PyInstaller .\PraktiCalcUninstaller.py --onedir --clean --windowed --uac-admin --icon ..\PraktiCalculatorMono.ico
+& python.exe -m PyInstaller .\PraktiCalcUninstaller.py --onedir --clean --windowed --uac-admin --icon ..\src\prakticalc_karl152\PraktiCalculatorMono.ico
 Copy-Item .\dist\PraktiCalcUninstaller\* '..\PraktiCalc Installer\content' -Recurse -Verbose
 Remove-Item .\dist -Recurse -Force
 Remove-Item .\build -Recurse -Force
@@ -88,7 +92,7 @@ Set-Location '..\PraktiCalc Installer'
 Write-Host "[3/3] Building Installer..."
 try {Compress-Archive -Path .\content\* -DestinationPath .\PraktiCalcProgramContent.zip -CompressionLevel Optimal -Verbose}
 catch {& "C:\Program Files\7-Zip\7z.exe" a .\PraktiCalcProgramContent.zip .\content\* -mx9}
-python.exe -m PyInstaller .\prakticalc-installer.py --onefile --clean --windowed --add-data PraktiCalcBanner.png:. --add-data PraktiCalcProgramContent.zip:. --add-data .\narrator.vbs:. --add-data ..\LICENSE:. --uac-admin --icon ..\PraktiCalculator.ico
+& python.exe -m PyInstaller .\prakticalc-installer.py --onefile --clean --windowed --add-data PraktiCalcBanner.png:. --add-data PraktiCalcProgramContent.zip:. --add-data .\narrator.vbs:. --add-data ..\LICENSE:. --uac-admin --icon ..\src\prakticalc_karl152\PraktiCalculator.ico
 New-Item -ItemType Directory ..\builds -ErrorAction SilentlyContinue
 Move-Item .\dist\prakticalc-installer.exe ..\builds\prakticalc-$PraktiCalcVersion-$winVersionString-amd64-installer.exe
 Remove-Item .\dist -Recurse -Force
