@@ -92,7 +92,7 @@ Set-Location '..\PraktiCalc Installer'
 Write-Host "[3/3] Building Installer..."
 try {Compress-Archive -Path .\content\* -DestinationPath .\PraktiCalcProgramContent.zip -CompressionLevel Optimal -Verbose}
 catch {& "C:\Program Files\7-Zip\7z.exe" a .\PraktiCalcProgramContent.zip .\content\* -mx9}
-& python.exe -m PyInstaller .\prakticalc-installer.py --onefile --clean --windowed --add-data PraktiCalcBanner.png:. --add-data PraktiCalcProgramContent.zip:. --add-data .\narrator.vbs:. --add-data ..\LICENSE:. --uac-admin --icon ..\src\prakticalc_karl152\PraktiCalculator.ico
+& python.exe -m PyInstaller .\prakticalc-installer.py --onefile --clean --windowed --add-data PraktiCalcBanner.png:. --add-data PraktiCalcProgramContent.zip:. --add-data ..\LICENSE:. --uac-admin --icon ..\src\prakticalc_karl152\PraktiCalculator.ico
 New-Item -ItemType Directory ..\builds -ErrorAction SilentlyContinue
 Move-Item .\dist\prakticalc-installer.exe ..\builds\prakticalc-$PraktiCalcVersion-$winVersionString-amd64-installer.exe
 Remove-Item .\dist -Recurse -Force

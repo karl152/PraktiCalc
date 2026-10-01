@@ -1,25 +1,10 @@
-#!/usr/bin/env python3
-
-# PraktiCalc - a practical calculator written in Python
-# Copyright (C) 2024-2026 Karl Wesseler
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <https://www.gnu.org/licenses/>.
+# PraktiCalc © 2024-2026 Karl Wesseler
+# Licensed under the GNU General Public License v3.0.
+# See https://www.gnu.org/licenses/gpl-3.0.txt for details.
 # SPDX-License-Identifier: GPL-3.0-only
 
-import tkinter as tk
-from tkinter import ttk
-from tkinter import messagebox
-import threading, subprocess, platform, ctypes, sys, zipfile, shutil, winreg
+import wx, threading, subprocess, platform, ctypes, sys, zipfile, shutil, winreg
+from wx.lib.agw.thumbnailctrl import ScrolledTextDialog
 from pathlib import Path
 from packaging.version import Version
 try:
@@ -27,34 +12,7 @@ try:
 except:
     pass
 
-#---------------------------
-PraktiCalcVersion = "1.5.6"
-#---------------------------
-
-def speak(string):
-    subprocess.Popen(["wscript", narrator, string])
-def speakAndWait(string):
-    subprocess.run(["wscript", narrator, string])
-auto = "--auto" in sys.argv
-TTS = "--TTS" in sys.argv
-BulletPoint = "\u2022"
-if Path("C:/Program Files/PraktiCalc").exists() == True:
-    UninstallFirst = True
-    # UninstallBaseString = "PraktiCalc is already installed on your system. If you want to reinstall or update it, please uninstall it first using "
-    # UninstallWinString = "Control Panel -> Programs -> Programs and Features -> PraktiCalc -> Uninstall/Change"
-    # UninstallWin11String = "Settings -> Apps -> Installed Apps -> PraktiCalc -> Uninstall"
-    # if platform.release() == "11":
-        # messagebox.showerror("Not installing", UninstallBaseString + UninstallWin11String)
-    # else:
-        # messagebox.showerror("Not installing", UninstallBaseString + UninstallWinString)
-    # sys.exit(1)
-else:
-    UninstallFirst = False
-
-if auto == False:
-    WizardPage = 0
-else:
-    WizardPage = 6
+PraktiCalcVersion = "1.6"
 
 def testPyInstallerOneFile():
     try:
@@ -63,17 +21,14 @@ def testPyInstallerOneFile():
     except:
         return False
 
-RunningAsOneFileExe = testPyInstallerOneFile()
-if RunningAsOneFileExe == True:
+if testPyInstallerOneFile():
     PraktiCalcBannerPath = (sys._MEIPASS + "/PraktiCalcBanner.png")
     PraktiCalcContentZIPPath = (sys._MEIPASS + "/PraktiCalcProgramContent.zip")
     licensefile = (sys._MEIPASS + "/LICENSE")
-    narrator = (sys._MEIPASS + "/narrator.vbs")
 else:
     PraktiCalcBannerPath = "PraktiCalcBanner.png"
     PraktiCalcContentZIPPath = "PraktiCalcProgramContent.zip"
     licensefile = "../LICENSE"
-    narrator = "narrator.vbs"
     print("""
 ----------------------------------------------------------
  WARNING: The PraktiCalc Installer will likely not work
@@ -81,207 +36,168 @@ else:
  build it before execution using the provided script
 ----------------------------------------------------------
 """)
-    if TTS == True:
-        speakAndWait("WARNING: The PraktiCalc Installer will likely not work when not built to one file using PyInstaller! You should build it before execution using the provided script")
 
-if "--help" in sys.argv:
-    messagebox.showinfo("PraktiCalc Installer CLI options", """--auto: starts automatic installation
---TTS: starts installer with text to speech
---help: shows this help text""")
-    sys.exit(0)
+class MainWindow(wx.Frame):
+    def __init__(self):
+        super().__init__(None, title="PraktiCalc Installer")
+        self.panel = wx.Panel(self)
+        self.BannerPNG = wx.Bitmap(PraktiCalcBannerPath)
+        self.Banner = wx.StaticBitmap(self.panel, bitmap=self.BannerPNG)
+        self.MenuEntryCheckbox = wx.CheckBox(self.panel, label="Add a start menu entry")
+        self.DesktopIconCheckbox = wx.CheckBox(self.panel, label="Create a desktop shortcut")
+        self.ResetSettingsCheckbox = wx.CheckBox(self.panel, label="Reset settings")
+        self.MenuEntryCheckbox.SetValue(True)
+        if Path("C:/Program Files/PraktiCalc").exists():
+            self.UninstallFirst = True
+        else:
+            self.UninstallFirst = False
+            self.ResetSettingsCheckbox.Disable()
+        if "--auto" in sys.argv:
+            ProgressWindow(self.UninstallFirst, self.MenuEntryCheckbox.GetValue(), self.DesktopIconCheckbox.GetValue(), self.ResetSettingsCheckbox.GetValue()).Show()
+            self.Close()
+        self.LicenseButton = wx.Button(self.panel, label="License")
+        self.InstallButton = wx.Button(self.panel, label="Install")
+        self.LicenseButton.Bind(wx.EVT_BUTTON, self.showLicense)
+        self.InstallButton.Bind(wx.EVT_BUTTON, self.startInstall)
+        self.sizer = wx.GridBagSizer(5, 5)
+        self.sizer.Add(self.Banner, pos=(0, 0), span=(1, 3), flag=wx.EXPAND)
+        self.sizer.AddGrowableCol(1)
+        for i, element in enumerate((self.MenuEntryCheckbox, self.DesktopIconCheckbox, self.ResetSettingsCheckbox)):
+            self.sizer.Add(element, pos=(i+1, 1), flag=wx.EXPAND)
+        self.sizer.Add(self.LicenseButton, pos=(4, 0), flag=wx.ALL, border=10)
+        self.sizer.Add(self.InstallButton, pos=(4, 2), flag=wx.ALIGN_RIGHT | wx.ALL, border=10)
+        self.panel.SetSizerAndFit(self.sizer)
+        self.Fit()
+    def showLicense(self, _):
+        with open(licensefile) as LicenseFile:
+            text = LicenseFile.read()
+        dlg = ScrolledTextDialog(self, title="GNU General Public License, Version 3.0", msg=text)
+        dlg.ShowModal()
+    def startInstall(self, _):
+        win = ProgressWindow(self.UninstallFirst, self.MenuEntryCheckbox.GetValue(), self.DesktopIconCheckbox.GetValue(), self.ResetSettingsCheckbox.GetValue())
+        win.Show()
+        self.Close()
 
-ExtractTo = "C:/Program Files/PraktiCalc"
-username = Path.home().stem
-
-def forward():
-    global WizardPage
-    if WizardPage == 6:
-        pass
-    else:
-        WizardPage += 1
-        pageReload()
-def back():
-    global WizardPage
-    if WizardPage == 0:
-        pass
-    else:
-        WizardPage -= 1
-        pageReload()
-def pageReload():
-    global WizardPage
-    if WizardPage == 0:
-        MainFrame.columnconfigure(0, weight=0)
-        MainFrame.rowconfigure(1, weight=0)
-        MainFrame.config(text="Welcome")
-        clearMainFrame()
-        InstallWizardWindow.geometry("408x420")
-        WelcomeImage = ttk.Label(MainFrame, image=InstallWizardWindow.Banner)
-        WelcomeText = ttk.Label(MainFrame, text="Welcome to the PraktiCalc Installer for Windows!\nThis Wizard will help you installing PraktiCalc.")
-        WelcomeImage.grid(row=0, column=0)
-        WelcomeText.grid(row=1, column=0, padx=10, pady=10)
-        if TTS == True:
-            speak("Welcome to the PraktiCalc Installer for Windows! This Wizard will help you installing PraktiCalc.")
-    elif WizardPage == 1:
-        MainFrame.config(text="License")
-        MainFrame.columnconfigure(0, weight=1)
-        MainFrame.rowconfigure(1, weight=1)
-        clearMainFrame()
-        InstallWizardWindow.geometry("870x620")
-        LicensePreText = ttk.Label(MainFrame, text="This software is licensed under the GNU General Public License, Version 3.\nContinue if you accept that.")
-        LicenseText = tk.Text(MainFrame, wrap=tk.WORD)
-        LicenseTextScrollbar = ttk.Scrollbar(MainFrame, orient=tk.VERTICAL, command=LicenseText.yview)
-        LicenseText.configure(yscrollcommand=LicenseTextScrollbar.set)
-        with open(licensefile, "r") as LicenseToInsert:
-            LicenseText.insert(tk.END, LicenseToInsert.read())
-        LicenseText.config(state=tk.DISABLED)
-        LicensePreText.grid(row=0, column=0, padx=10, pady=10)
-        LicenseText.grid(row=1, column=0, padx=(10, 0), pady=10, sticky=tk.NSEW)
-        LicenseTextScrollbar.grid(row=1, column=1, padx=(0, 10), pady=10, sticky=tk.NSEW[:-1])
-        if TTS == True:
-            speak("This software is licensed under the GNU General Public License, Version 3. Continue if you accept that.")
-    elif WizardPage == 2:
-        MainFrame.config(text="Destination")
-        MainFrame.columnconfigure(0, weight=0)
-        MainFrame.rowconfigure(1, weight=0)
-        clearMainFrame()
-        InstallWizardWindow.geometry("408x420")
-        DestinationText = ttk.Label(MainFrame, text="PraktiCalc will be installed into the following directory:")
-        DestinationText.grid(row=0, column=0, padx=10, pady=10)
-        DestinationPathDisplay = ttk.Entry(MainFrame)
-        DestinationPathDisplay.insert(0, ExtractTo)
-        DestinationPathDisplay.config(state="readonly", width=28)
-        DestinationPathDisplay.grid(row=1, column=0, padx=10, pady=10)
-        if TTS == True:
-            speak("PraktiCalc will be installed into the following directory: C:/Program Files/PraktiCalc")
-    elif WizardPage == 3:
-        MainFrame.config(text="Desktop Shortcut")
-        clearMainFrame()
-        DesktopShortcutText = ttk.Label(MainFrame, text="Do you want to create a Desktop Shortcut for PraktiCalc?")
-        DesktopShortcutText.grid(row=0, column=0, padx=10, pady=10)
-        DesktopShortcutOptionYes = ttk.Radiobutton(MainFrame, text="Yes", value=True, variable=DesktopShortcut)
-        DesktopShortcutOptionYes.grid(row=1, column=0, padx=10)
-        DesktopShortcutOptionNo = ttk.Radiobutton(MainFrame, text="No", value=False, variable=DesktopShortcut)
-        DesktopShortcutOptionNo.grid(row=2, column=0, padx=10)
-        if TTS == True:
-            speak("Do you want to create a Desktop Shortcut for PraktiCalc?")
-    elif WizardPage == 4:
-        MainFrame.config(text="Start Menu Entry")
-        clearMainFrame()
-        DesktopShortcutText = ttk.Label(MainFrame, text="Do you want to add PraktiCalc to the Start Menu?")
-        DesktopShortcutText.grid(row=0, column=0, padx=10, pady=10)
-        DesktopShortcutOptionYes = ttk.Radiobutton(MainFrame, text="Yes", value=True, variable=StartMenuEntry)
-        DesktopShortcutOptionYes.grid(row=1, column=0, padx=10)
-        DesktopShortcutOptionNo = ttk.Radiobutton(MainFrame, text="No", value=False, variable=StartMenuEntry)
-        DesktopShortcutOptionNo.grid(row=2, column=0, padx=10)
-        if TTS == True:
-            speak("Do you want to add PraktiCalc to the Start Menu?")
-    elif WizardPage == 5:
-        MainFrame.config(text="Ready for installation")
-        clearMainFrame()
-        ReadyText = ttk.Label(MainFrame, text="PraktiCalc is now ready to be installed.\nYour choices:")
-        DestinationChoiceText = ttk.Label(MainFrame, text=f"{BulletPoint} Install PraktiCalc to C:/Program Files/PraktiCalc")
-        DesktopShortcutChoice = ttk.Label(MainFrame)
-        StartMenuEntryChoice = ttk.Label(MainFrame)
-        if DesktopShortcut.get() == True:
-            DesktopShortcutChoice.config(text=f"{BulletPoint} add a shortcut to the Desktop")
+class ProgressWindow(wx.Frame):
+    def __init__(self, existingInstall, menu, desktop, reset):
+        super().__init__(None, title="Installing PraktiCalc...")
+        self.featureList = []
+        if existingInstall:
+            self.featureList.append("existingInstall")
+        self.featureList.extend(["main", "reg"])
+        if menu:
+            self.featureList.append("menuEntry")
+        if desktop:
+            self.featureList.append("desktopShortcut")
+        if reset:
+            self.featureList.append("settingsReset")
+        self.panel = wx.Panel(self)
+        self.Infobar = wx.InfoBar(self.panel)
+        btnID = wx.NewIdRef()
+        self.Infobar.AddButton(btnID, "Close")
+        self.Infobar.Bind(wx.EVT_BUTTON, lambda _: self.Close(), id=btnID)
+        self.DriveIcon = wx.StaticBitmap(self.panel, bitmap=wx.ArtProvider().GetBitmap(wx.ART_HARDDISK, wx.ART_OTHER, wx.Size(64, 64)))
+        if existingInstall:
+            MainLabel = f"Updating to PraktiCalc {PraktiCalcVersion}"
         else:
-            DesktopShortcutChoice.config(text=f"{BulletPoint} don't add a shortcut to the Desktop")
-        if StartMenuEntry.get() == True:
-            StartMenuEntryChoice.config(text=f"{BulletPoint} add an entry to the Start Menu")
+            MainLabel = f"Installing PraktiCalc {PraktiCalcVersion}"
+        self.InstallText = wx.StaticText(self.panel, label=MainLabel)
+        font = self.InstallText.GetFont()
+        font.PointSize += 3
+        font = font.Bold()
+        self.InstallText.SetFont(font)
+        self.Progressbar = wx.Gauge(self.panel)
+        self.Progressbar.Pulse()
+        self.Icons = []
+        self.Texts = []
+        FeatureTexts = {
+            "existingInstall": "removing existing version",
+            "main": "copying files",
+            "reg": "registering the install",
+            "menuEntry": "adding start menu entry",
+            "desktopShortcut": "creating desktop shortcut",
+            "settingsReset": "resetting the settings"
+        }
+        self.Icons.append(wx.StaticBitmap(self.panel, bitmap=wx.ArtProvider().GetBitmap(wx.ART_GO_FORWARD, wx.ART_OTHER, wx.Size(16, 16))))
+        for _ in self.featureList[:-1]:
+            self.Icons.append(wx.StaticBitmap(self.panel))
+        for item in self.featureList:
+            self.Texts.append(wx.StaticText(self.panel, label=FeatureTexts.get(item)))
+        self.sizer = wx.GridBagSizer()
+        self.sizer.Add(self.Infobar, pos=(0, 0), span=(1, 2), flag=wx.EXPAND)
+        self.sizer.AddGrowableCol(1)
+        self.sizer.Add(self.DriveIcon, pos=(1, 0), flag=wx.ALL, border=10)
+        self.sizer.Add(self.InstallText, pos=(1, 1), flag=wx.EXPAND | wx.RIGHT, border=200)
+        self.sizer.Add(self.Progressbar, pos=(2, 0), span=(1, 2), flag=wx.EXPAND | wx.ALL, border=10)
+        for i in range(len(self.featureList)):
+            self.sizer.Add(self.Icons[i], pos=(i+3, 0), flag=wx.ALIGN_RIGHT | wx.RIGHT, border=5)
+            self.sizer.Add(self.Texts[i], pos=(i+3, 1))
+        self.sizer.Add(wx.StaticText(self.panel, label=" "), pos=(len(self.featureList)+3, 1)) # spacer
+        self.sizer.AddGrowableRow(len(self.featureList)+2)
+        self.panel.SetSizerAndFit(self.sizer)
+        self.Fit()
+        self.status = 0
+        threading.Thread(target=self.install, daemon=True).start()
+    def markDone(self):
+        self.Icons[self.status].SetBitmap(wx.ArtProvider().GetBitmap(wx.ART_TICK_MARK, wx.ART_OTHER, wx.Size(16, 16)))
+        try:
+            self.Icons[self.status+1].SetBitmap(wx.ArtProvider().GetBitmap(wx.ART_GO_FORWARD, wx.ART_OTHER, wx.Size(16, 16)))
+        except IndexError:
+            if "--auto" in sys.argv:
+                self.Close()
+            else:
+                self.Infobar.ShowMessage("Installation completed successfully!", wx.ICON_INFORMATION)
+                self.Fit()
         else:
-            StartMenuEntryChoice.config(text=f"{BulletPoint} don't add an entry to the Start Menu")
-        FinalAdvise = ttk.Label(MainFrame, text="Click continue to start the installation.")
-        ReadyText.grid(row=0, column=0, padx=10, pady=10, sticky=tk.W)
-        DestinationChoiceText.grid(row=1, column=0, padx=10, sticky=tk.W)
-        DesktopShortcutChoice.grid(row=2, column=0, padx=10, sticky=tk.W)
-        StartMenuEntryChoice.grid(row=3, column=0, padx=10, sticky=tk.W)
-        FinalAdvise.grid(row=4, column=0, padx=10, pady=10, sticky=tk.W)
-        if TTS == True:
-            speak("PraktiCalc is now ready to be installed like you chose in the previous screens. Click continue to start the installation.")
-    elif WizardPage == 6:
-        global Progress, InstallProgressText
-        MainFrame.config(text="Installing PraktiCalc...")
-        clearMainFrame()
-        InstallText = ttk.Label(MainFrame, text="PraktiCalc is being installed. Please wait.\nThis process should take less than a minute.")
-        InstallProgressText = tk.Label(MainFrame, bg="black", fg="white", font=("Lucida Console", 10))
-        InstallText2 = ttk.Label(MainFrame, text="Please don't close this window.")
-        InstallText.grid(row=0, column=0, padx=10, pady=10)
-        InstallProgressText.grid(row=1, column=0, padx=10, pady=10)
-        InstallText2.grid(row=2, column=0, padx=10, pady=10)
-        for widgets in BottomFrame.winfo_children():
-            widgets.destroy()
-        Progress = ttk.Progressbar(BottomFrame, mode="indeterminate")
-        Progress.start(10)
-        Progress.grid(row=0, column=0, columnspan=2, sticky=tk.SE+tk.W)
-        threading.Thread(target=actuallyInstall, daemon=True).start()
-        if auto == False and TTS == True:
-            speakAndWait("PraktiCalc is being installed. Please wait.\nThis process should take less than a minute.")
-    elif WizardPage == 7:
-        if auto == True:
-            InstallWizardWindow.destroy()
+            self.status += 1
+    def markError(self, error="There was an error during the installation!"):
+        self.Icons[self.status].SetBitmap(wx.ArtProvider().GetBitmap(wx.ART_CROSS_MARK, wx.ART_OTHER, wx.Size(16, 16)))
+        if "--auto" in sys.argv:
+            self.Close()
         else:
-            MainFrame.config(text="Installation finished")
-            clearMainFrame()
-            FinishIcon = tk.Label(MainFrame, text="ü", font=("Wingdings", 32))
-            FinishText = ttk.Label(MainFrame, text="Installation successfull!\nPraktiCalc was installed")
-            FinishIcon.grid(row=0, column=0, padx=50, pady=10)
-            FinishText.grid(row=1, column=0, padx=20, pady=10)
-            for widgets in BottomFrame.winfo_children():
-                widgets.destroy()
-            FinishButton = ttk.Button(BottomFrame, text="Close", command=lambda: InstallWizardWindow.destroy())
-            FinishButton.grid(row=0, column=0, columnspan=2, sticky=tk.SE+tk.W)
-            InstallWizardWindow.geometry("200x200")
-            if TTS == True:
-                speak("PraktiCalc was installed, you can close this window now")
-def actuallyInstall():
-    global Progress, InstallProgressText, WizardPage
-    ProgressText = "checking system compatibility..."
-    InstallProgressText.config(text=ProgressText)
-    if platform.system() == "Windows":
-        ProgressText += ("\ncorrect operating system: " + platform.system())
-        InstallProgressText.config(text=ProgressText)
-        if platform.release() == "Vista" or "7" or "8" or "8.1" or "10" or "11":
-            ProgressText += ("\ncorrect Windows version: " + platform.release())
-            InstallProgressText.config(text=ProgressText)
-            if UninstallFirst == True:
-                ProgressText += "\nremoving previous installation...\n"
-                InstallProgressText.config(text=ProgressText)
-                with winreg.OpenKeyEx(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc") as PraktiKey:
-                    PrevInstallPath = winreg.QueryValueEx(PraktiKey, "InstallLocation")[0]
-                    PreviousVersion = winreg.QueryValueEx(PraktiKey, "DisplayVersion")[0]
-                    if Version(PraktiCalcVersion) < Version(PreviousVersion):
-                        messagebox.showerror(parent=InstallWizardWindow, title="Error - Downgrading unsupported", message="You already have a newer version of PraktiCalc installed!")
-                        InstallWizardWindow.destroy()
-                        exit()
-                subprocess.getoutput(r'reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /f')
-                try:
-                    shutil.rmtree(PrevInstallPath)
-                except:
-                    messagebox.showerror(parent=InstallWizardWindow, title="Uninstallation Error", message="Failed to uninstall the previous version of PraktiCalc.\nPlease make sure it's closed and try again.\nIf that doesn't work, restart your PC and try again.\nThank you!")
+            self.Infobar.ShowMessage(error, wx.ICON_ERROR)
+            self.Fit()
+    def install(self):
+        ExtractTo = "C:/Program Files/PraktiCalc"
+        username = Path.home().stem
+        if "existingInstall" in self.featureList:
+            self.Progressbar.Pulse()
+            with winreg.OpenKeyEx(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc") as PraktiKey:
+                PrevInstallPath = winreg.QueryValueEx(PraktiKey, "InstallLocation")[0]
+                PreviousVersion = winreg.QueryValueEx(PraktiKey, "DisplayVersion")[0]
+                if Version(PraktiCalcVersion) < Version(PreviousVersion):
+                    messagebox.showerror(parent=InstallWizardWindow, title="Error - Downgrading unsupported", message="You already have a newer version of PraktiCalc installed!")
                     InstallWizardWindow.destroy()
-                Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc.url").unlink(missing_ok=True)
-                Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc.lnk").unlink(missing_ok=True)
-                Path("C:/Users/" + username + "/Desktop/PraktiCalc.url").unlink(missing_ok=True)
-                Path("C:/Users/" + username + "/Desktop/PraktiCalc.lnk").unlink(missing_ok=True)
-            ProgressText += "\ncreating installation directory...\n"
-            InstallProgressText.config(text=ProgressText)
+                    exit()
+            subprocess.getoutput(r'reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PraktiCalc" /f')
+            try:
+                shutil.rmtree(PrevInstallPath)
+            except:
+                self.markError()
+                wx.MessageDialog(self, "Failed to uninstall the previous version of PraktiCalc.\nPlease make sure it's closed and try again.\nIf that doesn't work, restart your PC and try again.\nThank you!", "Uninstallation error", wx.ICON_ERROR).showModal()
+                self.Close()
+            Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc.url").unlink(missing_ok=True)
+            Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc.lnk").unlink(missing_ok=True)
+            Path("C:/Users/" + username + "/Desktop/PraktiCalc.url").unlink(missing_ok=True)
+            Path("C:/Users/" + username + "/Desktop/PraktiCalc.lnk").unlink(missing_ok=True)
+            self.markDone()
+        try:
             Path("C:/Program Files/PraktiCalc").mkdir(parents=True, exist_ok=True)
-            ProgressText += "\nmoving PraktiCalc program files...\n"
-            InstallProgressText.config(text=ProgressText)
-            Progress.stop()
             with zipfile.ZipFile(PraktiCalcContentZIPPath, 'r') as ZipRef:
                 files = []
                 for file in ZipRef.infolist():
                     if not file.is_dir():
                         files.append(file)
-                Progress.config(mode="determinate", maximum=len(files), value=0)
+                self.Progressbar.SetRange(len(files))
                 for index, file in enumerate(files, 1):
                     ZipRef.extract(file, ExtractTo)
-                    Progress.config(value=index)
-                    if tk.TkVersion >= 9:
-                        Progress.config(text=str(index) + "/" + str(len(files)))
-            ProgressText += "\nregistering program..."
-            InstallProgressText.config(text=ProgressText)
+                    self.Progressbar.SetValue(index)
+        except Exception as e:
+            self.markError(str(e))
+            return
+        else:
+            self.markDone()
+        try:
             with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", 0, winreg.KEY_WRITE) as UninstallKey:
                 with winreg.CreateKey(UninstallKey, "PraktiCalc") as PraktiKey:
                     winreg.SetValueEx(PraktiKey, "DisplayName", 0, winreg.REG_SZ, "PraktiCalc")
@@ -292,44 +208,42 @@ def actuallyInstall():
                     winreg.SetValueEx(PraktiKey, "DisplayIcon", 0, winreg.REG_SZ, r"C:\Program Files\PraktiCalc\PraktiCalc.exe")
                     winreg.SetValueEx(PraktiKey, "NoModify", 0, winreg.REG_DWORD, 1)
                     winreg.SetValueEx(PraktiKey, "NoRepair", 0, winreg.REG_DWORD, 1)
-            if StartMenuEntry.get() == True:
-                ProgressText += "\ncreating start menu entry..."
-                InstallProgressText.config(text=ProgressText)
-                shutil.copy(ExtractTo + "/PraktiCalc.url", "C:/ProgramData/Microsoft/Windows/Start Menu/Programs")
-            if DesktopShortcut.get() == True:
-                ProgressText += "\ncreating desktop shortcut..."
-                InstallProgressText.config(text=ProgressText)
-                shutil.copy(ExtractTo + "/PraktiCalc.url", "C:/Users/" + username + "/Desktop")
-            WizardPage = 7
-            pageReload()
+        except Exception as e:
+            self.markError(str(e))
+            return
         else:
-            InstallWizardWindow.destroy()
-            messagebox.showerror("Incompatible Windows Version", "The Windows Version you are using is not supported by the PraktiCalc Installer.\nThis installer only supports Windows Vista, 7, 8, 8.1, 10 and 11. \n\nIf your Windows Version is older, I am sorry.\nIf your Windows Version is newer than 11, you should be able to run this Installer in Compatibility Mode, which you can enable in the file properties.")
-            exit()
-    else:
-        InstallWizardWindow.destroy()
-        messagebox.showerror("Compatibility Error", "This installer is for Windows only. Downlaod the AppImage or the specific package if you're on Linux to install PraktiCalc. There are no packages for MacOS, as I don't have Apple Hardware to test and Build PraktiCalc for MacOS.\n\nIf you want to build this installer yourself, please note that you can only do that on Windows (maybe with Wine on Linux, just maybe)")
-        exit()
-def clearMainFrame():
-    for widget in MainFrame.winfo_children():
-        widget.destroy()
-InstallWizardWindow = tk.Tk()
-DesktopShortcut = tk.BooleanVar()
-StartMenuEntry = tk.BooleanVar(value=True)
-InstallWizardWindow.Banner = tk.PhotoImage(file=PraktiCalcBannerPath)
-InstallWizardWindow.title("PraktiCalc Installer")
-InstallWizardWindow.columnconfigure(0, weight=1)
-InstallWizardWindow.rowconfigure(0, weight=1)
-MainFrame = ttk.LabelFrame(InstallWizardWindow, text="Error, close this window now!")
-MainFrame.grid(row=0, column=0, sticky=tk.NSEW)
-BottomFrame = ttk.Frame(InstallWizardWindow)
-BottomFrame.grid(row=1, column=0, sticky=tk.NSEW)
-BottomFrame.columnconfigure(0, weight=1)
-BottomFrame.columnconfigure(1, weight=1)
-BottomFrame.rowconfigure(0, weight=1)
-PrevButton = ttk.Button(BottomFrame, text="<< Back", command=back)
-NextButton = ttk.Button(BottomFrame, text="Continue >>", command=forward)
-PrevButton.grid(row=0, column=0, sticky=tk.SE+tk.W)
-NextButton.grid(row=0, column=1, sticky=tk.SE+tk.W)
-pageReload()
-InstallWizardWindow.mainloop()
+            self.markDone()
+        if "menuEntry" in self.featureList:
+            try:
+                shutil.copy(ExtractTo + "/PraktiCalc.url", "C:/ProgramData/Microsoft/Windows/Start Menu/Programs")
+            except Exception as e:
+                self.markError(str(e))
+                return
+            else:
+                self.markDone()
+        if "desktopShortcut" in self.featureList:
+            try:
+                shutil.copy(ExtractTo + "/PraktiCalc.url", "C:/Users/" + username + "/Desktop")
+            except Exception as e:
+                self.markError(str(e))
+                return
+            else:
+                self.markDone()
+        if "settingsReset" in self.featureList:
+            try:
+                subprocess.getoutput(r'reg delete "HKEY_CURRENT_USER\Software\PraktiCalc" /f')
+            except Exception as e:
+                self.markError(str(e))
+                return
+            else:
+                self.markDone()
+
+app = wx.App()
+if "--help" in sys.argv:
+    wx.MessageDialog(None, "--auto: starts an automatic unattended install", f"PraktiCalc {PraktiCalcVersion} Install Options", wx.OK | wx.ICON_INFORMATION).ShowModal()
+elif platform.system() == "Windows" and int(platform.win32_ver()[1][0:2]) >= 6:
+    frame = MainWindow()
+    frame.Show()
+    app.MainLoop()
+else:
+    wx.MessageDialog(None, "This installer is incompatible with your operating system", "Compatibility error", wx.OK | wx.ICON_ERROR).ShowModal()
