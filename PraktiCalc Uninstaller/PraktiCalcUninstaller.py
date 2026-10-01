@@ -72,7 +72,9 @@ try {
         Remove-Item "C:\Program Files\PraktiCalc" -Recurse -Force -Verbose
     } while (-not $?)
 }
-Start-Sleep 1
+Write-Host
+Write-Host "Uninstallation finished. Thank you for using PraktiCalc!"
+Start-Sleep 2
 '''])
         except:
             wx.MessageDialog(self, "Error during uninstall.\nTry running C:/Program Files/PraktiCalc/PraktiCalcUninstaller.exe as Administrator.", "Error", wx.ICON_ERROR).ShowModal()
