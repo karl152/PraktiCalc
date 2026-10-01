@@ -8,7 +8,7 @@ from wx.lib.agw.thumbnailctrl import ScrolledTextDialog
 from pathlib import Path
 from packaging.version import Version
 try:
-    ctypes.windll.shcore.SetProcessDpiAwareness(1)
+    ctypes.windll.shcore.SetProcessDpiAwareness(2)
 except:
     pass
 
