@@ -49,8 +49,12 @@ class Uninstaller(wx.Dialog):
             subprocess.getoutput(f'rmdir /S /Q "{InstallPath}"')
             Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc.url").unlink(missing_ok=True)
             Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc.lnk").unlink(missing_ok=True)
+            Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc Legacy Extension Loader.url").unlink(missing_ok=True)
+            Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc Legacy Extension Loader.lnk").unlink(missing_ok=True)
             Path("C:/Users/" + username + "/Desktop/PraktiCalc.url").unlink(missing_ok=True)
             Path("C:/Users/" + username + "/Desktop/PraktiCalc.lnk").unlink(missing_ok=True)
+            Path("C:/Users/" + username + "/Desktop/PraktiCalc Legacy Extension Loader.url").unlink(missing_ok=True)
+            Path("C:/Users/" + username + "/Desktop/PraktiCalc Legacy Extension Loader.lnk").unlink(missing_ok=True)
             subprocess.Popen(["powershell.exe", "-NoProfile", "-Command", r'''Write-Host "Uninstalling PraktiCalc [2/2]...";
 Write-Host
 Write-Host "       If you got feedback or suggestions"

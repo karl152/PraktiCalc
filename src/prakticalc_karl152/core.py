@@ -24,15 +24,15 @@ elif platform.system() == "Darwin":
 # test if this is running as a pyinstaller executable
 try:
     print(sys._MEIPASS)
-    RunningAsOneFileExe =  True
+    RunningAsOneFileExe = True
 except:
-    RunningAsOneFileExe =  False
+    RunningAsOneFileExe = False
 
 class Configuration:
     def __init__(self):
         if platform.system() == "Windows":
             if RunningAsOneFileExe == True:
-                if sys.executable == r"C:\Program Files\PraktiCalc\prakticalc.exe":
+                if sys.executable == r"C:\Program Files\PraktiCalc\prakticalc.exe" or sys.executable == r"C:\Program Files\PraktiCalc\PLEL.exe":
                     self.backend = WindowsConfig()
                 else:
                     self.backend = XDGConfig()

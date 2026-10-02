@@ -391,7 +391,7 @@ class ExtensionWindow(tk.Tk):
         self.columnconfigure(0, weight=1)
         if platform.system() == "Windows":
             if RunningAsOneFileExe == True:
-                if sys.executable == r"C:\Program Files\PraktiCalc\prakticalc.exe":
+                if sys.executable == r"C:\Program Files\PraktiCalc\prakticalc.exe" or sys.executable == r"C:\Program Files\PraktiCalc\PLEL.exe":
                     self.FolderPath = Path.home() / "AppData" / "Roaming" / "PraktiXtensions"
                 else:
                     f1 = Path(sys.executable).parent

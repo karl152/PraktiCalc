@@ -80,6 +80,11 @@ Copy-Item .\dist\prakticalc\* '..\..\PraktiCalc Installer\content' -Recurse -Ver
 Remove-Item .\dist -Recurse -Force
 Remove-Item .\build -Recurse -Force
 Remove-Item .\prakticalc.spec
+& python.exe -m PyInstaller .\PLEL.py --onedir --clean --windowed --add-data PLEL.png:. --add-data PraktiCalculator_icon.xbm:. --add-data PraktiCalculator_icon_inverted.xbm:. --add-data python-powered.png:. --add-data info.vbs:. --add-data error.vbs:. --icon PLEL.png
+Copy-Item .\dist\PLEL\* '..\..\PraktiCalc Installer\content' -Recurse -Verbose
+Remove-Item .\dist -Recurse -Force
+Remove-Item .\build -Recurse -Force
+Remove-Item .\PLEL.spec
 Set-Location ..\..
 Write-Host "[2/3] Building Uninstaller..."
 Set-Location '.\PraktiCalc Uninstaller'
@@ -100,6 +105,7 @@ Remove-Item .\build -Recurse -Force
 Remove-Item .\prakticalc-installer.spec
 Remove-Item .\PraktiCalcProgramContent.zip
 Remove-Item .\content\prakticalc.exe
+Remove-Item .\content\PLEL.exe
 Remove-Item .\content\PraktiCalcUninstaller.exe
 Remove-Item .\content\_internal -Recurse -Force
 Remove-Item .\content\LICENSE

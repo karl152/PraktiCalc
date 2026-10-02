@@ -178,8 +178,12 @@ class ProgressWindow(wx.Frame):
                 self.Close()
             Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc.url").unlink(missing_ok=True)
             Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc.lnk").unlink(missing_ok=True)
+            Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc Legacy Extension Loader.url").unlink(missing_ok=True)
+            Path("C:/ProgramData/Microsoft/Windows/Start Menu/Programs/PraktiCalc Legacy Extension Loader.lnk").unlink(missing_ok=True)
             Path("C:/Users/" + username + "/Desktop/PraktiCalc.url").unlink(missing_ok=True)
             Path("C:/Users/" + username + "/Desktop/PraktiCalc.lnk").unlink(missing_ok=True)
+            Path("C:/Users/" + username + "/Desktop/PraktiCalc Legacy Extension Loader.url").unlink(missing_ok=True)
+            Path("C:/Users/" + username + "/Desktop/PraktiCalc Legacy Extension Loader.lnk").unlink(missing_ok=True)
             self.markDone()
         try:
             Path("C:/Program Files/PraktiCalc").mkdir(parents=True, exist_ok=True)
@@ -216,6 +220,7 @@ class ProgressWindow(wx.Frame):
         if "menuEntry" in self.featureList:
             try:
                 shutil.copy(ExtractTo + "/PraktiCalc.url", "C:/ProgramData/Microsoft/Windows/Start Menu/Programs")
+                shutil.copy(ExtractTo + "/PraktiCalc Legacy Extension Loader.url", "C:/ProgramData/Microsoft/Windows/Start Menu/Programs")
             except Exception as e:
                 self.markError(str(e))
                 return
@@ -224,6 +229,7 @@ class ProgressWindow(wx.Frame):
         if "desktopShortcut" in self.featureList:
             try:
                 shutil.copy(ExtractTo + "/PraktiCalc.url", "C:/Users/" + username + "/Desktop")
+                shutil.copy(ExtractTo + "/PraktiCalc Legacy Extension Loader.url", "C:/Users/" + username + "/Desktop")
             except Exception as e:
                 self.markError(str(e))
                 return
