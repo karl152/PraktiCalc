@@ -1,3 +1,7 @@
 #!/bin/dash
 cd /usr/share/prakticalc/
-exec /usr/bin/python3 /usr/share/prakticalc/prakticalc.py "$@"
+if [ "$1" = "--plel" ]; then
+     exec /usr/bin/python3 /usr/share/prakticalc/PLEL.py "$@"
+else
+    exec /usr/bin/python3 /usr/share/prakticalc/prakticalc.py "$@"
+fi

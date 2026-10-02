@@ -1,0 +1,10 @@
+[Desktop Entry]
+Categories=Utility;
+Comment=PraktiXtensions in PraktiCalc 1.6+!
+Exec=prakticalc --plel
+Icon=de.karl_52.PraktiCalc.PLEL
+Name=PraktiCalc Legacy Extension Loader
+Path=
+StartupNotify=true
+Terminal=false
+Type=Application

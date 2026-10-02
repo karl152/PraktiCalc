@@ -20,6 +20,7 @@ do
 done
 
 chmod +x debian/rules
+cp src/prakticalc_karl152/PLEL.png linux-pkg-builds/debian/prakticalc/usr/share/icons/hicolor/128x128/apps/de.karl_52.PraktiCalc.PLEL.png
 
 if [ "$#" -lt 1 ]; then
     echo "Please specify a build mode (deb or dsc)."
@@ -28,12 +29,13 @@ fi
 
 if [ "$1" = "deb" ]; then
     dpkg-buildpackage --no-sign --build=binary
-    chmod -x debian/rules
     rm -rv debian/.debhelper/ debian/prakticalc debian/debhelper-build-stamp debian/files debian/prakticalc.substvars
 elif [ "$1" = "dsc" ]; then
     dpkg-buildpackage --build=source
-    chmod -x debian/rules
     rm -v debian/files
 else
     echo "Please specify a build mode (deb or dsc)."
 fi
+
+chmod -x debian/rules
+rm linux-pkg-builds/debian/prakticalc/usr/share/icons/hicolor/128x128/apps/de.karl_52.PraktiCalc.PLEL.png
