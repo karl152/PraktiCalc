@@ -460,7 +460,10 @@ class CustomInfoDialog(wx.Dialog):
         self.InfoBox = wx.StaticBox(self.panel, label="[i]")
         if "--debug" in sys.argv:
             self.InfoBox.SetLabel("[i] <-> RUNNING IN DEBUG MODE")
-        self.LogoBitmap = wx.StaticBitmap(self.InfoBox, bitmap=wx.Bitmap(PraktiCalcIconPath))
+        if platform.system() == "Darwin":
+            self.LogoBitmap = wx.StaticBitmap(self.InfoBox, bitmap=wx.Bitmap(PraktiCalcIconPath), size=wx.Size(128, 128))
+        else:
+            self.LogoBitmap = wx.StaticBitmap(self.InfoBox, bitmap=wx.Bitmap(PraktiCalcIconPath))
         self.StaticInfoText = wx.StaticText(self.InfoBox, label=infotext + "\n")
         self.InfoBoxSizer = wx.GridBagSizer()
         self.InfoBoxSizer.Add(self.LogoBitmap, pos=(0, 0), flag=wx.ALIGN_CENTER | wx.ALL, border=5)
