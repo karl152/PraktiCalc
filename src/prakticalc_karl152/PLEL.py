@@ -109,7 +109,7 @@ if Path("./usr/share/tcltk/ttkthemes").exists():
 
 if RunningAsOneFileExe == True:
     if platform.system() == "Darwin":
-        PraktiCalcMacIconPath = (sys._MEIPASS + "/PLEL_macOS.png")
+        PraktiCalcMacIconPath = (sys._MEIPASS + "/PLEL-macOS.png")
     PraktiCalcIconPath = (sys._MEIPASS + "/PLEL.png")
     PraktiCalcIconMonoPath = (sys._MEIPASS + "/PraktiCalculator_icon.xbm")
     PraktiCalcIconMonoInvertedPath = (sys._MEIPASS + "/PraktiCalculator_icon_inverted.xbm")
@@ -118,7 +118,7 @@ if RunningAsOneFileExe == True:
     VBSErrorPath = (sys._MEIPASS + "/error.vbs")
 else:
     if platform.system() == "Darwin":
-        PraktiCalcMacIconPath = "PLEL_macOS.png"
+        PraktiCalcMacIconPath = "PLEL-macOS.png"
     PraktiCalcIconPath = "PLEL.png"
     PraktiCalcIconMonoPath = "PraktiCalculator_icon.xbm"
     PraktiCalcIconMonoInvertedPath = "PraktiCalculator_icon_inverted.xbm"
