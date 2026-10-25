@@ -24,7 +24,8 @@ import wx, wx.adv
 from tkinter import messagebox, colorchooser
 from pathlib import Path
 from decimal import Decimal
-import platform, subprocess, sys, shutil, math, time, configparser, importlib.util, webbrowser, zipfile, tempfile, hashlib, re, random, threading
+from packaging.version import Version
+import platform, subprocess, sys, shutil, math, time, configparser, importlib.util, webbrowser, zipfile, tempfile, hashlib, re, random, threading, zlib, collections, statistics
 if platform.system() == "Windows":
     import winreg, getpass
     from ctypes import wintypes
@@ -141,7 +142,7 @@ class MainWindow(wx.Frame):
         self.ToolMenuExtensionsItem = self.ToolMenu.Append(wx.NewIdRef(), "Extensions\tX")
         self.Bind(wx.EVT_MENU, lambda _: HistoryWindow(self, calculator), self.ToolMenuHistoryItem)
         self.Bind(wx.EVT_MENU, lambda _: SettingsWindow(self, calculator, cfg), self.ToolMenuSettingsItem)
-        self.Bind(wx.EVT_MENU, lambda _: ExtensionWindow(self, calculator, dialog, cfg), self.ToolMenuExtensionsItem)
+        self.Bind(wx.EVT_MENU, lambda _: ExtensionWindow(self, calculator, dialog, cfg).Show(), self.ToolMenuExtensionsItem)
         self.HelpMenu = wx.Menu()
         self.HelpMenuAboutItem = self.HelpMenu.Append(wx.NewIdRef(), "About\tI")
         self.Bind(wx.EVT_MENU, lambda _: dialog.info(self), self.HelpMenuAboutItem)
@@ -255,7 +256,7 @@ class MainWindow(wx.Frame):
             73: lambda _: dialog.info(self), # I
             115: lambda _: SettingsWindow(self, calculator, cfg), # s
             83: lambda _: SettingsWindow(self, calculator, cfg), # S
-            120: lambda _: ExtensionWindow(self, calculator, dialog, cfg), # x
+            120: lambda _: ExtensionWindow(self, calculator, dialog, cfg).Show(), # x
             88: lambda _: ExtensionWindow(self, calculator, dialog, cfg), # X
             99: lambda _: self.clear(calculator, cfg), # c
             67: lambda _: self.clear(calculator, cfg), # C
@@ -626,37 +627,216 @@ class HistoryWindow(wx.Frame):
         calculator.clearHistory()
         self.HistoryList.Clear()
 
-# extension window
-class ExtensionWindow(wx.Dialog):
-    def __init__(self, parent, calculator, dialog, cfg):
-        super().__init__(parent, title="[WIP] Extensions")
-        self.SetIcon(wx.Icon(PraktiCalcIconPath, wx.BITMAP_TYPE_PNG))
-        self.font = wx.Font(10, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
-        self.panel = wx.Panel(self)
-        self.sThing = wx.StaticText(self.panel, label=r""" _   ___   _
-|   |   |   |
-|   |   |   |
-|   \   /   |
-|    \_/    |
-|     _     |
-|    / \    |
-|_   \_/   _|""")
-        self.sThing.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_SCROLLBAR))
-        self.TextPartII = wx.StaticText(self.panel, label="""\nThe new PraktiCalc Extension system is far from done.
-As the Legacy Extension System relies on Tkinter, I
-couldn't just port it to wxPython, also because
-PraktiXtensions themselves depend on Tkinter.
-PraktiCalc 1.6 will support both PraktiXtensions and
-new PraktiCalc Extensions. Stay tuned!
-  ~Karl""")
-        self.sThing.SetFont(self.font)
-        self.TextPartII.SetFont(self.font)
-        self.sizer = wx.GridBagSizer(5)
-        self.sizer.Add(self.sThing, pos=(0, 0))
-        self.sizer.Add(self.TextPartII, pos=(0, 1))
-        self.panel.SetSizerAndFit(self.sizer)
+# extension window panel (Notebook, Toolbook, Listbook, Choicebook)
+class ExtensionWindowPanel(wx.Panel):
+    def __init__(self, parent, dialog, mode):
+        super().__init__(parent)
+        self.Dialog = dialog
+        self.Mode = mode
+        self.EasyModes = ("Notebook", "Toolbook", "Listbook", "Choicebook")
+        self.Images = wx.ImageList(16, 16)
+        self.Counter = 0
+        modes = {
+            "Notebook": wx.Notebook,
+            "Toolbook": wx.Toolbook,
+            "Listbook": wx.Listbook,
+            "Choicebook": wx.Choicebook
+            }
+        self.frame = modes.get(mode)(self)
+    def addPage(self, parent, instance, name, icon):
+        if self.Mode in self.EasyModes:
+            self.frame.AddPage(instance, name)
+            if icon.exists():
+                self.Images.Add(wx.Bitmap(str(icon), type=wx.BITMAP_TYPE_PNG))
+            else:
+                self.Images.Add(wx.ArtProvider.GetBitmap(wx.ART_EXECUTABLE_FILE, wx.ART_BUTTON, (16, 16)))
+            if self.Counter == 0:
+                self.frame.AssignImageList(self.Images)
+            self.frame.SetPageImage(self.Counter, self.Counter)
+            self.Counter += 1
+        else:
+            self.Dialog.error("Invalid frame container!", self.Parent)
+        self.frame.Fit()
         self.Fit()
-        self.Show()
+
+# extension window
+class ExtensionWindow(wx.Frame):
+    def __init__(self, parent, calculator, dialog, cfg):
+        super().__init__(parent, title="Extensions")
+        Containers = ("Notebook", "Toolbook", "Listbook", "Choicebook")
+        self.panel = ExtensionWindowPanel(self, dialog, Containers[random.randint(0, 3)])
+        if platform.system() == "Windows":
+            WinFolderMode = "Roaming" # -> Configuration (Local, Roaming)
+            if RunningAsOneFileExe == True:
+                if sys.executable == r"C:\Program Files\PraktiCalc\prakticalc.exe":
+                    self.FolderPath = Path.home() / "AppData" / WinFolderMode / "PraktiCalcExtensions"
+                else:
+                    f1 = Path(sys.executable).parent
+                    self.FolderPath = f1 / "extensions"
+            else:
+                self.FolderPath = Path.home() / "AppData" / WinFolderMode / "PraktiCalcExtensions"
+        elif platform.system() == "Darwin":
+            self.FolderPath = Path.home() / "Library" / "PraktiCalcExtensions"
+        else:
+            self.FolderPath = Path.home() / ".local" / "share" / "PraktiCalcExtensions"
+        self.sizer = wx.GridBagSizer()
+        self.sizer.AddGrowableRow(0)
+        self.sizer.AddGrowableCol(0)
+        self.sizer.Add(self.panel.frame, pos=(0, 0), flag=wx.EXPAND)
+        self.panel.SetSizerAndFit(self.sizer)
+        self.loadExtensions(parent, calculator, dialog)
+    def loadExtensions(self, parent, calculator, dialog): # loads extensions from the folder, writes default extensions to folder if folder doesn't exist
+        if not self.FolderPath.exists():
+            self.FolderPath.mkdir(parents=True)
+            # Embedded extensions
+            self.updateExtensionManager()
+        ContentIsThere = False
+        for f in self.FolderPath.iterdir():
+            if not str(f).endswith("__pycache__"):
+                ContentIsThere = True
+        if ContentIsThere == False:
+            dialog.error(f"There are no extensions installed. You can install some manually in {self.FolderPath},\nor delete that folder to reset the extension system, which reinstalls the extension manager.", parent)
+            self.Close()
+            return
+        # Updates for embedded extensions
+        if Path(self.FolderPath / "ExtensionManager.ini").exists():
+            ExtensionManagerMeta = configparser.ConfigParser()
+            ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini", encoding="utf-8")
+            if ExtensionManagerMeta["Metadata"]["version"] != "0.1":
+                self.updateExtensionManager()
+        # ---
+        for file in self.FolderPath.iterdir():
+            if file.suffix == ".py":
+                if Path(self.FolderPath / f"{file.stem}.ini").exists():
+                    data = configparser.ConfigParser()
+                    data.read(Path(self.FolderPath / f"{file.stem}.ini"), encoding="utf-8")
+                    compatibility = self.checkCompatibility(data["Compatibility"])
+                    if compatibility == False:
+                        dialog.error("This extension is incompatible with your Version of PraktiCalc and/or Python!", self)
+                        return
+                    integrity = self.checkHashes(data["Verification"], file)
+                    if integrity == False:
+                        dialog.error("This extension wasn't loaded because the cryptographic verification failed!", self)
+                        return
+                    canload = compatibility and integrity
+                    if canload == True:
+                        self.loadExtension(file, data["Metadata"]["name"], self.FolderPath / f"{file.stem}.png", parent, calculator, dialog)
+                    else:
+                        dialog.error("The extension couldn't be loaded!", parent)
+                else:
+                    self.loadExtension(file, file.stem, self.FolderPath / f"{file.stem}.png", parent, calculator, dialog)
+        self.Fit()
+    def checkCompatibility(self, compatData): # verifies compatibility with Python and PraktiCalc version
+        # Python
+        if compatData["minpython"] == "default":
+            minok = True
+        elif tuple(compatData["minpython"].split(".")) <= platform.python_version_tuple()[:-1]:
+            minok = True
+        else:
+            minok = False
+        if compatData["maxpython"] == "default":
+            maxok = True
+        elif tuple(compatData["maxpython"].split(".")) >= platform.python_version_tuple()[:-1]:
+            maxok = True
+        else:
+            maxok = False
+        # PraktiCalc
+        if compatData["minprakticalc"] == "default":
+            minpc = True
+        elif Version(compatData["minprakticalc"]) <= Version(PraktiCalcVersion):
+            minpc = True
+        else:
+            minpc = False
+        if compatData["maxprakticalc"] == "default":
+            maxpc = True
+        elif Version(compatData["maxprakticalc"]) >= Version(PraktiCalcVersion):
+            maxpc = True
+        else:
+            maxpc = False
+        return minok and maxok and minpc and maxpc
+    def checkHashes(self, cryptoData, file): # verifies integrity with hashes provided by the extension
+        with open(file, "rb") as openedFile:
+            fileData = openedFile.read()
+        hashfunctions = {
+            "sha256": hashlib.sha256(fileData).hexdigest(),
+            "sha2512": hashlib.sha512(fileData).hexdigest(),
+            "sha3512": hashlib.sha3_512(fileData).hexdigest(),
+            "adler32": hex(zlib.adler32(fileData))[2:]
+            }
+        results = []
+        for key in hashfunctions.keys():
+            if cryptoData[key] == "":
+                results.append(True)
+            elif cryptoData[key] == hashfunctions.get(key):
+                results.append(True)
+            else:
+                results.append(False)
+        if False in results:
+            return False
+        else:
+            return True
+    def loadExtension(self, file, name, iconpath, parent, calculator, dialog): # directly loads an extension into the window
+        spec = importlib.util.spec_from_file_location(file.stem, file)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        classs = getattr(module, file.stem)
+        instance = classs(self.panel.frame, self, parent, calculator, dialog)
+        self.panel.addPage(self, instance, name, iconpath)
+        print("loaded extension " + name)
+    def updateExtensionManager(self): # updates extension manager extension to the version embedded here
+        if Path(self.FolderPath / "ExtensionManager.py").exists():
+            Path(self.FolderPath / "ExtensionManager.py").unlink()
+            Path(self.FolderPath / "ExtensionManager.ini").unlink(missing_ok=True)
+            Path(self.FolderPath / "ExtensionManager.txt").unlink(missing_ok=True)
+        if not Path(self.FolderPath / "ExtensionManager.py").exists():
+            ExtensionManagerCode = r"""# PraktiCalc Extension Manager
+# Copyright (C) 2026 Karl Wesseler
+# SPDX-License-Identifier: GPL-3.0-only
+
+import wx, subprocess, shutil
+
+class ExtensionManager(wx.Panel):
+    def __init__(self, tabs, parent, mainWin, calculator, dialog):
+        super().__init__(tabs)
+        self.label = wx.StaticText(self, label="Welcome, this is the new extension system.\nWell, there is no documentation and no extensions so far...\nThis is a placeholder for the new extension manager.")
+        self.btn = wx.Button(self, label="Open extension folder")
+        self.btn.Bind(wx.EVT_BUTTON, lambda _: subprocess.Popen(["xdg-open", str(parent.FolderPath)]))
+        if not shutil.which("xdg-open"):
+            self.btn.Disable()
+        self.sizer = wx.GridBagSizer()
+        self.sizer.Add(self.label, pos=(0, 0))
+        self.sizer.Add(self.btn, pos=(1, 1))
+        self.SetSizerAndFit(self.sizer)"""
+            ExtensionManagerMetadata = configparser.ConfigParser()
+            ExtensionManagerMetadata["PraktiCalcExtension"] = {"extensionspec": "1.0"}
+            ExtensionManagerMetadata["Metadata"] = {"name": "Extension Manager",
+                                                    "version": "0.1",
+                                                    "filename": "ExtensionManager.py",
+                                                    "author": "Karl Wesseler",
+                                                    "description": "The PraktiCalc Extension Manager",
+                                                    "color": "",
+                                                    "website": "",
+                                                    "requiresinternet": "false"
+                                                    }
+            ExtensionManagerMetadata["Compatibility"] = {"minprakticalc": "1.6",
+                                                         "maxprakticalc": "default",
+                                                         "minpython": "default",
+                                                         "maxpython": "default"
+                                                         }
+            ExtensionManagerMetadata["Verification"] = {"sha256": "",
+                                                        "sha2512": "",
+                                                        "sha3512": "",
+                                                        "adler32": "",
+                                                        "md6": ""
+                                                        }
+            ExtensionManagerMetadata["Configuration"] = {"key": "value"} # example
+            ExtensionManagerDescription = "A placeholder for the new extension manager"
+            with open(self.FolderPath / "ExtensionManager.py", "w", encoding="utf-8") as emfile:
+                emfile.write(ExtensionManagerCode)
+            with open(self.FolderPath / "ExtensionManager.ini", "w", encoding="utf-8") as emmeta:
+                ExtensionManagerMetadata.write(emmeta)
+            with open(self.FolderPath / "ExtensionManager.txt", "w", encoding="utf-8") as emdesc:
+                emdesc.write(ExtensionManagerDescription)
 
 # console
 class Console:
