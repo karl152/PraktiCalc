@@ -709,7 +709,7 @@ class MainWindow(tk.Tk):
             "Set memory": lambda: self.setMemory(calculator),
             "Get memory": lambda: self.getMemory(calculator, cfg),
             "Add to memory": lambda: self.addToMemory(calculator, helper, dialog),
-            "Subtract from memory": lambda: self.subtractFromMemory(calculator),
+            "Subtract from memory": lambda: self.subtractFromMemory(calculator, helper, dialog),
             "Append to memory": lambda: self.appendToMemory(calculator),
             "Clear memory": lambda: self.clearMemory(calculator)
             }
@@ -943,8 +943,11 @@ class MainWindow(tk.Tk):
         except Exception as e:
             dialog.error(str(e), self, helper)
         self.refreshMemoryDisplay(calculator)
-    def subtractFromMemory(self, calculator):
-        calculator.subtractFromMemory()
+    def subtractFromMemory(self, calculator, helper, dialog):
+        try:
+            calculator.subtractFromMemory()
+        except Exception as e:
+            dialog.error(str(e), self, helper)
         self.refreshMemoryDisplay(calculator)
     def clearMemory(self, calculator):
         calculator.clearMemory()
