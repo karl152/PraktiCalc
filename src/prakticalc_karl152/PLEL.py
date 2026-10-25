@@ -453,25 +453,26 @@ class ExtensionWindow(tk.Tk):
                         canload = True
                     else:
                         canload = False
-                    if canload == True:
-                        spec = importlib.util.spec_from_file_location(file.stem, file)
-                        module = importlib.util.module_from_spec(spec)
-                        spec.loader.exec_module(module)
-                        classs = getattr(module, file.stem)
-                        instance = classs(self.Tabs, self, parent, helper, calculator, dialog, helper.DarkMode)
-                        self.Tabs.add(instance, text=meta["PraktiXtension"]["name"])
-                        print("loaded extension " + meta["PraktiXtension"]["name"])
+                    with open(file, mode="rb") as extfile:
+                        content = extfile.read()
+                    if meta["PraktiXtension"]["sha256"] == "" or hashlib.sha256(content).hexdigest() == meta["PraktiXtension"]["sha256"]:
+                        if canload == True:
+                            self.loadExtension(file, meta["PraktiXtension"]["name"], parent, helper, calculator, dialog)
+                        else:
+                            dialog.error("Incompatible Python version", parent, helper)
                     else:
-                        dialog.error("Incompatible Python version", parent, helper)
+                        dialog.error("An extension couldn't be loaded because the cryptographic verification failed!", parent, helper)
                 else:
-                    spec = importlib.util.spec_from_file_location(file.stem, file)
-                    module = importlib.util.module_from_spec(spec)
-                    spec.loader.exec_module(module)
-                    classs = getattr(module, file.stem)
-                    instance = classs(self.Tabs, self, parent, helper, calculator, dialog, helper.DarkMode)
-                    self.Tabs.add(instance, text=file.stem)
-                    print("loaded extension " + file.stem)
+                    self.loadExtension(file, file.stem, parent, helper, calculator, dialog)
         self.geometry(f"{int(700*parent.ScaleFactor)}x{int(500*parent.ScaleFactor)}")
+    def loadExtension(self, file, name, parent, helper, calculator, dialog): # unified method to directly load an extension
+        spec = importlib.util.spec_from_file_location(file.stem, file)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        classs = getattr(module, file.stem)
+        instance = classs(self.Tabs, self, parent, helper, calculator, dialog, helper.DarkMode)
+        self.Tabs.add(instance, text=name)
+        print("loaded extension " + name)
     def updateDecimalConverter(self): # updates decimal converter extension to the version embedded here
         if Path(self.FolderPath / "DecimalConverter.py").exists():
             Path(self.FolderPath / "DecimalConverter.py").unlink()
