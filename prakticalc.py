@@ -1344,10 +1344,15 @@ class ExtensionWindow(tk.Toplevel):
                         canload = True
                     else:
                         canload = False
-                    if canload == True:
-                        self.loadExtension(file, meta["PraktiXtension"]["name"], parent, helper, calculator, dialog)
+                    with open(file, mode="rb") as extfile:
+                        content = extfile.read()
+                    if meta["PraktiXtension"]["sha256"] == "" or hashlib.sha256(content).hexdigest() == meta["PraktiXtension"]["sha256"]:
+                        if canload == True:
+                            self.loadExtension(file, meta["PraktiXtension"]["name"], parent, helper, calculator, dialog)
+                        else:
+                            dialog.error("Incompatible Python version", parent, helper)
                     else:
-                        dialog.error("Incompatible Python version", parent, helper)
+                        dialog.error("An extension couldn't be loaded because the cryptographic verification failed!", parent, helper)
                 else:
                     self.loadExtension(file, file.stem, parent, helper, calculator, dialog)
         self.geometry(f"{int(700*parent.ScaleFactor)}x{int(500*parent.ScaleFactor)}")
