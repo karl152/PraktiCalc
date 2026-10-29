@@ -712,11 +712,11 @@ class ExtensionWindow(wx.Frame):
                     data.read(Path(self.FolderPath / f"{file.stem}.ini"), encoding="utf-8")
                     compatibility = self.checkCompatibility(data["Compatibility"])
                     if compatibility == False:
-                        dialog.error(f"{data["Metadata"]["name"]} is incompatible with your Version of PraktiCalc and/or Python!", self)
+                        dialog.error(f"{data['Metadata']['name']} is incompatible with your Version of PraktiCalc and/or Python!", self)
                         continue
                     integrity = self.checkHashes(data["Verification"], file)
                     if integrity == False:
-                        dialog.error(f"{data["Metadata"]["name"]} wasn't loaded because the cryptographic verification failed!", self)
+                        dialog.error(f"{data['Metadata']['name']} wasn't loaded because the cryptographic verification failed!", self)
                         continue
                     canload = compatibility and integrity
                     if canload == True:
