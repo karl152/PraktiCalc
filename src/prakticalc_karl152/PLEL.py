@@ -64,7 +64,7 @@ elif platform.system() == "Darwin":
 else:
     WingWebDings = False
     NativeTheme = "default"
-    AdditionalLinuxMsgBoxStyles = ["xmessage", "gxmessage", "wmessage", "yad", "kdialog", "zenity", "Xdialog", "notify-send"]
+    AdditionalLinuxMsgBoxStyles = ["xmessage", "gxmessage", "wmessage", "yad", "kdialog", "xenity", "zenity", "Xdialog", "notify-send"]
     for MsgBoxStyle in AdditionalLinuxMsgBoxStyles:
         if shutil.which(MsgBoxStyle):
             MsgBoxStyles.append(MsgBoxStyle)
@@ -284,6 +284,7 @@ Licensed under the GPLv3"""
                     "wmessage": lambda: subprocess.Popen(["wmessage", "-title", "About PLEL", "-buttons", "OK", "-default", "OK", infotext]),
                     "yad": lambda: subprocess.Popen(["yad", "--title=About PLEL", "--info", "--image=" + PraktiCalcIconPath, "--button=OK", "--text=" + infotext]),
                     "kdialog": lambda: subprocess.Popen(["kdialog", "--title=About PLEL", "--msgbox", infotext]),
+                    "xenity": lambda: subprocess.Popen(["xenity", "--title=About PLEL", "--info", "--text=" + infotext]),
                     "zenity": lambda: subprocess.Popen(["zenity", "--title=About PLEL", "--info", "--icon=" + PraktiCalcIconPath, "--text=" + infotext]),
                     "AppleScript": lambda: subprocess.run(["osascript", "-e", f'display dialog "{infotext}" with icon POSIX file "{PraktiCalcIconPath}" with title "About PraktiCalc"']),
                     "Xdialog": lambda: subprocess.Popen(["Xdialog", "--title=About PLEL", "--msgbox", infotext.replace("\u00a9", "(C)"), "10", "40"]),
@@ -344,6 +345,7 @@ Licensed under the GPLv3"""
                     "wmessage": lambda: subprocess.Popen(["wmessage", "-title", "Error", "-buttons", "OK", "-default", "OK", "[X] " + message]),
                     "yad": lambda: subprocess.Popen(["yad", "--title=Error", "--error", "--image=dialog-error", "--button=OK", "--no-markup", "--text", message]),
                     "kdialog": lambda: subprocess.Popen(["kdialog", "--title=Error", "--error", message]),
+                    "xenity": lambda: subprocess.Popen(["xenity", "--title=Error", "--error", "--no-markup", "--text", message]),
                     "zenity": lambda: subprocess.Popen(["zenity", "--title=Error", "--error", "--no-markup", "--text", message]),
                     "AppleScript": lambda: subprocess.run(["osascript", "-e", f'display dialog "{message}" with icon stop with title "Error"']),
                     "Xdialog": lambda: subprocess.Popen(["Xdialog", "--title=Error", "--msgbox", message, "10", "40"]),
