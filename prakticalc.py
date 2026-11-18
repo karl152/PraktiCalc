@@ -35,7 +35,7 @@ from decimal import Decimal
 # variables
 CLIHelp = "--help" in sys.argv
 CLIVersion = "--version" in sys.argv
-PraktiCalcVersion = "1.3.6"
+PraktiCalcVersion = "1.3.7"
 BypassWindowsDPIFix = "--nodpiawareness" in sys.argv
 if platform.system() == "Windows":
     MsgBoxStyles = ["Tkinter", "Alternative", "VBS"]
@@ -453,6 +453,7 @@ def Settings() :
         MsgBoxStyleSelect.current(CurrentMsgBoxStyle)
     except:
         MsgBoxStyleSelect.set("[X] Invalid selection!")
+    MsgBoxStyleSelect.config(state="readonly")
     SettingsOKButton = ttk.Button(SettingsWindowFrame, text="OK", command=loadTheme)
     SettingsWindowFrame.grid(row=0, column=0, sticky="nesw")
     StatusBarToggle.grid(row=0, column=0, sticky="w", padx=10)
