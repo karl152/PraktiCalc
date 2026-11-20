@@ -692,6 +692,7 @@ class ExtensionWindow(wx.Frame):
             self.FolderPath.mkdir(parents=True)
             # Embedded extensions
             self.updateExtensionManager()
+            self.updateDecimalConverter()
         ContentIsThere = False
         for f in self.FolderPath.iterdir():
             if not str(f).endswith("__pycache__"):
@@ -706,6 +707,11 @@ class ExtensionWindow(wx.Frame):
             ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini", encoding="utf-8")
             if ExtensionManagerMeta["Metadata"]["version"] != "0.1":
                 self.updateExtensionManager()
+        if Path(self.FolderPath / "DecimalConverter.ini").exists():
+            ExtensionManagerMeta = configparser.ConfigParser()
+            ExtensionManagerMeta.read(self.FolderPath / "DecimalConverter.ini", encoding="utf-8")
+            if ExtensionManagerMeta["Metadata"]["version"] != "2.0":
+                self.updateDecimalConverter()
         # ---
         for file in self.FolderPath.iterdir():
             if file.suffix == ".py":
@@ -838,6 +844,90 @@ class ExtensionManager(wx.Panel):
             with open(self.FolderPath / "ExtensionManager.ini", "w", encoding="utf-8") as emmeta:
                 ExtensionManagerMetadata.write(emmeta)
             with open(self.FolderPath / "ExtensionManager.txt", "w", encoding="utf-8") as emdesc:
+                emdesc.write(ExtensionManagerDescription)
+    def updateDecimalConverter(self):
+        if Path(self.FolderPath / "DecimalConverter.py").exists():
+            Path(self.FolderPath / "DecimalConverter.py").unlink()
+            Path(self.FolderPath / "DecimalConverter.ini").unlink(missing_ok=True)
+            Path(self.FolderPath / "DecimalConverter.txt").unlink(missing_ok=True)
+        if not Path(self.FolderPath / "DecimalConverter.py").exists():
+            ExtensionManagerCode = r"""# PraktiCalc Decimal Converter
+# Copyright (C) 2024-2026 Karl Wesseler
+# SPDX-License-Identifier: GPL-3.0-only
+
+import wx
+
+class DecimalConverter(wx.Panel):
+    def __init__(self, tabs, parent, mainWin, calculator, dialog):
+        super().__init__(tabs)
+        self.DecimalInputLabel = wx.StaticText(self, label="Decimal")
+        self.BinaryOutputLabel = wx.StaticText(self, label="Binary")
+        self.HexadecimalOutputLabel = wx.StaticText(self, label="Hexadecimal")
+        self.DecimalInput = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.DecimalInput.Bind(wx.EVT_TEXT_ENTER, lambda event: self.update(event, dialog, parent))
+        self.BinaryOutput = wx.TextCtrl(self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_CHARWRAP)
+        self.HexadecimalOutput = wx.TextCtrl(self, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_CHARWRAP)
+        self.BinaryCopyButton = wx.Button(self, label="Copy")
+        self.HexadecimalCopyButton = wx.Button(self, label="Copy")
+        self.BinaryCopyButton.Bind(wx.EVT_BUTTON, lambda _: self.copy(self.BinaryOutput.GetValue()))
+        self.HexadecimalCopyButton.Bind(wx.EVT_BUTTON, lambda _: self.copy(self.HexadecimalOutput.GetValue()))
+        self.sizer = wx.GridBagSizer()
+        self.sizer.Add(self.DecimalInputLabel, pos=(0, 0), span=(1, 2), flag=wx.EXPAND)
+        self.sizer.Add(self.DecimalInput, pos=(1, 0), span=(1, 2), flag=wx.EXPAND)
+        self.sizer.Add(self.BinaryOutputLabel, pos=(2, 0), flag=wx.EXPAND)
+        self.sizer.Add(self.BinaryOutput, pos=(3, 0), flag=wx.EXPAND)
+        self.sizer.Add(self.BinaryCopyButton, pos=(4, 0), flag=wx.EXPAND)
+        self.sizer.Add(self.HexadecimalOutputLabel, pos=(2, 1), flag=wx.EXPAND)
+        self.sizer.Add(self.HexadecimalOutput, pos=(3, 1), flag=wx.EXPAND)
+        self.sizer.Add(self.HexadecimalCopyButton, pos=(4, 1), flag=wx.EXPAND)
+        self.sizer.AddGrowableRow(3)
+        self.sizer.AddGrowableCol(0)
+        self.sizer.AddGrowableCol(1)
+        self.SetSizerAndFit(self.sizer)
+    def update(self, event, dialog, parent):
+        try:
+            DecimalNumber = int(self.DecimalInput.GetValue())
+        except:
+            dialog.error("Please enter a real number!", parent)
+            return
+        self.BinaryOutput.SetValue(str(bin(DecimalNumber))[2:])
+        self.HexadecimalOutput.SetValue(str(hex(DecimalNumber)).upper()[2:])
+        event.Skip()
+    def copy(self, value):
+        DataObj = wx.TextDataObject()
+        DataObj.SetText(value)
+        wx.TheClipboard.Open()
+        wx.TheClipboard.SetData(DataObj)
+        wx.TheClipboard.Close()"""
+            ExtensionManagerMetadata = configparser.ConfigParser()
+            ExtensionManagerMetadata["PraktiCalcExtension"] = {"extensionspec": "1.0"}
+            ExtensionManagerMetadata["Metadata"] = {"name": "Decimal Converter",
+                                                    "version": "2.0",
+                                                    "filename": "DecimalConverter.py",
+                                                    "author": "Karl Wesseler",
+                                                    "description": "The PraktiCalc Decimal Converter",
+                                                    "color": "",
+                                                    "website": "",
+                                                    "requiresinternet": "false"
+                                                    }
+            ExtensionManagerMetadata["Compatibility"] = {"minprakticalc": "1.6",
+                                                         "maxprakticalc": "default",
+                                                         "minpython": "default",
+                                                         "maxpython": "default"
+                                                         }
+            ExtensionManagerMetadata["Verification"] = {"sha256": "",
+                                                        "sha2512": "",
+                                                        "sha3512": "",
+                                                        "adler32": "",
+                                                        "md6": ""
+                                                        }
+            ExtensionManagerMetadata["Configuration"] = {"key": "value"} # example
+            ExtensionManagerDescription = "The Decimal Converter, present in PraktiCalc like always.\n\nChangelog:\nv2.0: rewrote the entire extension for PraktiCalc 1.6, added multiline output, removed OK button"
+            with open(self.FolderPath / "DecimalConverter.py", "w", encoding="utf-8") as emfile:
+                emfile.write(ExtensionManagerCode)
+            with open(self.FolderPath / "DecimalConverter.ini", "w", encoding="utf-8") as emmeta:
+                ExtensionManagerMetadata.write(emmeta)
+            with open(self.FolderPath / "DecimalConverter.txt", "w", encoding="utf-8") as emdesc:
                 emdesc.write(ExtensionManagerDescription)
 
 # console
