@@ -702,16 +702,17 @@ class ExtensionWindow(wx.Frame):
             self.Close()
             return
         # Updates for embedded extensions
-        if Path(self.FolderPath / "ExtensionManager.ini").exists():
-            ExtensionManagerMeta = configparser.ConfigParser()
-            ExtensionManagerMeta.read(self.FolderPath / "ExtensionManager.ini", encoding="utf-8")
-            if ExtensionManagerMeta["Metadata"]["version"] != "0.1":
-                self.updateExtensionManager()
-        if Path(self.FolderPath / "DecimalConverter.ini").exists():
-            ExtensionManagerMeta = configparser.ConfigParser()
-            ExtensionManagerMeta.read(self.FolderPath / "DecimalConverter.ini", encoding="utf-8")
-            if ExtensionManagerMeta["Metadata"]["version"] != "2.0":
-                self.updateDecimalConverter()
+        BuiltInExtensions = {
+            "ExtensionManager": "0.1",
+            "DecimalConverter": "2.0"
+            }
+        Updaters = (self.updateExtensionManager, self.updateDecimalConverter)
+        for index, extension in enumerate(BuiltInExtensions):
+            if Path(self.FolderPath / f"{extension}.ini").exists():
+                Meta = configparser.ConfigParser()
+                Meta.read(self.FolderPath / f"{extension}.ini", encoding="utf-8")
+                if Meta["Metadata"]["version"] != BuiltInExtensions.get(extension):
+                    Updaters[index]()
         # ---
         for file in self.FolderPath.iterdir():
             if file.suffix == ".py":
@@ -792,12 +793,9 @@ class ExtensionWindow(wx.Frame):
         self.panel.addPage(self, instance, name, iconpath)
         print("loaded extension " + name)
     def updateExtensionManager(self): # updates extension manager extension to the version embedded here
-        if Path(self.FolderPath / "ExtensionManager.py").exists():
-            Path(self.FolderPath / "ExtensionManager.py").unlink()
-            Path(self.FolderPath / "ExtensionManager.ini").unlink(missing_ok=True)
-            Path(self.FolderPath / "ExtensionManager.txt").unlink(missing_ok=True)
+        self.deleteExistingExtension("ExtensionManager")
         if not Path(self.FolderPath / "ExtensionManager.py").exists():
-            ExtensionManagerCode = r"""# PraktiCalc Extension Manager
+            Code = r"""# PraktiCalc Extension Manager
 # Copyright (C) 2026 Karl Wesseler
 # SPDX-License-Identifier: GPL-3.0-only
 
@@ -815,9 +813,9 @@ class ExtensionManager(wx.Panel):
         self.sizer.Add(self.label, pos=(0, 0))
         self.sizer.Add(self.btn, pos=(1, 1))
         self.SetSizerAndFit(self.sizer)"""
-            ExtensionManagerMetadata = configparser.ConfigParser()
-            ExtensionManagerMetadata["PraktiCalcExtension"] = {"extensionspec": "1.0"}
-            ExtensionManagerMetadata["Metadata"] = {"name": "Extension Manager",
+            Metadata = configparser.ConfigParser()
+            Metadata["PraktiCalcExtension"] = {"extensionspec": "1.0"}
+            Metadata["Metadata"] = {"name": "Extension Manager",
                                                     "version": "0.1",
                                                     "filename": "ExtensionManager.py",
                                                     "author": "Karl Wesseler",
@@ -826,32 +824,24 @@ class ExtensionManager(wx.Panel):
                                                     "website": "",
                                                     "requiresinternet": "false"
                                                     }
-            ExtensionManagerMetadata["Compatibility"] = {"minprakticalc": "1.6",
+            Metadata["Compatibility"] = {"minprakticalc": "1.6",
                                                          "maxprakticalc": "default",
                                                          "minpython": "default",
                                                          "maxpython": "default"
                                                          }
-            ExtensionManagerMetadata["Verification"] = {"sha256": "",
+            Metadata["Verification"] = {"sha256": "",
                                                         "sha2512": "",
                                                         "sha3512": "",
                                                         "adler32": "",
                                                         "md6": ""
                                                         }
-            ExtensionManagerMetadata["Configuration"] = {"key": "value"} # example
-            ExtensionManagerDescription = "A placeholder for the new extension manager"
-            with open(self.FolderPath / "ExtensionManager.py", "w", encoding="utf-8") as emfile:
-                emfile.write(ExtensionManagerCode)
-            with open(self.FolderPath / "ExtensionManager.ini", "w", encoding="utf-8") as emmeta:
-                ExtensionManagerMetadata.write(emmeta)
-            with open(self.FolderPath / "ExtensionManager.txt", "w", encoding="utf-8") as emdesc:
-                emdesc.write(ExtensionManagerDescription)
+            Metadata["Configuration"] = {"key": "value"} # example
+            Description = "A placeholder for the new extension manager"
+            self.writeExtension("ExtensionManager", Code, Metadata, Description)
     def updateDecimalConverter(self):
-        if Path(self.FolderPath / "DecimalConverter.py").exists():
-            Path(self.FolderPath / "DecimalConverter.py").unlink()
-            Path(self.FolderPath / "DecimalConverter.ini").unlink(missing_ok=True)
-            Path(self.FolderPath / "DecimalConverter.txt").unlink(missing_ok=True)
+        self.deleteExistingExtension("DecimalConverter")
         if not Path(self.FolderPath / "DecimalConverter.py").exists():
-            ExtensionManagerCode = r"""# PraktiCalc Decimal Converter
+            Code = r"""# PraktiCalc Decimal Converter
 # Copyright (C) 2024-2026 Karl Wesseler
 # SPDX-License-Identifier: GPL-3.0-only
 
@@ -899,9 +889,9 @@ class DecimalConverter(wx.Panel):
         wx.TheClipboard.Open()
         wx.TheClipboard.SetData(DataObj)
         wx.TheClipboard.Close()"""
-            ExtensionManagerMetadata = configparser.ConfigParser()
-            ExtensionManagerMetadata["PraktiCalcExtension"] = {"extensionspec": "1.0"}
-            ExtensionManagerMetadata["Metadata"] = {"name": "Decimal Converter",
+            Metadata = configparser.ConfigParser()
+            Metadata["PraktiCalcExtension"] = {"extensionspec": "1.0"}
+            Metadata["Metadata"] = {"name": "Decimal Converter",
                                                     "version": "2.0",
                                                     "filename": "DecimalConverter.py",
                                                     "author": "Karl Wesseler",
@@ -910,25 +900,35 @@ class DecimalConverter(wx.Panel):
                                                     "website": "",
                                                     "requiresinternet": "false"
                                                     }
-            ExtensionManagerMetadata["Compatibility"] = {"minprakticalc": "1.6",
+            Metadata["Compatibility"] = {"minprakticalc": "1.6",
                                                          "maxprakticalc": "default",
                                                          "minpython": "default",
                                                          "maxpython": "default"
                                                          }
-            ExtensionManagerMetadata["Verification"] = {"sha256": "",
+            Metadata["Verification"] = {"sha256": "",
                                                         "sha2512": "",
                                                         "sha3512": "",
                                                         "adler32": "",
                                                         "md6": ""
                                                         }
-            ExtensionManagerMetadata["Configuration"] = {"key": "value"} # example
-            ExtensionManagerDescription = "The Decimal Converter, present in PraktiCalc like always.\n\nChangelog:\nv2.0: rewrote the entire extension for PraktiCalc 1.6, added multiline output, removed OK button"
-            with open(self.FolderPath / "DecimalConverter.py", "w", encoding="utf-8") as emfile:
-                emfile.write(ExtensionManagerCode)
-            with open(self.FolderPath / "DecimalConverter.ini", "w", encoding="utf-8") as emmeta:
-                ExtensionManagerMetadata.write(emmeta)
-            with open(self.FolderPath / "DecimalConverter.txt", "w", encoding="utf-8") as emdesc:
-                emdesc.write(ExtensionManagerDescription)
+            Metadata["Configuration"] = {"key": "value"} # example
+            Description = "The Decimal Converter, present in PraktiCalc like always.\n\nChangelog:\nv2.0: rewrote the entire extension for PraktiCalc 1.6, added multiline output, removed OK button"
+            self.writeExtension("DecimalConverter", Code, Metadata, Description)
+    def deleteExistingExtension(self, extension):
+        if Path(self.FolderPath / f"{extension}.py").exists():
+            Path(self.FolderPath / f"{extension}.py").unlink()
+            Path(self.FolderPath / f"{extension}.ini").unlink(missing_ok=True)
+            Path(self.FolderPath / f"{extension}.txt").unlink(missing_ok=True)
+            return True
+        else:
+            return False
+    def writeExtension(self, name, code, metadata, description):
+        with open(self.FolderPath / f"{name}.py", "w", encoding="utf-8") as codeFile:
+            codeFile.write(code)
+        with open(self.FolderPath / f"{name}.ini", "w", encoding="utf-8") as metadataFile:
+            metadata.write(metadataFile)
+        with open(self.FolderPath / f"{name}.txt", "w", encoding="utf-8") as descriptionFile:
+            descriptionFile.write(description)
 
 # console
 class Console:
